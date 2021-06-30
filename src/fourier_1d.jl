@@ -20,23 +20,14 @@ function get_data()
     y_data = read(file, "u")[1:n_train, 1:subsampling_rate:end]
     close(file)
 
-    grid = LinRange(0, 1, total_grid_size)
+    grid = reshape(repeat(LinRange(0, 1, total_grid_size), n_train),(total_grid_size, n_train))'
+    x_data = cat(x_data, grid, dims=3)
 
-    new_x_data = zeros(n_train, total_grid_size, 2)
-    new_x_data[:, :, 1] = x_data
-    for i in 1:n_train
-        new_x_data[i, :, 2] = grid
-    end
-
-    return new_x_data, y_data
+    return x_data, y_data
 end
 
-x, y= get_data()
-
-# size(x)
-x[1, :, :]
-# function preprocess()
-# end
+function preprocess()
+end
 
 ##################
 # SpectralConv1d #
