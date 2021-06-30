@@ -1,5 +1,4 @@
 module NeuralOperators
-
-# Write your package code here.
-
+    using CUDA: reshape
+include("fourier_1d.jl")
 end

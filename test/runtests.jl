@@ -2,5 +2,5 @@ using NeuralOperators
 using Test
 
 @testset "NeuralOperators.jl" begin
-    # Write your tests here.
+    include("fourier_1d.jl")
 end
