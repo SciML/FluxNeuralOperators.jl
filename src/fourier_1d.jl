@@ -10,17 +10,13 @@ export get_data, preprocess
 # preprocess #
 ##############
 
-function get_data()
-    n_train = 1000
-    subsampling_rate = 2^3
-    total_grid_size = div(2^13, subsampling_rate)
-
+function get_data(n=1000, Δsamples=2^3, grid_size=div(2^13, Δsamples))
     file = matopen("data/burgers_data_R10.mat")
-    x_data = read(file, "a")[1:n_train, 1:subsampling_rate:end]
-    y_data = read(file, "u")[1:n_train, 1:subsampling_rate:end]
+    x_data = read(file, "a")[1:n, 1:Δsamples:end]
+    y_data = read(file, "u")[1:n, 1:Δsamples:end]
     close(file)
 
-    grid = reshape(repeat(LinRange(0, 1, total_grid_size), n_train),(total_grid_size, n_train))'
+    grid = reshape(repeat(LinRange(0, 1, grid_size), n),(grid_size, n))'
     x_data = cat(x_data, grid, dims=3)
 
     return x_data, y_data
