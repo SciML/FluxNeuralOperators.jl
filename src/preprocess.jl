@@ -22,15 +22,19 @@ end
 
 function get_data(; n=1000, Δsamples=2^3, grid_size=div(2^13, Δsamples))
     file = matopen(joinpath(datadep"BurgersR10", "burgers_data_R10.mat"))
-    x_data = read(file, "a")[1:n, 1:Δsamples:end]
-    y_data = read(file, "u")[1:n, 1:Δsamples:end]
+    x_data = collect(read(file, "a")[1:n, 1:Δsamples:end]')
+    y_data = collect(read(file, "u")[1:n, 1:Δsamples:end]')
     close(file)
-
-    grid = reshape(repeat(LinRange(0, 1, grid_size), n),(grid_size, n))'
-    x_data = cat(x_data, grid, dims=3)
 
     return x_data, y_data
 end
 
-function preprocess()
+function preprocess(x_data, y_data)
+    grid_size, n = size(x_data)
+    x_loc_data = Array{Float64, 3}(undef, grid_size, 2, n)
+
+    x_loc_data[:, 1, :] .= reshape(repeat(LinRange(0, 1, grid_size), n), (grid_size, n))
+    x_loc_data[:, 2, :] .= x_data
+
+    return x_loc_data, y_data
 end
