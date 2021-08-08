@@ -4,8 +4,9 @@ authors = ["JingYu Ning <foldfelis@gmail.com> and contributors"]
 version = "0.1.0"
 
 [deps]
-CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
+DataDeps = "124859b0-ceae-595e-8997-d05f6a7a8dfe"
 FFTW = "7a1cc6ca-52ef-59f5-83cd-3a7055c09341"
+Fetch = "bb354801-46f6-40b6-9c3d-d42d7a74c775"
 Flux = "587475ba-b771-5e3f-ad9e-33799f191a9c"
 MAT = "23992714-dd62-5051-b70f-ba57cb901cac"
 
