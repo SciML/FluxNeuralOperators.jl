@@ -3,8 +3,7 @@ using Fetch
 using MAT
 
 export
-    get_data,
-    preprocess
+    get_data
 
 function register_datasets()
     register(DataDep(
@@ -26,13 +25,7 @@ function get_data(; n=1000, Δsamples=2^3, grid_size=div(2^13, Δsamples))
     y_data = collect(read(file, "u")[1:n, 1:Δsamples:end]')
     close(file)
 
-    return x_data, y_data
-end
-
-function preprocess(x_data, y_data)
-    grid_size, n = size(x_data)
-    x_loc_data = Array{Float64, 3}(undef, grid_size, 2, n)
-
+    x_loc_data = Array{Float32, 3}(undef, grid_size, 2, n)
     x_loc_data[:, 1, :] .= reshape(repeat(LinRange(0, 1, grid_size), n), (grid_size, n))
     x_loc_data[:, 2, :] .= x_data
 
