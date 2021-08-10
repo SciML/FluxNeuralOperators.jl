@@ -45,7 +45,7 @@ function (m::SpectralConv1d)(𝐱::AbstractArray)
     return m.σ.(𝐱_out)
 end
 
-function FourierBlock(
+function FourierOperator(
     ch::Pair{<:Integer,<:Integer},
     modes::Integer,
     σ=identity
@@ -65,10 +65,10 @@ function FNO()
 
     return Chain(
         Conv((1, ), 2=>64),
-        FourierBlock(ch, modes, relu),
-        FourierBlock(ch, modes, relu),
-        FourierBlock(ch, modes, relu),
-        FourierBlock(ch, modes),
+        FourierOperator(ch, modes, relu),
+        FourierOperator(ch, modes, relu),
+        FourierOperator(ch, modes, relu),
+        FourierOperator(ch, modes),
         Conv((1, ), 64=>128, relu),
         Conv((1, ), 128=>1),
         flatten
