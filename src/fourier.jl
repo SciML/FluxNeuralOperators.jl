@@ -4,6 +4,7 @@ using Tullio
 
 export
     SpectralConv1d,
+    FourierOperator,
     FNO
 
 struct SpectralConv1d{T,S}
@@ -74,5 +75,3 @@ function FNO()
         flatten
     )
 end
-
-# loss(m::SpectralConv1d, x, x̂) = sum(abs2, x̂ .- m(x)) / len
