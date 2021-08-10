@@ -1,5 +1,8 @@
 module NeuralOperators
+    function __init__()
+        register_datasets()
+    end
 
-# Write your package code here.
-
+    include("preprocess.jl")
+    include("fourier.jl")
 end

@@ -3,6 +3,14 @@ uuid = "ea5c82af-86e5-48da-8ee1-382d6ad7af4b"
 authors = ["JingYu Ning <foldfelis@gmail.com> and contributors"]
 version = "0.1.0"
 
+[deps]
+DataDeps = "124859b0-ceae-595e-8997-d05f6a7a8dfe"
+FFTW = "7a1cc6ca-52ef-59f5-83cd-3a7055c09341"
+Fetch = "bb354801-46f6-40b6-9c3d-d42d7a74c775"
+Flux = "587475ba-b771-5e3f-ad9e-33799f191a9c"
+MAT = "23992714-dd62-5051-b70f-ba57cb901cac"
+Tullio = "bc48ee85-29a4-5162-ae0b-a64e1601d4bc"
+
 [compat]
 julia = "1.6"
 

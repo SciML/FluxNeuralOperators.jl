@@ -1,6 +1,9 @@
 using NeuralOperators
 using Test
 
+ENV["DATADEPS_ALWAYS_ACCEPT"] = true
+
 @testset "NeuralOperators.jl" begin
-    # Write your tests here.
+    include("preprocess.jl")
+    include("fourier.jl")
 end
