@@ -7,7 +7,9 @@ export
     FourierOperator,
     FNO
 
-struct SpectralConv1d{T,S}
+c_glorot_uniform(dims...) = Flux.glorot_uniform(dims...) + Flux.glorot_uniform(dims...) * im
+
+struct SpectralConv1d{T, S}
     weight::T
     in_channel::S
     out_channel::S
@@ -19,8 +21,8 @@ function SpectralConv1d(
     ch::Pair{<:Integer,<:Integer},
     modes::Integer,
     σ=identity;
-    init=Flux.glorot_uniform,
-    T::DataType=Float32
+    init=c_glorot_uniform,
+    T::DataType=ComplexF32
 )
     in_chs, out_chs = ch
     scale = one(T) / (in_chs * out_chs)
@@ -32,16 +34,17 @@ end
 Flux.@functor SpectralConv1d
 
 function (m::SpectralConv1d)(𝐱::AbstractArray)
-    𝐱_fft = rfft(𝐱, 1) # [x, in_chs, batch]
-    𝐱_selected = 𝐱_fft[1:m.modes, :, :] # [modes, in_chs, batch]
+    𝐱_fft = fft(𝐱, 2) # [in_chs, x, batch]
+    𝐱_selected = 𝐱_fft[:, 1:m.modes, :] # [in_chs, modes, batch]
 
-    # [modes, out_chs, batch] <- [modes, in_chs, batch] [out_chs, in_chs, modes]
-    @tullio 𝐱_weighted[m, o, b] := 𝐱_selected[m, i, b] * m.weight[o, i, m]
+    # [out_chs, modes, batch] <- [in_chs, modes, batch] [out_chs, in_chs, modes]
+    @tullio 𝐱_weighted[o, m, b] := 𝐱_selected[i, m, b] * m.weight[o, i, m]
 
-    d = size(𝐱, 1) ÷ 2 + 1 - m.modes
-    𝐱_padded = cat(𝐱_weighted, zeros(Float32, d, size(𝐱)[2:end]...), dims=1)
+    s = size(𝐱_weighted)
+    d = size(𝐱, 2) - m.modes
+    𝐱_padded = cat(𝐱_weighted, zeros(ComplexF32, s[1], d, s[3:end]...), dims=2)
 
-    𝐱_out = irfft(𝐱_padded , size(𝐱, 1), 1)
+    𝐱_out = ifft(𝐱_padded, 2)
 
     return m.σ.(𝐱_out)
 end
@@ -53,7 +56,7 @@ function FourierOperator(
 )
     return Chain(
         Parallel(+,
-            Conv((1, ), ch),
+            Dense(ch.first, ch.second, init=c_glorot_uniform),
             SpectralConv1d(ch, modes)
         ),
         x -> σ.(x)
@@ -63,15 +66,16 @@ end
 function FNO()
     modes = 16
     ch = 64 => 64
+    σ = x -> @. log(1 + exp(x))
 
     return Chain(
-        Conv((1, ), 2=>64),
-        FourierOperator(ch, modes, relu),
-        FourierOperator(ch, modes, relu),
-        FourierOperator(ch, modes, relu),
+        Dense(2, 64, init=c_glorot_uniform),
+        FourierOperator(ch, modes, σ),
+        FourierOperator(ch, modes, σ),
+        FourierOperator(ch, modes, σ),
         FourierOperator(ch, modes),
-        Conv((1, ), 64=>128, relu),
-        Conv((1, ), 128=>1),
+        Dense(64, 128, σ, init=c_glorot_uniform),
+        Dense(128, 1, init=c_glorot_uniform),
         flatten
     )
 end
