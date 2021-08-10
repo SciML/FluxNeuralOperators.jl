@@ -11,13 +11,13 @@ struct SpectralConv1d{T,S}
     in_channel::S
     out_channel::S
     modes::S
-    σ::Function
+    σ
 end
 
 function SpectralConv1d(
     ch::Pair{<:Integer,<:Integer},
     modes::Integer,
-    σ::Function=identity;
+    σ=identity;
     init=Flux.glorot_uniform,
     T::DataType=Float32
 )
@@ -48,7 +48,7 @@ end
 function FourierBlock(
     ch::Pair{<:Integer,<:Integer},
     modes::Integer,
-    σ::Function=identity
+    σ=identity
 )
     return Chain(
         Parallel(+,
