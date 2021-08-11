@@ -59,7 +59,7 @@ uuid = "ca575930-c2e3-43a9-ace4-1e988b2c1908"
 
 [[NeuralOperators]]
 path = ".."
-uuid = "9ab867d4-5049-4b07-85bc-95379d8d6d9c"
+uuid = "ea5c82af-86e5-48da-8ee1-382d6ad7af4b"
 version = "0.1.0"
 
 [[Parsers]]
