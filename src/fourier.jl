@@ -1,7 +1,6 @@
 export
     SpectralConv1d,
-    FourierOperator,
-    FNO
+    FourierOperator
 
 struct SpectralConv1d{T, S}
     weight::T
