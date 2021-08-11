@@ -1,13 +1,12 @@
 using Flux
 using FFTW
 using Tullio
+using Zygote
 
 export
     SpectralConv1d,
     FourierOperator,
     FNO
-
-c_glorot_uniform(dims...) = Flux.glorot_uniform(dims...) + Flux.glorot_uniform(dims...) * im
 
 struct SpectralConv1d{T, S}
     weight::T
@@ -17,8 +16,12 @@ struct SpectralConv1d{T, S}
     σ
 end
 
+function c_glorot_uniform(dims...)
+    return Flux.glorot_uniform(dims...) + Flux.glorot_uniform(dims...) * im
+end
+
 function SpectralConv1d(
-    ch::Pair{<:Integer,<:Integer},
+    ch::Pair{<:Integer, <:Integer},
     modes::Integer,
     σ=identity;
     init=c_glorot_uniform,
@@ -28,7 +31,10 @@ function SpectralConv1d(
     scale = one(T) / (in_chs * out_chs)
     weights = scale * init(out_chs, in_chs, modes)
 
-    return SpectralConv1d(weights, in_chs, out_chs, modes, σ)
+    return Chain(
+        x -> Zygote.hook(real, x),
+        SpectralConv1d(weights, in_chs, out_chs, modes, σ)
+    )
 end
 
 Flux.@functor SpectralConv1d
@@ -46,17 +52,17 @@ function (m::SpectralConv1d)(𝐱::AbstractArray)
 
     𝐱_out = ifft(𝐱_padded, 2)
 
-    return m.σ.(𝐱_out)
+    return m.σ.(real(𝐱_out))
 end
 
 function FourierOperator(
-    ch::Pair{<:Integer,<:Integer},
+    ch::Pair{<:Integer, <:Integer},
     modes::Integer,
     σ=identity
 )
     return Chain(
         Parallel(+,
-            Dense(ch.first, ch.second, init=c_glorot_uniform),
+            Dense(ch.first, ch.second),
             SpectralConv1d(ch, modes)
         ),
         x -> σ.(x)
@@ -66,16 +72,16 @@ end
 function FNO()
     modes = 16
     ch = 64 => 64
-    σ = x -> @. log(1 + exp(x))
+    σ = relu
 
     return Chain(
-        Dense(2, 64, init=c_glorot_uniform),
+        Dense(2, 64),
         FourierOperator(ch, modes, σ),
         FourierOperator(ch, modes, σ),
         FourierOperator(ch, modes, σ),
         FourierOperator(ch, modes),
-        Dense(64, 128, σ, init=c_glorot_uniform),
-        Dense(128, 1, init=c_glorot_uniform),
+        Dense(64, 128, σ),
+        Dense(128, 1),
         flatten
     )
 end
