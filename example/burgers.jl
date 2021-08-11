@@ -32,4 +32,5 @@ function loss_test()
 end
 
 data = [(𝐱, 𝐲) for (𝐱, 𝐲) in loader_train] |> device
-Flux.@epochs 500 @time(Flux.train!(loss, params(m), data, Flux.ADAM(), cb=Flux.throttle(loss_test, 10)))
+opt = Flux.Optimiser(WeightDecay(1f-4), Flux.ADAM(1f-3))
+Flux.@epochs 500 @time(Flux.train!(loss, params(m), data, opt, cb=Flux.throttle(loss_test, 10)))
