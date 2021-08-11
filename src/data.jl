@@ -15,13 +15,13 @@ function register_datasets()
     ))
 end
 
-function get_burgers_data(; n=1000, Δsamples=2^3, grid_size=div(2^13, Δsamples))
+function get_burgers_data(; n=2048, Δsamples=2^3, grid_size=div(2^13, Δsamples), T=Float32)
     file = matopen(joinpath(datadep"BurgersR10", "burgers_data_R10.mat"))
-    x_data = collect(read(file, "a")[1:n, 1:Δsamples:end]')
-    y_data = collect(read(file, "u")[1:n, 1:Δsamples:end]')
+    x_data = T.(collect(read(file, "a")[1:n, 1:Δsamples:end]'))
+    y_data = T.(collect(read(file, "u")[1:n, 1:Δsamples:end]'))
     close(file)
 
-    x_loc_data = Array{Float32, 3}(undef, 2, grid_size, n)
+    x_loc_data = Array{T, 3}(undef, 2, grid_size, n)
     x_loc_data[1, :, :] .= reshape(repeat(LinRange(0, 1, grid_size), n), (grid_size, n))
     x_loc_data[2, :, :] .= x_data
 
