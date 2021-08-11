@@ -5,4 +5,5 @@ using Flux
 @testset "NeuralOperators.jl" begin
     include("data.jl")
     include("fourier.jl")
+    include("model.jl")
 end
