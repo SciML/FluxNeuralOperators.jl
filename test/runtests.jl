@@ -1,9 +1,9 @@
 using NeuralOperators
 using Test
-
-ENV["DATADEPS_ALWAYS_ACCEPT"] = true
+using Flux
 
 @testset "NeuralOperators.jl" begin
-    include("preprocess.jl")
+    include("data.jl")
     include("fourier.jl")
+    include("model.jl")
 end
