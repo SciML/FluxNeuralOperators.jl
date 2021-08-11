@@ -1,7 +1,6 @@
 export
     SpectralConv1d,
-    FourierOperator,
-    FNO
+    FourierOperator
 
 struct SpectralConv1d{T, S}
     weight::T
@@ -28,26 +27,31 @@ function SpectralConv1d(
 
     return Chain(
         x -> Zygote.hook(real, x),
-        SpectralConv1d(weights, in_chs, out_chs, modes, σ)
+        SpectralConv1d(weights, in_chs, out_chs, modes, σ),
     )
 end
 
 Flux.@functor SpectralConv1d
 
+t(𝐱) = @tullio 𝐱ᵀ[i, j, k] := 𝐱[j, i, k]
+ein_mul(𝐱₁, 𝐱₂) = @tullio 𝐲[m, o, b] := 𝐱₁[m, i, b] * 𝐱₂[o, i, m]
+
 function (m::SpectralConv1d)(𝐱::AbstractArray)
-    𝐱_fft = fft(𝐱, 2) # [in_chs, x, batch]
-    𝐱_selected = 𝐱_fft[:, 1:m.modes, :] # [in_chs, modes, batch]
+    𝐱ᵀ = t(𝐱) # [x, in_chs, batch] <- [in_chs, x, batch]
+    𝐱_fft = fft(𝐱ᵀ, 1) # [x, in_chs, batch]
+    𝐱_selected = 𝐱_fft[1:m.modes, :, :] # [modes, in_chs, batch]
 
-    # [out_chs, modes, batch] <- [in_chs, modes, batch] [out_chs, in_chs, modes]
-    @tullio 𝐱_weighted[o, m, b] := 𝐱_selected[i, m, b] * m.weight[o, i, m]
+    # [modes, out_chs, batch] <- [modes, in_chs, batch] * [out_chs, in_chs, modes]
+    𝐱_weighted = ein_mul(𝐱_selected, m.weight)
 
-    s = size(𝐱_weighted)
-    d = size(𝐱, 2) - m.modes
-    𝐱_padded = cat(𝐱_weighted, zeros(ComplexF32, s[1], d, s[3:end]...), dims=2)
+    s = size(𝐱_weighted)[2:end]
+    d = size(𝐱ᵀ, 1) - m.modes
+    𝐱_padded = cat(𝐱_weighted, zeros(ComplexF32, d, s...), dims=1)
 
-    𝐱_out = ifft(𝐱_padded, 2)
+    𝐱_out = ifft(𝐱_padded, 1) # [x, out_chs, batch]
+    𝐱_outᵀ = t(𝐱_out) # [out_chs, x, batch] <- [x, out_chs, batch]
 
-    return m.σ.(real(𝐱_out))
+    return m.σ.(real(𝐱_outᵀ))
 end
 
 function FourierOperator(
