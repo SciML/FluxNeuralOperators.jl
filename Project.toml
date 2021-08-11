@@ -10,6 +10,7 @@ Fetch = "bb354801-46f6-40b6-9c3d-d42d7a74c775"
 Flux = "587475ba-b771-5e3f-ad9e-33799f191a9c"
 MAT = "23992714-dd62-5051-b70f-ba57cb901cac"
 Tullio = "bc48ee85-29a4-5162-ae0b-a64e1601d4bc"
+Zygote = "e88e6eb3-aa80-5325-afca-941959d7151f"
 
 [compat]
 julia = "1.6"
