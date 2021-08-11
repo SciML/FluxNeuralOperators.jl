@@ -1,7 +1,3 @@
-using DataDeps
-using Fetch
-using MAT
-
 export
     get_data
 

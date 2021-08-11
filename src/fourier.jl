@@ -1,8 +1,3 @@
-using Flux
-using FFTW
-using Tullio
-using Zygote
-
 export
     SpectralConv1d,
     FourierOperator,

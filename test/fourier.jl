@@ -1,5 +1,3 @@
-using Flux
-
 @testset "SpectralConv1d" begin
     modes = 16
     ch = 64 => 64
