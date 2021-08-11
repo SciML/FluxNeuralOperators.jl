@@ -1,3 +1,5 @@
+using CUDA, CUDAKernels, KernelAbstractions
+
 export
     SpectralConv1d,
     FourierOperator,
@@ -15,6 +17,9 @@ function c_glorot_uniform(dims...)
     return Flux.glorot_uniform(dims...) + Flux.glorot_uniform(dims...) * im
 end
 
+t(𝐱) = @tullio 𝐱ᵀ[a, b, c] := 𝐱[b, a, c]
+ein_mul(𝐱₁, 𝐱₂) = @tullio 𝐲[m, o, b] := 𝐱₁[m, i, b] * 𝐱₂[o, i, m]
+
 function SpectralConv1d(
     ch::Pair{<:Integer, <:Integer},
     modes::Integer,
@@ -27,25 +32,27 @@ function SpectralConv1d(
     weights = scale * init(out_chs, in_chs, modes)
 
     return Chain(
+        t,
         x -> Zygote.hook(real, x),
-        SpectralConv1d(weights, in_chs, out_chs, modes, σ)
+        SpectralConv1d(weights, in_chs, out_chs, modes, σ),
+        t
     )
 end
 
 Flux.@functor SpectralConv1d
 
 function (m::SpectralConv1d)(𝐱::AbstractArray)
-    𝐱_fft = fft(𝐱, 2) # [in_chs, x, batch]
-    𝐱_selected = 𝐱_fft[:, 1:m.modes, :] # [in_chs, modes, batch]
+    𝐱_fft = fft(𝐱, 1) # [x, in_chs, batch]
+    𝐱_selected = 𝐱_fft[1:m.modes, :, :] # [modes, in_chs, batch]
 
-    # [out_chs, modes, batch] <- [in_chs, modes, batch] [out_chs, in_chs, modes]
-    @tullio 𝐱_weighted[o, m, b] := 𝐱_selected[i, m, b] * m.weight[o, i, m]
+    # [modes, out_chs, batch] <- [modes, in_chs, batch] [out_chs, in_chs, modes]
+    𝐱_weighted = ein_mul(𝐱_selected, m.weight)
 
-    s = size(𝐱_weighted)
-    d = size(𝐱, 2) - m.modes
-    𝐱_padded = cat(𝐱_weighted, zeros(ComplexF32, s[1], d, s[3:end]...), dims=2)
+    s = size(𝐱_weighted)[2:end]
+    d = size(𝐱, 1) - m.modes
+    𝐱_padded = cat(𝐱_weighted, zeros(ComplexF32, d, s...), dims=1)
 
-    𝐱_out = ifft(𝐱_padded, 2)
+    𝐱_out = ifft(𝐱_padded, 1) # [x, out_chs, batch]
 
     return m.σ.(real(𝐱_out))
 end

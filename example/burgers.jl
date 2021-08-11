@@ -1,14 +1,14 @@
 using NeuralOperators
 using Flux
-# using CUDA
+using CUDA
 
-# if has_cuda()
-#     @info "CUDA is on"
-#     device = gpu
-#     CUDA.allowscalar(false)
-# else
+if has_cuda()
+    @info "CUDA is on"
+    device = gpu
+    CUDA.allowscalar(false)
+else
     device = cpu
-# end
+end
 
 m = FourierNeuralOperator() |> device
 loss(𝐱, 𝐲) = sum(abs2, 𝐲 .- m(𝐱)) / size(𝐱)[end]
@@ -33,4 +33,4 @@ end
 
 data = [(𝐱, 𝐲) for (𝐱, 𝐲) in loader_train] |> device
 opt = Flux.Optimiser(WeightDecay(1f-4), Flux.ADAM(1f-3))
-Flux.@epochs 500 @time(Flux.train!(loss, params(m), data, opt, cb=Flux.throttle(loss_test, 10)))
+Flux.@epochs 500 @time(Flux.train!(loss, params(m), data, opt))
