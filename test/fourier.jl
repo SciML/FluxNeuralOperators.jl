@@ -7,7 +7,7 @@
         SpectralConv1d(ch, modes)
     )
 
-    𝐱, _ = get_data()
+    𝐱, _ = get_burgers_data()
     @test size(m(𝐱)) == (64, 1024, 1000)
 
     T = Float32
@@ -25,7 +25,7 @@ end
         FourierOperator(ch, modes)
     )
 
-    𝐱, _ = get_data()
+    𝐱, _ = get_burgers_data()
     @test size(m(𝐱)) == (64, 1024, 1000)
 
     loss(x, y) = Flux.mse(m(x), y)
@@ -34,7 +34,7 @@ end
 end
 
 @testset "FNO" begin
-    𝐱, 𝐲 = get_data()
+    𝐱, 𝐲 = get_burgers_data()
     𝐱, 𝐲 = Float32.(𝐱), Float32.(𝐲)
     @test size(FNO()(𝐱)) == size(𝐲)
 

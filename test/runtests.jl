@@ -3,6 +3,6 @@ using Test
 using Flux
 
 @testset "NeuralOperators.jl" begin
-    include("preprocess.jl")
+    include("data.jl")
     include("fourier.jl")
 end
