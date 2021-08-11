@@ -1,11 +1,6 @@
-using Flux
-using FFTW
-using Tullio
-
 export
     SpectralConv1d,
-    FourierOperator,
-    FNO
+    FourierOperator
 
 c_glorot_uniform(dims...) = Flux.glorot_uniform(dims...) + Flux.glorot_uniform(dims...) * im
 
@@ -60,22 +55,5 @@ function FourierOperator(
             SpectralConv1d(ch, modes)
         ),
         x -> σ.(x)
-    )
-end
-
-function FNO()
-    modes = 16
-    ch = 64 => 64
-    σ = x -> @. log(1 + exp(x))
-
-    return Chain(
-        Dense(2, 64, init=c_glorot_uniform),
-        FourierOperator(ch, modes, σ),
-        FourierOperator(ch, modes, σ),
-        FourierOperator(ch, modes, σ),
-        FourierOperator(ch, modes),
-        Dense(64, 128, σ, init=c_glorot_uniform),
-        Dense(128, 1, init=c_glorot_uniform),
-        flatten
     )
 end

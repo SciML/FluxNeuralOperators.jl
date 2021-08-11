@@ -1,9 +1,15 @@
+using Flux
 using NeuralOperators
 using Test
 
-ENV["DATADEPS_ALWAYS_ACCEPT"] = true
+tests = [
+    "data",
+    "fourier",
+    "models",
+]
 
 @testset "NeuralOperators.jl" begin
-    include("preprocess.jl")
-    include("fourier.jl")
+    for f in tests
+        include("$f.jl")
+    end
 end
