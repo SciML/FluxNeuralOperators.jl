@@ -1,4 +1,6 @@
 name: CI
+env:
+  DATADEPS_ALWAYS_ACCEPT: true
 on:
   - push
   - pull_request
