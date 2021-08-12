@@ -42,7 +42,7 @@ function (m::SpectralConv1d)(𝐱::AbstractArray)
     𝐱_padded = cat(𝐱_weighted, pad, dims=1) # [x, out_chs, batch] <- [modes, out_chs, batch]
 
     𝐱_out = ifft(𝐱_padded, 1) # [x, out_chs, batch]
-    𝐱_outᵀ = permutedims(real(𝐱_out), [2, 1, 3]) # [out_chs, x, batch] <- [x, out_chs, batch]
+    𝐱_outᵀ = permutedims(real(𝐱_out), (2, 1, 3)) # [out_chs, x, batch] <- [x, out_chs, batch]
 
     return m.σ.(𝐱_outᵀ)
 end
