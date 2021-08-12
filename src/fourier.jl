@@ -10,9 +10,7 @@ struct SpectralConv1d{T, S}
     σ
 end
 
-function c_glorot_uniform(dims...)
-    return Flux.glorot_uniform(dims...) + Flux.glorot_uniform(dims...) * im
-end
+c_glorot_uniform(dims...) = Flux.glorot_uniform(dims...) + Flux.glorot_uniform(dims...)*im
 
 function SpectralConv1d(
     ch::Pair{<:Integer, <:Integer},
@@ -38,8 +36,8 @@ function (m::SpectralConv1d)(𝐱::AbstractArray)
 
     # [modes, out_chs, batch] <- [modes, in_chs, batch] * [out_chs, in_chs, modes]
     𝐱_weighted = spectral_conv(view(𝐱_fft, 1:m.modes, :, :), m.weight)
-    pad = zeros(ComplexF32, size(𝐱_fft, 1)-m.modes, Base.tail(size(𝐱_weighted))...)
-    𝐱_padded = cat(𝐱_weighted, pad, dims=1) # [x, out_chs, batch] <- [modes, out_chs, batch]
+    # [x, out_chs, batch] <- [modes, out_chs, batch]
+    𝐱_padded = cat(𝐱_weighted, zeros(ComplexF32, size(𝐱_fft, 1)-m.modes, Base.tail(size(𝐱_weighted))...), dims=1)
 
     𝐱_out = ifft(𝐱_padded, 1) # [x, out_chs, batch]
     𝐱_outᵀ = permutedims(real(𝐱_out), (2, 1, 3)) # [out_chs, x, batch] <- [x, out_chs, batch]
