@@ -33,7 +33,7 @@ Flux.@functor SpectralConv1d
 spectral_conv(𝐱₁, 𝐱₂) = @tullio 𝐲[m, o, b] := 𝐱₁[m, i, b] * 𝐱₂[o, i, m]
 
 function (m::SpectralConv1d)(𝐱::AbstractArray)
-    𝐱ᵀ = permutedims(Zygote.hook(real, 𝐱), [2, 1, 3]) # [x, in_chs, batch] <- [in_chs, x, batch]
+    𝐱ᵀ = permutedims(Zygote.hook(real, 𝐱), (2, 1, 3)) # [x, in_chs, batch] <- [in_chs, x, batch]
     𝐱_fft = fft(𝐱ᵀ, 1) # [x, in_chs, batch]
 
     # [modes, out_chs, batch] <- [modes, in_chs, batch] * [out_chs, in_chs, modes]
