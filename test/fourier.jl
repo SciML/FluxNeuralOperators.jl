@@ -1,10 +1,10 @@
-@testset "SpectralConv1d" begin
-    modes = 16
+@testset "SpectralConv" begin
+    modes = (16, )
     ch = 64 => 64
 
     m = Chain(
         Dense(2, 64),
-        SpectralConv1d(ch, modes)
+        SpectralConv(ch, modes)
     )
 
     𝐱, _ = get_burgers_data(n=1000)
@@ -17,7 +17,7 @@
 end
 
 @testset "FourierOperator" begin
-    modes = 16
+    modes = (16, )
     ch = 64 => 64
 
     m = Chain(
