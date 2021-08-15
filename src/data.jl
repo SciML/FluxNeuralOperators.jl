@@ -1,7 +1,7 @@
 export
     UnitGaussianNormalizer,
-    Encode,
-    Decode,
+    encode,
+    decode,
     get_burgers_data,
     get_darcy_flow_data
 
@@ -17,11 +17,8 @@ function UnitGaussianNormalizer(𝐱; ϵ=1f-5)
     return UnitGaussianNormalizer(mean(𝐱, dims=dims), StatsBase.std(𝐱, dims=dims), ϵ)
 end
 
-struct Encode end
-struct Decode end
-
-(n::UnitGaussianNormalizer)(𝐱, ::Type{Encode}) = @. (𝐱-n.mean) / (n.std+n.ϵ)
-(n::UnitGaussianNormalizer)(𝐱, ::Type{Decode}) = @. 𝐱 * (n.std+n.ϵ) + n.mean
+encode(n::UnitGaussianNormalizer, 𝐱::AbstractArray) = @. (𝐱-n.mean) / (n.std+n.ϵ)
+decode(n::UnitGaussianNormalizer, 𝐱::AbstractArray) = @. 𝐱 * (n.std+n.ϵ) + n.mean
 
 
 function register_burgers()
@@ -76,6 +73,7 @@ function get_darcy_flow_data(; n=1024, Δsamples=5, T=Float32, test_data=true)
     file = matopen(joinpath(datadep"DarcyFlow", file))
     x_data = T.(permutedims(read(file, "coeff")[1:n, 1:Δsamples:end, 1:Δsamples:end], (3, 2, 1)))
     y_data = T.(permutedims(read(file, "sol")[1:n, 1:Δsamples:end, 1:Δsamples:end], (3, 2, 1)))
+    close(file)
 
     x_dims = pushfirst!([size(x_data)...], 1)
     y_dims = pushfirst!([size(y_data)...], 1)
@@ -83,5 +81,5 @@ function get_darcy_flow_data(; n=1024, Δsamples=5, T=Float32, test_data=true)
 
     x_normalizer, y_normalizer = UnitGaussianNormalizer(x_data), UnitGaussianNormalizer(y_data)
 
-    return x_normalizer(x_data, Encode), y_normalizer(y_data, Encode), x_normalizer, y_normalizer
+    return encode(x_normalizer, x_data), encode(y_normalizer, y_data), x_normalizer, y_normalizer
 end
