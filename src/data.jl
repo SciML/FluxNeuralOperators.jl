@@ -67,7 +67,7 @@ function get_burgers_data(; n=2048, Δsamples=2^3, grid_size=div(2^13, Δsamples
     return x_loc_data, y_data
 end
 
-function get_darcy_flow_data(; n=1024, Δsamples=5, T=Float32, test_data=true)
+function get_darcy_flow_data(; n=1024, Δsamples=5, T=Float32, test_data=false)
     # size(training_data) == size(testing_data) == (1024, 421, 421)
     file = test_data ? "piececonst_r421_N1024_smooth2.mat" : "piececonst_r421_N1024_smooth1.mat"
     file = matopen(joinpath(datadep"DarcyFlow", file))
