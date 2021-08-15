@@ -211,9 +211,9 @@ version = "3.3.9+8"
 
 [[Fetch]]
 deps = ["Base64", "HTTP", "JSON3", "Random", "StructTypes"]
-git-tree-sha1 = "805a7f0edd71138f053b572613e918ef147625f0"
+git-tree-sha1 = "84ba4219db49572bc3020589e77db293707aad51"
 uuid = "bb354801-46f6-40b6-9c3d-d42d7a74c775"
-version = "0.1.0"
+version = "0.1.1"
 
 [[FillArrays]]
 deps = ["LinearAlgebra", "Random", "SparseArrays", "Statistics"]
