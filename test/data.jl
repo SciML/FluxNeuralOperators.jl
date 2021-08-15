@@ -4,3 +4,7 @@
     @test size(xs) == (2, 1024, 1000)
     @test size(ys) == (1024, 1000)
 end
+
+@testset "get navier stokes data" begin
+    # get_navier_stokes()
+end
