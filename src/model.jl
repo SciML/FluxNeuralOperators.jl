@@ -2,7 +2,7 @@ export
     FourierNeuralOperator
 
 function FourierNeuralOperator()
-    modes = 16
+    modes = (16, )
     ch = 64 => 64
     σ = relu
 
