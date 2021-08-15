@@ -12,7 +12,7 @@ struct UnitGaussianNormalizer{T}
 end
 
 function UnitGaussianNormalizer(𝐱; ϵ=1f-5)
-    dims = 1:length(size(𝐱))-1
+    dims = 1:ndims(𝐱)-1
 
     return UnitGaussianNormalizer(mean(𝐱, dims=dims), StatsBase.std(𝐱, dims=dims), ϵ)
 end

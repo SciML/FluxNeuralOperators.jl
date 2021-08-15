@@ -38,8 +38,8 @@ function (m::SpectralConv)(𝐱::AbstractArray)
     𝐱_fft = fft(𝐱ᵀ, 1:ndims(m)) # [x, in_chs, batch]
 
     # [modes, out_chs, batch] <- [modes, in_chs, batch] * [out_chs, in_chs, modes]
-    ranges = [1:dim_modes for dim_modes in m.modes]
-    𝐱_flattened = reshape(view(𝐱_fft, ranges..., :, :), prod(m.modes), size(𝐱_fft)[end-1:end]...)
+    xlen = ndims(𝐱_fft)
+    𝐱_flattened = reshape(view(𝐱_fft, map(d->1:d, m.modes)..., :, :), :, size(𝐱_fft, xlen-1), size(𝐱_fft, xlen))
     𝐱_weighted = spectral_conv(𝐱_flattened, m.weight)
     𝐱_shaped = reshape(𝐱_weighted, m.modes..., size(𝐱_weighted, xlen-1), size(𝐱_weighted, xlen))
 
