@@ -28,7 +28,7 @@ function register_burgers()
         Burgers' equation dataset from
         [fourier_neural_operator](https://github.com/zongyi-li/fourier_neural_operator)
         """,
-        "https://drive.google.com/file/d/16a8od4vidbiNR3WtaBPCSZ0T3moxjhYe/view?usp=sharing",
+        "https://drive.google.com/file/d/17MYsKzxUQVaLMWodzPbffR8hhDHoadPp/view?usp=sharing",
         "9cbbe5070556c777b1ba3bacd49da5c36ea8ed138ba51b6ee76a24b971066ecd",
         fetch_method=gdownload,
         post_fetch_method=unpack
@@ -42,7 +42,7 @@ function register_darcy_flow()
         Darcy flow dataset from
         [fourier_neural_operator](https://github.com/zongyi-li/fourier_neural_operator)
         """,
-        "https://drive.google.com/file/d/1Z1uxG9R8AdAGJprG5STcphysjm56_0Jf/view?usp=sharing",
+        "https://drive.google.com/file/d/1zzVMuGhOG70EnR5L24LWqmX9-Wh_H5Wu/view?usp=sharing",
         "802825de9da7398407296c99ca9ceb2371c752f6a3bdd1801172e02ce19edda4",
         fetch_method=gdownload,
         post_fetch_method=unpack
