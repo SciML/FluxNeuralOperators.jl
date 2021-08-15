@@ -77,8 +77,8 @@ function get_darcy_flow_data(; n=1024, Δsamples=5, T=Float32, test_data=true)
     x_data = T.(permutedims(read(file, "coeff")[1:n, 1:Δsamples:end, 1:Δsamples:end], (3, 2, 1)))
     y_data = T.(permutedims(read(file, "sol")[1:n, 1:Δsamples:end, 1:Δsamples:end], (3, 2, 1)))
 
-    x_dims = insert!([size(x_data)...], 3, 1)
-    y_dims = insert!([size(y_data)...], 3, 1)
+    x_dims = pushfirst!([size(x_data)...], 1)
+    y_dims = pushfirst!([size(y_data)...], 1)
     x_data, y_data = reshape(x_data, x_dims...), reshape(y_data, y_dims...)
 
     x_normalizer, y_normalizer = UnitGaussianNormalizer(x_data), UnitGaussianNormalizer(y_data)

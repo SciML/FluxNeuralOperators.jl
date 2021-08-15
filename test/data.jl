@@ -19,6 +19,6 @@ end
 @testset "get darcy flow data" begin
     xs, ys, x_normalizer, y_normalizer = get_darcy_flow_data()
 
-    @test size(xs) == (85, 85, 1, 1024)
-    @test size(ys) == (85, 85, 1, 1024)
+    @test size(xs) == (1, 85, 85, 1024)
+    @test size(ys) == (1, 85, 85, 1024)
 end
