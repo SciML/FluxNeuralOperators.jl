@@ -34,7 +34,7 @@ Base.ndims(::SpectralConv{N}) where {N} = N
 spectral_conv(𝐱₁, 𝐱₂) = @tullio 𝐲[m, o, b] := 𝐱₁[m, i, b] * 𝐱₂[o, i, m]
 
 function (m::SpectralConv)(𝐱::AbstractArray)
-    𝐱ᵀ = permutedims(Zygote.hook(real, 𝐱), (ndims(m)+1, 1:ndims(m)..., ndims(m)+2)) # [x, in_chs, batch] <- [in_chs, x, batch]
+    𝐱ᵀ = permutedims(Zygote.hook(real, 𝐱), (2:ndims(m)+1..., 1, ndims(m)+2)) # [x, in_chs, batch] <- [in_chs, x, batch]
     𝐱_fft = fft(𝐱ᵀ, 1:ndims(m)) # [x, in_chs, batch]
 
     # [modes, out_chs, batch] <- [modes, in_chs, batch] * [out_chs, in_chs, modes]
@@ -48,7 +48,7 @@ function (m::SpectralConv)(𝐱::AbstractArray)
     𝐱_padded = cat(𝐱_shaped, pad, dims=1:ndims(m))
 
     𝐱_out = ifft(𝐱_padded, 1:ndims(m)) # [x, out_chs, batch]
-    𝐱_outᵀ = permutedims(real(𝐱_out), (2:ndims(m)+1..., 1, ndims(m)+2)) # [out_chs, x, batch] <- [x, out_chs, batch]
+    𝐱_outᵀ = permutedims(real(𝐱_out), (ndims(m)+1, 1:ndims(m)..., ndims(m)+2)) # [out_chs, x, batch] <- [x, out_chs, batch]
 
     return m.σ.(𝐱_outᵀ)
 end
