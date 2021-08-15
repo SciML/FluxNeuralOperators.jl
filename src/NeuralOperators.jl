@@ -2,6 +2,7 @@ module NeuralOperators
     using DataDeps
     using Fetch
     using MAT
+    using StatsBase
 
     using Flux
     using FFTW

@@ -1,6 +1,28 @@
 export
+    UnitGaussianNormalizer,
+    Encode,
+    Decode,
     get_burgers_data,
-    get_navier_stokes
+    get_darcy_flow_data
+
+struct UnitGaussianNormalizer{T}
+    mean::Array{T}
+    std::Array{T}
+    ϵ::T
+end
+
+function UnitGaussianNormalizer(𝐱; ϵ=1f-5)
+    dims = 1:length(size(𝐱))-1
+
+    return UnitGaussianNormalizer(mean(𝐱, dims=dims), StatsBase.std(𝐱, dims=dims), ϵ)
+end
+
+struct Encode end
+struct Decode end
+
+(n::UnitGaussianNormalizer)(𝐱, ::Type{Encode}) = @. (𝐱-n.mean) / (n.std+n.ϵ)
+(n::UnitGaussianNormalizer)(𝐱, ::Type{Decode}) = @. 𝐱 * (n.std+n.ϵ) + n.mean
+
 
 function register_burgers()
     register(DataDep(
@@ -16,23 +38,23 @@ function register_burgers()
     ))
 end
 
-# function register_navier_stokes()
-#     register(DataDep(
-#         "NavierStokes",
-#         """
-#         Navier–Stokes equations dataset from
-#         [fourier_neural_operator](https://github.com/zongyi-li/fourier_neural_operator)
-#         """,
-#         "https://drive.google.com/file/d/1r3idxpsHa21ijhlu3QQ1hVuXcqnBTO7d/view?usp=sharing",
-#         "1a3b2893489dd1493923362bc74cd571e0b4f6ee290985eda060f4140df602d0",
-#         fetch_method=gdownload,
-#         post_fetch_method=unpack
-#     ))
-# end
+function register_darcy_flow()
+    register(DataDep(
+        "DarcyFlow",
+        """
+        Darcy flow dataset from
+        [fourier_neural_operator](https://github.com/zongyi-li/fourier_neural_operator)
+        """,
+        "https://drive.google.com/file/d/1Z1uxG9R8AdAGJprG5STcphysjm56_0Jf/view?usp=sharing",
+        "802825de9da7398407296c99ca9ceb2371c752f6a3bdd1801172e02ce19edda4",
+        fetch_method=gdownload,
+        post_fetch_method=unpack
+    ))
+end
 
 function register_datasets()
     register_burgers()
-    # register_navier_stokes()
+    register_darcy_flow()
 end
 
 function get_burgers_data(; n=2048, Δsamples=2^3, grid_size=div(2^13, Δsamples), T=Float32)
@@ -48,6 +70,18 @@ function get_burgers_data(; n=2048, Δsamples=2^3, grid_size=div(2^13, Δsamples
     return x_loc_data, y_data
 end
 
-# function get_navier_stokes()
-#     file = matopen(joinpath(datadep"NavierStokes", "ns_V1e-3_N5000_T50.mat"))
-# end
+function get_darcy_flow_data(; n=1024, Δsamples=5, T=Float32, test_data=true)
+    # size(training_data) == size(testing_data) == (1024, 421, 421)
+    file = test_data ? "piececonst_r421_N1024_smooth2.mat" : "piececonst_r421_N1024_smooth1.mat"
+    file = matopen(joinpath(datadep"DarcyFlow", file))
+    x_data = T.(permutedims(read(file, "coeff")[1:n, 1:Δsamples:end, 1:Δsamples:end], (3, 2, 1)))
+    y_data = T.(permutedims(read(file, "sol")[1:n, 1:Δsamples:end, 1:Δsamples:end], (3, 2, 1)))
+
+    x_dims = insert!([size(x_data)...], 3, 1)
+    y_dims = insert!([size(y_data)...], 3, 1)
+    x_data, y_data = reshape(x_data, x_dims...), reshape(y_data, y_dims...)
+
+    x_normalizer, y_normalizer = UnitGaussianNormalizer(x_data), UnitGaussianNormalizer(y_data)
+
+    return x_normalizer(x_data, Encode), y_normalizer(y_data, Encode), x_normalizer, y_normalizer
+end
