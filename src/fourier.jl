@@ -2,7 +2,7 @@ export
     SpectralConv,
     FourierOperator
 
-struct SpectralConv{T, S, N}
+struct SpectralConv{N, T, S}
     weight::T
     in_channel::S
     out_channel::S
@@ -29,22 +29,24 @@ end
 
 Flux.@functor SpectralConv
 
+Base.ndims(::SpectralConv{N}) where {N} = N
+
 spectral_conv(𝐱₁, 𝐱₂) = @tullio 𝐲[m, o, b] := 𝐱₁[m, i, b] * 𝐱₂[o, i, m] # TODO: extend `m` to n-dim
 
 function (m::SpectralConv)(𝐱::AbstractArray)
-    𝐱ᵀ = permutedims(Zygote.hook(real, 𝐱), (m.ndim+1, 1:m.ndim..., m.ndim+2)) # [x, in_chs, batch] <- [in_chs, x, batch]
-    𝐱_fft = fft(𝐱ᵀ, 1:m.ndim) # [x, in_chs, batch]
+    𝐱ᵀ = permutedims(Zygote.hook(real, 𝐱), (ndims(m)+1, 1:ndims(m)..., ndims(m)+2)) # [x, in_chs, batch] <- [in_chs, x, batch]
+    𝐱_fft = fft(𝐱ᵀ, 1:ndims(m)) # [x, in_chs, batch]
 
     # [modes, out_chs, batch] <- [modes, in_chs, batch] * [out_chs, in_chs, modes]
     ranges = [1:dim_modes for dim_modes in m.modes]
     𝐱_weighted = spectral_conv(view(𝐱_fft, ranges..., :, :), m.weight)
 
     # [x, out_chs, batch] <- [modes, out_chs, batch]
-    pad = zeros(ComplexF32, (collect(size(𝐱_fft)[1:m.ndim])-collect(m.modes))..., size(𝐱_weighted)[end-1:end]...)
-    𝐱_padded = cat(𝐱_weighted, pad, dims=1:m.ndim)
+    pad = zeros(ComplexF32, (collect(size(𝐱_fft)[1:ndims(m)])-collect(m.modes))..., size(𝐱_weighted)[end-1:end]...)
+    𝐱_padded = cat(𝐱_weighted, pad, dims=1:ndims(m))
 
-    𝐱_out = ifft(𝐱_padded, 1:m.ndim) # [x, out_chs, batch]
-    𝐱_outᵀ = permutedims(real(𝐱_out), (2:m.ndim+1..., 1, m.ndim+2)) # [out_chs, x, batch] <- [x, out_chs, batch]
+    𝐱_out = ifft(𝐱_padded, 1:ndims(m)) # [x, out_chs, batch]
+    𝐱_outᵀ = permutedims(real(𝐱_out), (2:ndims(m)+1..., 1, ndims(m)+2)) # [out_chs, x, batch] <- [x, out_chs, batch]
 
     return m.σ.(𝐱_outᵀ)
 end

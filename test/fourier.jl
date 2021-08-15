@@ -6,6 +6,7 @@
         Dense(2, 64),
         SpectralConv(ch, modes)
     )
+    @test ndims(SpectralConv(ch, modes)) == 1
 
     𝐱, _ = get_burgers_data(n=1000)
     @test size(m(𝐱)) == (64, 1024, 1000)
