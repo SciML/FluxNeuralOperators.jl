@@ -4,7 +4,7 @@ export
 function FourierNeuralOperator()
     modes = (16, )
     ch = 64 => 64
-    σ = relu
+    σ = gelu
 
     return Chain(
         Dense(2, 64),
