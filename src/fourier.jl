@@ -48,7 +48,7 @@ function spectral_conv(m, 𝐱)
     𝐱_flattened = reshape(view(𝐱_fft, map(d->1:d, m.modes)..., :, :), :, size(𝐱_fft, n_dims-1), size(𝐱_fft, n_dims))
     𝐱_weighted = apply_spectral_pattern(𝐱_flattened, m.weight) # [prod(m.modes), out_chs, batch], only 3-dims
     𝐱_shaped = reshape(𝐱_weighted, m.modes..., size(𝐱_weighted, 2), size(𝐱_weighted, 3))
-    𝐱_padded = spectral_pad(𝐱_shaped, size(𝐱_fft)) # [x, out_chs, batch] <- [modes, out_chs, batch]
+    𝐱_padded = spectral_pad(𝐱_shaped, (size(𝐱_fft)[1:end-2]..., size(𝐱_weighted, 2), size(𝐱_weighted, 3))) # [x, out_chs, batch] <- [modes, out_chs, batch]
     𝐱_ifft = real(ifft(𝐱_padded, 1:ndims(m))) # [x, out_chs, batch]
 
     return m.σ.(𝐱_ifft)
@@ -77,7 +77,7 @@ function FourierOperator(
     permuted=false
 ) where {S<:Integer, N}
     short_cut = permuted ? Conv(Tuple(ones(Int, length(modes))), ch) : Dense(ch.first, ch.second)
-    
+
     return Chain(
         Parallel(+, short_cut, SpectralConv(ch, modes, permuted=permuted)),
         x -> σ.(x)
