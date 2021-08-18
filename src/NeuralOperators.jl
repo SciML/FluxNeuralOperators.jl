@@ -11,6 +11,7 @@ module NeuralOperators
     using CUDAKernels
     using KernelAbstractions
     using Zygote
+    using ChainRulesCore
 
     function __init__()
         register_datasets()

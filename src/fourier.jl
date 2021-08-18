@@ -34,6 +34,26 @@ Base.ndims(::SpectralConv{N}) where {N} = N
 # [prod(m.modes), out_chs, batch] <- [prod(m.modes), in_chs, batch] * [out_chs, in_chs, prod(m.modes)]
 spectral_conv(𝐱₁, 𝐱₂) = @tullio 𝐲[m, o, b] := 𝐱₁[m, i, b] * 𝐱₂[o, i, m]
 
+function spectral_pad(𝐱::AbstractArray, dims::NTuple)
+    𝐱_padded = zeros(eltype(𝐱), dims)
+
+    return spectral_pad!(𝐱_padded, 𝐱)
+end
+
+function spectral_pad!(𝐱_padded::AbstractArray, 𝐱::AbstractArray)
+    𝐱_padded[map(d->1:d, size(𝐱))...] .= 𝐱
+
+    return 𝐱_padded
+end
+
+function ChainRulesCore.rrule(::typeof(spectral_pad), 𝐱::AbstractArray, dims::NTuple)
+    function spectral_pad_pullback(𝐲̄)
+        return NoTangent(), view(𝐲̄, map(d->1:d, size(𝐱))...), NoTangent()
+    end
+
+    return spectral_pad(𝐱, dims), spectral_pad_pullback
+end
+
 function (m::SpectralConv)(𝐱::AbstractArray)
     n_dims = ndims(𝐱)
 
@@ -43,10 +63,7 @@ function (m::SpectralConv)(𝐱::AbstractArray)
     𝐱_flattened = reshape(view(𝐱_fft, map(d->1:d, m.modes)..., :, :), :, size(𝐱_fft, n_dims-1), size(𝐱_fft, n_dims))
     𝐱_weighted = spectral_conv(𝐱_flattened, m.weight) # [prod(m.modes), out_chs, batch], only 3-dims
     𝐱_shaped = reshape(𝐱_weighted, m.modes..., size(𝐱_weighted, 2), size(𝐱_weighted, 3))
-
-    # [x, out_chs, batch] <- [modes, out_chs, batch]
-    pad = zeros(ComplexF32, ntuple(i->size(𝐱_fft, i)-m.modes[i], ndims(m))..., size(𝐱_shaped, n_dims-1), size(𝐱_shaped, n_dims))
-    𝐱_padded = cat(𝐱_shaped, pad, dims=1:ndims(m))
+    𝐱_padded = spectral_pad(𝐱_shaped, size(𝐱_fft)) # [x, out_chs, batch] <- [modes, out_chs, batch]
 
     𝐱_out = ifft(𝐱_padded, 1:ndims(m)) # [x, out_chs, batch]
     𝐱_outᵀ = permutedims(real(𝐱_out), (ndims(m)+1, 1:ndims(m)..., ndims(m)+2)) # [out_chs, x, batch] <- [x, out_chs, batch]
