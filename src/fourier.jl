@@ -2,13 +2,13 @@ export
     SpectralConv,
     FourierOperator
 
-struct SpectralConv{N, T, S}
+struct SpectralConv{N, T, S, F}
     weight::T
     in_channel::S
     out_channel::S
     modes::NTuple{N, S}
     ndim::S
-    σ
+    σ::F
 end
 
 c_glorot_uniform(dims...) = Flux.glorot_uniform(dims...) + Flux.glorot_uniform(dims...)*im
