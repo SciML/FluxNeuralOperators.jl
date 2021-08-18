@@ -34,13 +34,10 @@ Base.ndims(::SpectralConv{N}) where {N} = N
 # [prod(m.modes), out_chs, batch] <- [prod(m.modes), in_chs, batch] * [out_chs, in_chs, prod(m.modes)]
 spectral_conv(𝐱₁, 𝐱₂) = @tullio 𝐲[m, o, b] := 𝐱₁[m, i, b] * 𝐱₂[o, i, m]
 
-function spectral_pad(𝐱::AbstractArray, dims::NTuple)
-    𝐱_padded = zeros(eltype(𝐱), dims)
-
-    return spectral_pad!(𝐱_padded, 𝐱)
-end
+spectral_pad(𝐱::AbstractArray, dims::NTuple) = spectral_pad!(similar(𝐱, dims), 𝐱)
 
 function spectral_pad!(𝐱_padded::AbstractArray, 𝐱::AbstractArray)
+    fill!(𝐱_padded, eltype(𝐱)(0)) # zeros(eltype(𝐱), dims)
     𝐱_padded[map(d->1:d, size(𝐱))...] .= 𝐱
 
     return 𝐱_padded
