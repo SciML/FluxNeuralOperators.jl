@@ -77,6 +77,7 @@ function FourierOperator(
     permuted=false
 ) where {S<:Integer, N}
     short_cut = permuted ? Conv(Tuple(ones(Int, length(modes))), ch) : Dense(ch.first, ch.second)
+    
     return Chain(
         Parallel(+, short_cut, SpectralConv(ch, modes, permuted=permuted)),
         x -> σ.(x)
