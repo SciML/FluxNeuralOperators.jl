@@ -15,7 +15,7 @@
 [codecov link]: https://codecov.io/gh/foldfelis/NeuralOperators.jl
 
 [Neural Operator](https://github.com/zongyi-li/graph-pde) is a novel deep learning method to learned the mapping
-between infinite-dimensional spaces of functions introduced by [Zongyi Li](https://github.com/zongyi-li)et al.
+between infinite-dimensional spaces of functions introduced by [Zongyi Li](https://github.com/zongyi-li) et al.
 
 In this project I temporarily provide the SpectralConv layer and the
 [Fourier Neural Operator](https://github.com/zongyi-li/fourier_neural_operator).
