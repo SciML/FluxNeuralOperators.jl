@@ -1,8 +1,11 @@
 export
     SpectralConv,
+    SpectralConvPerm,
     FourierOperator
 
-struct SpectralConv{N, T, S, F}
+abstract type AbstractSpectralConv{N, T, S, F} end
+
+struct SpectralConv{N, T, S, F} <: AbstractSpectralConv{N, T, S, F}
     weight::T
     in_channel::S
     out_channel::S
@@ -10,7 +13,7 @@ struct SpectralConv{N, T, S, F}
     σ::F
 end
 
-struct SpectralConvPerm{N, T, S, F}
+struct SpectralConvPerm{N, T, S, F} <: AbstractSpectralConv{N, T, S, F}
     weight::T
     in_channel::S
     out_channel::S
@@ -18,6 +21,35 @@ struct SpectralConvPerm{N, T, S, F}
     σ::F
 end
 
+"""
+    SpectralConv(
+        ch, modes, σ=identity;
+        init=c_glorot_uniform, permuted=false, T=ComplexF32
+    )
+
+## SpectralConv
+
+* ``v(x)``: input
+* ``F``, ``F^{-1}``: Fourier transform, inverse fourier transform
+* ``L``: linear transform on the lower Fouier modes.
+
+``v(x)`` -> ``F`` -> ``L`` -> ``F^{-1}``
+
+## Example
+
+```jldoctest
+julia> SpectralConv(2=>5, (16, ))
+SpectralConv(2 => 5, (16,), σ=identity)
+
+julia> using Flux
+
+julia> SpectralConv(2=>5, (16, ), relu)
+SpectralConv(2 => 5, (16,), σ=relu)
+
+julia> SpectralConv(2=>5, (16, ), relu, permuted=true)
+SpectralConvPerm(2 => 5, (16,), σ=relu)
+```
+"""
 function SpectralConv(
     ch::Pair{S, S},
     modes::NTuple{N, S},
@@ -38,10 +70,14 @@ end
 Flux.@functor SpectralConv
 Flux.@functor SpectralConvPerm
 
-Base.ndims(::SpectralConv{N}) where {N} = N
-Base.ndims(::SpectralConvPerm{N}) where {N} = N
+Base.ndims(::AbstractSpectralConv{N}) where {N} = N
 
-function spectral_conv(m, 𝐱)
+function Base.show(io::IO, l::AbstractSpectralConv)
+    T = (l isa SpectralConv) ? SpectralConv : SpectralConvPerm
+    print(io, "$(string(T))($(l.in_channel) => $(l.out_channel), $(l.modes), σ=$(string(l.σ)))")
+end
+
+function spectral_conv(m::AbstractSpectralConv, 𝐱::AbstractArray)
     n_dims = ndims(𝐱)
 
     𝐱_fft = fft(Zygote.hook(real, 𝐱), 1:ndims(m)) # [x, in_chs, batch]
@@ -54,7 +90,7 @@ function spectral_conv(m, 𝐱)
     return m.σ.(𝐱_ifft)
 end
 
-function (m::SpectralConv)(𝐱::AbstractArray)
+function (m::SpectralConv)(𝐱)
     𝐱ᵀ = permutedims(𝐱, (ntuple(i->i+1, ndims(m))..., 1, ndims(m)+2)) # [x, in_chs, batch] <- [in_chs, x, batch]
     𝐱_out = spectral_conv(m, 𝐱ᵀ) # [x, out_chs, batch]
     𝐱_outᵀ = permutedims(𝐱_out, (ndims(m)+1, 1:ndims(m)..., ndims(m)+2)) # [out_chs, x, batch] <- [x, out_chs, batch]
@@ -62,7 +98,7 @@ function (m::SpectralConv)(𝐱::AbstractArray)
     return 𝐱_outᵀ
 end
 
-function (m::SpectralConvPerm)(𝐱::AbstractArray)
+function (m::SpectralConvPerm)(𝐱)
     return spectral_conv(m, 𝐱) # [x, out_chs, batch]
 end
 
@@ -70,6 +106,58 @@ end
 # operator #
 ############
 
+"""
+    FourierOperator(ch, modes, σ=identity; permuted=false)
+
+## FourierOperator
+
+* ``v(x)``: input
+* ``F``, ``F^{-1}``: Fourier transform, inverse fourier transform
+* ``L``: linear transform on the lower Fouier modes
+* ``D``: local linear transform
+
+```
+        ┌ F -> L -> F¯¹ ┐
+v(x) -> ┤               ├ -> + -> σ
+        └      D        ┘
+```
+
+## Example
+
+```jldoctest
+julia> FourierOperator(2=>5, (16, ))
+Chain(
+  Parallel(
+    +,
+    Dense(2, 5),                        # 15 parameters
+    SpectralConv(2 => 5, (16,), σ=identity),  # 160 parameters
+  ),
+  NeuralOperators.var"#activation_func#14"{typeof(identity)}(identity),
+)                   # Total: 3 arrays, 175 parameters, 1.668 KiB.
+
+julia> using Flux
+
+julia> FourierOperator(2=>5, (16, ), relu)
+Chain(
+  Parallel(
+    +,
+    Dense(2, 5),                        # 15 parameters
+    SpectralConv(2 => 5, (16,), σ=identity),  # 160 parameters
+  ),
+  NeuralOperators.var"#activation_func#14"{typeof(relu)}(NNlib.relu),
+)                   # Total: 3 arrays, 175 parameters, 1.668 KiB.
+
+julia> FourierOperator(2=>5, (16, ), relu, permuted=true)
+Chain(
+  Parallel(
+    +,
+    Conv((1,), 2 => 5),                 # 15 parameters
+    SpectralConvPerm(2 => 5, (16,), σ=identity),  # 160 parameters
+  ),
+  NeuralOperators.var"#activation_func#14"{typeof(relu)}(NNlib.relu),
+)                   # Total: 3 arrays, 175 parameters, 1.871 KiB.
+```
+"""
 function FourierOperator(
     ch::Pair{S, S},
     modes::NTuple{N, S},
@@ -77,10 +165,11 @@ function FourierOperator(
     permuted=false
 ) where {S<:Integer, N}
     short_cut = permuted ? Conv(Tuple(ones(Int, length(modes))), ch) : Dense(ch.first, ch.second)
+    activation_func(x) = σ.(x)
 
     return Chain(
         Parallel(+, short_cut, SpectralConv(ch, modes, permuted=permuted)),
-        x -> σ.(x)
+        activation_func
     )
 end
 
