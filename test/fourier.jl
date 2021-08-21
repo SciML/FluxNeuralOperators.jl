@@ -7,6 +7,7 @@
         SpectralConv(ch, modes)
     )
     @test ndims(SpectralConv(ch, modes)) == 1
+    @test repr(SpectralConv(ch, modes)) == "SpectralConv(64 => 128, (16,), σ=identity)"
 
     𝐱, _ = get_burgers_data(n=5)
     @test size(m(𝐱)) == (128, 1024, 5)

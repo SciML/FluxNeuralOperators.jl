@@ -41,12 +41,14 @@ end
 julia> SpectralConv(2=>5, (16, ))
 SpectralConv(2 => 5, (16,), σ=identity)
 
+julia> using Flux
+
 julia> SpectralConv(2=>5, (16, ), relu)
 SpectralConv(2 => 5, (16,), σ=relu)
 
 julia> SpectralConv(2=>5, (16, ), relu, permuted=true)
 SpectralConvPerm(2 => 5, (16,), σ=relu)
-````
+```
 """
 function SpectralConv(
     ch::Pair{S, S},
@@ -104,6 +106,58 @@ end
 # operator #
 ############
 
+"""
+    FourierOperator(ch, modes, σ=identity; permuted=false)
+
+## FourierOperator
+
+* ``v(x)``: input
+* ``F``, ``F^{-1}``: Fourier transform, inverse fourier transform
+* ``L``: linear transform on the lower Fouier modes
+* ``D``: local linear transform
+
+```
+        ┌ F -> L -> F¯¹ ┐
+v(x) -> ┤               ├ -> + -> σ
+        └      D        ┘
+```
+
+## Example
+
+```jldoctest
+julia> FourierOperator(2=>5, (16, ))
+Chain(
+  Parallel(
+    +,
+    Dense(2, 5),                        # 15 parameters
+    SpectralConv(2 => 5, (16,), σ=identity),  # 160 parameters
+  ),
+  NeuralOperators.var"#activation_func#14"{typeof(identity)}(identity),
+)                   # Total: 3 arrays, 175 parameters, 1.668 KiB.
+
+julia> using Flux
+
+julia> FourierOperator(2=>5, (16, ), relu)
+Chain(
+  Parallel(
+    +,
+    Dense(2, 5),                        # 15 parameters
+    SpectralConv(2 => 5, (16,), σ=identity),  # 160 parameters
+  ),
+  NeuralOperators.var"#activation_func#14"{typeof(relu)}(NNlib.relu),
+)                   # Total: 3 arrays, 175 parameters, 1.668 KiB.
+
+julia> FourierOperator(2=>5, (16, ), relu, permuted=true)
+Chain(
+  Parallel(
+    +,
+    Conv((1,), 2 => 5),                 # 15 parameters
+    SpectralConvPerm(2 => 5, (16,), σ=identity),  # 160 parameters
+  ),
+  NeuralOperators.var"#activation_func#14"{typeof(relu)}(NNlib.relu),
+)                   # Total: 3 arrays, 175 parameters, 1.871 KiB.
+```
+"""
 function FourierOperator(
     ch::Pair{S, S},
     modes::NTuple{N, S},
@@ -111,10 +165,11 @@ function FourierOperator(
     permuted=false
 ) where {S<:Integer, N}
     short_cut = permuted ? Conv(Tuple(ones(Int, length(modes))), ch) : Dense(ch.first, ch.second)
+    activation_func(x) = σ.(x)
 
     return Chain(
         Parallel(+, short_cut, SpectralConv(ch, modes, permuted=permuted)),
-        x -> σ.(x)
+        activation_func
     )
 end
 
