@@ -27,13 +27,13 @@ end
         init=c_glorot_uniform, permuted=false, T=ComplexF32
     )
 
-## SpectralConv
+## Arguments
 
-* ``v(x)``: input
-* ``F``, ``F^{-1}``: Fourier transform, inverse fourier transform
-* ``L``: linear transform on the lower Fouier modes.
-
-``v(x)`` -> ``F`` -> ``L`` -> ``F^{-1}``
+* `ch`: Input and output channel size, e.g. `64=>64`.
+* `modes`: The Fourier modes to be preserved.
+* `σ`: Activation function.
+* `permuted`: Whether the dim is permuted. If `permuted=true`, layer accepts
+    data in the order of `(..., ch, batch)`, otherwise the order is `(ch, ..., batch)`.
 
 ## Example
 
@@ -109,18 +109,13 @@ end
 """
     FourierOperator(ch, modes, σ=identity; permuted=false)
 
-## FourierOperator
+## Arguments
 
-* ``v(x)``: input
-* ``F``, ``F^{-1}``: Fourier transform, inverse fourier transform
-* ``L``: linear transform on the lower Fouier modes
-* ``D``: local linear transform
-
-```
-        ┌ F -> L -> F¯¹ ┐
-v(x) -> ┤               ├ -> + -> σ
-        └      D        ┘
-```
+* `ch`: Input and output channel size for spectral convolution, e.g. `64=>64`.
+* `modes`: The Fourier modes to be preserved for spectral convolution.
+* `σ`: Activation function.
+* `permuted`: Whether the dim is permuted. If `permuted=true`, layer accepts
+    data in the order of `(..., ch, batch)`, otherwise the order is `(ch, ..., batch)`.
 
 ## Example
 
