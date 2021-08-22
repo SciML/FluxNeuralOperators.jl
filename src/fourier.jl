@@ -153,7 +153,7 @@ function FourierOperator(
     permuted=false
 ) where {S<:Integer, N}
     linear = permuted ? Conv(Tuple(ones(Int, length(modes))), ch) : Dense(ch.first, ch.second)
-    conv = SpectralConv(ch, modes, σ; permuted=permuted)
+    conv = SpectralConv(ch, modes; permuted=permuted)
 
     return FourierOperator(linear, conv, σ)
 end
