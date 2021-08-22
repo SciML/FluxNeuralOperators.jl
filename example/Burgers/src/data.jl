@@ -30,3 +30,15 @@ function get_burgers_data(; n=2048, Δsamples=2^3, grid_size=div(2^13, Δsamples
 
     return x_loc_data, y_data
 end
+
+function get_dataloader(; n_train=1800, n_test=200, batchsize=100)
+    𝐱, 𝐲 = get_burgers_data(n=2048)
+
+    𝐱_train, 𝐲_train = 𝐱[:, :, 1:n_train], 𝐲[:, 1:n_train]
+    loader_train = Flux.DataLoader((𝐱_train, 𝐲_train), batchsize=batchsize, shuffle=true)
+
+    𝐱_test, 𝐲_test = 𝐱[:, :, end-n_test+1:end], 𝐲[:, end-n_test+1:end]
+    loader_test = Flux.DataLoader((𝐱_test, 𝐲_test), batchsize=batchsize, shuffle=false)
+
+    return loader_train, loader_test
+end

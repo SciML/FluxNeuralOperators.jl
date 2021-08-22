@@ -30,18 +30,10 @@ function train()
         Dense(128, 1),
         flatten
     ) |> device
+    
     loss(𝐱, 𝐲) = sum(abs2, 𝐲 .- m(𝐱)) / size(𝐱)[end]
 
-    n_train = 1800
-    n_test = 200
-    batchsize = 100
-    𝐱, 𝐲 = get_burgers_data(n=2048)
-
-    𝐱_train, 𝐲_train = 𝐱[:, :, 1:n_train], 𝐲[:, 1:n_train]
-    loader_train = Flux.DataLoader((𝐱_train, 𝐲_train), batchsize=batchsize, shuffle=true)
-
-    𝐱_test, 𝐲_test = 𝐱[:, :, end-n_test+1:end], 𝐲[:, end-n_test+1:end]
-    loader_test = Flux.DataLoader((𝐱_test, 𝐲_test), batchsize=batchsize, shuffle=false)
+    loader_train, loader_test = get_dataloader()
 
     function validate()
         validation_losses = [loss(device(𝐱), device(𝐲)) for (𝐱, 𝐲) in loader_test]
