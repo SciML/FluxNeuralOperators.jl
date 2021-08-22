@@ -50,9 +50,10 @@ function SpectralConv(
     in_chs, out_chs = ch
     scale = one(T) / (in_chs * out_chs)
     weights = scale * init(out_chs, in_chs, prod(modes))
+    W = typeof(weights)
     F = typeof(σ)
 
-    return SpectralConv{permuted,N,T,S,F}(weights, in_chs, out_chs, modes, σ)
+    return SpectralConv{permuted,N,W,S,F}(weights, in_chs, out_chs, modes, σ)
 end
 
 Flux.@functor SpectralConv
@@ -91,6 +92,12 @@ end
 ############
 # operator #
 ############
+
+struct FourierOperator{L, C, F}
+    linear::L
+    conv::C
+    σ::F
+end
 
 """
     FourierOperator(ch, modes, σ=identity; permuted=false)
@@ -145,14 +152,18 @@ function FourierOperator(
     σ=identity;
     permuted=false
 ) where {S<:Integer, N}
-    short_cut = permuted ? Conv(Tuple(ones(Int, length(modes))), ch) : Dense(ch.first, ch.second)
-    activation_func(x) = σ.(x)
+    linear = permuted ? Conv(Tuple(ones(Int, length(modes))), ch) : Dense(ch.first, ch.second)
+    conv = SpectralConv(ch, modes, σ; permuted=permuted)
 
-    return Chain(
-        Parallel(+, short_cut, SpectralConv(ch, modes, permuted=permuted)),
-        activation_func
-    )
+    return FourierOperator(linear, conv, σ)
 end
+
+Flux.@functor FourierOperator
+
+function (m::FourierOperator)(𝐱)
+    return m.σ.(m.linear(𝐱) + m.conv(𝐱))
+end
+
 
 #########
 # utils #
