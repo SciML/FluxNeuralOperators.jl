@@ -3,11 +3,23 @@ export
     FourierOperator
 
 struct SpectralConv{P, N, T, S, F}
+    permuted::Bool
     weight::T
     in_channel::S
     out_channel::S
     modes::NTuple{N, S}
     σ::F
+end
+
+function SpectralConv(
+    permuted::Bool,
+    weight::T,
+    in_channel::S,
+    out_channel::S,
+    modes::NTuple{N, S},
+    σ::F
+) where {N, T, S, F}
+    return SpectralConv{permuted, N, T, S, F}(permuted, weight, in_channel, out_channel, modes, σ)
 end
 
 """
@@ -53,7 +65,7 @@ function SpectralConv(
     W = typeof(weights)
     F = typeof(σ)
 
-    return SpectralConv{permuted,N,W,S,F}(weights, in_chs, out_chs, modes, σ)
+    return SpectralConv{permuted, N, W, S, F}(permuted, weights, in_chs, out_chs, modes, σ)
 end
 
 Flux.@functor SpectralConv
