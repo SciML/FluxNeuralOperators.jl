@@ -24,7 +24,7 @@ Currently, `FourierOperator` is provided in this work.
 
 ## Usage
 
-```
+```julia
 function FourierNeuralOperator()
     modes = (16, )
     ch = 64 => 64
@@ -48,13 +48,13 @@ end
 
 Or you can just call:
 
-```
+```julia
 fno = FourierNeuralOperator()
 ```
 
 And then train as a Flux model.
 
-```
+```julia
 loss(𝐱, 𝐲) = sum(abs2, 𝐲 .- fno(𝐱)) / size(𝐱)[end]
 opt = Flux.Optimiser(WeightDecay(1f-4), Flux.ADAM(1f-3))
 Flux.@epochs 50 Flux.train!(loss, params(m), data, opt)
