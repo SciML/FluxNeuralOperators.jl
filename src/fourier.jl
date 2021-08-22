@@ -1,19 +1,8 @@
 export
     SpectralConv,
-    SpectralConvPerm,
     FourierOperator
 
-abstract type AbstractSpectralConv{N, T, S, F} end
-
-struct SpectralConv{N, T, S, F} <: AbstractSpectralConv{N, T, S, F}
-    weight::T
-    in_channel::S
-    out_channel::S
-    modes::NTuple{N, S}
-    σ::F
-end
-
-struct SpectralConvPerm{N, T, S, F} <: AbstractSpectralConv{N, T, S, F}
+struct SpectralConv{P, N, T, S, F}
     weight::T
     in_channel::S
     out_channel::S
@@ -33,7 +22,7 @@ end
 * `modes`: The Fourier modes to be preserved.
 * `σ`: Activation function.
 * `permuted`: Whether the dim is permuted. If `permuted=true`, layer accepts
-    data in the order of `(..., ch, batch)`, otherwise the order is `(ch, ..., batch)`.
+    data in the order of `(ch, ..., batch)`, otherwise the order is `(..., ch, batch)`.
 
 ## Example
 
@@ -47,7 +36,7 @@ julia> SpectralConv(2=>5, (16, ), relu)
 SpectralConv(2 => 5, (16,), σ=relu)
 
 julia> SpectralConv(2=>5, (16, ), relu, permuted=true)
-SpectralConvPerm(2 => 5, (16,), σ=relu)
+SpectralConv(2 => 5, (16,), σ=relu)
 ```
 """
 function SpectralConv(
@@ -61,23 +50,20 @@ function SpectralConv(
     in_chs, out_chs = ch
     scale = one(T) / (in_chs * out_chs)
     weights = scale * init(out_chs, in_chs, prod(modes))
+    F = typeof(σ)
 
-    L = permuted ? SpectralConvPerm : SpectralConv
-
-    return L(weights, in_chs, out_chs, modes, σ)
+    return SpectralConv{permuted,N,T,S,F}(weights, in_chs, out_chs, modes, σ)
 end
 
 Flux.@functor SpectralConv
-Flux.@functor SpectralConvPerm
 
-Base.ndims(::AbstractSpectralConv{N}) where {N} = N
+Base.ndims(::SpectralConv{P,N}) where {P,N} = N
 
-function Base.show(io::IO, l::AbstractSpectralConv)
-    T = (l isa SpectralConv) ? SpectralConv : SpectralConvPerm
-    print(io, "$(string(T))($(l.in_channel) => $(l.out_channel), $(l.modes), σ=$(string(l.σ)))")
+function Base.show(io::IO, l::SpectralConv)
+    print(io, "SpectralConv($(l.in_channel) => $(l.out_channel), $(l.modes), σ=$(string(l.σ)))")
 end
 
-function spectral_conv(m::AbstractSpectralConv, 𝐱::AbstractArray)
+function spectral_conv(m::SpectralConv, 𝐱::AbstractArray)
     n_dims = ndims(𝐱)
 
     𝐱_fft = fft(Zygote.hook(real, 𝐱), 1:ndims(m)) # [x, in_chs, batch]
@@ -90,7 +76,7 @@ function spectral_conv(m::AbstractSpectralConv, 𝐱::AbstractArray)
     return m.σ.(𝐱_ifft)
 end
 
-function (m::SpectralConv)(𝐱)
+function (m::SpectralConv{false})(𝐱)
     𝐱ᵀ = permutedims(𝐱, (ntuple(i->i+1, ndims(m))..., 1, ndims(m)+2)) # [x, in_chs, batch] <- [in_chs, x, batch]
     𝐱_out = spectral_conv(m, 𝐱ᵀ) # [x, out_chs, batch]
     𝐱_outᵀ = permutedims(𝐱_out, (ndims(m)+1, 1:ndims(m)..., ndims(m)+2)) # [out_chs, x, batch] <- [x, out_chs, batch]
@@ -98,7 +84,7 @@ function (m::SpectralConv)(𝐱)
     return 𝐱_outᵀ
 end
 
-function (m::SpectralConvPerm)(𝐱)
+function (m::SpectralConv{true})(𝐱)
     return spectral_conv(m, 𝐱) # [x, out_chs, batch]
 end
 
@@ -115,7 +101,7 @@ end
 * `modes`: The Fourier modes to be preserved for spectral convolution.
 * `σ`: Activation function.
 * `permuted`: Whether the dim is permuted. If `permuted=true`, layer accepts
-    data in the order of `(..., ch, batch)`, otherwise the order is `(ch, ..., batch)`.
+    data in the order of `(ch, ..., batch)`, otherwise the order is `(..., ch, batch)`.
 
 ## Example
 
