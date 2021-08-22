@@ -9,7 +9,7 @@
     @test ndims(SpectralConv(ch, modes)) == 1
     @test repr(SpectralConv(ch, modes)) == "SpectralConv(64 => 128, (16,), σ=identity, permuted=false)"
 
-    𝐱, _ = get_burgers_data(n=5)
+    𝐱 = rand(Float32, 2, 1024, 5)
     @test size(m(𝐱)) == (128, 1024, 5)
 
     loss(x, y) = Flux.mse(m(x), y)
@@ -28,7 +28,7 @@ end
     @test ndims(SpectralConv(ch, modes, permuted=true)) == 1
     @test repr(SpectralConv(ch, modes, permuted=true)) == "SpectralConv(64 => 128, (16,), σ=identity, permuted=true)"
 
-    𝐱, _ = get_burgers_data(n=5)
+    𝐱 = rand(Float32, 2, 1024, 5)
     𝐱 = permutedims(𝐱, (2, 1, 3))
     @test size(m(𝐱)) == (1024, 128, 5)
 
@@ -47,7 +47,7 @@ end
     )
     @test repr(FourierOperator(ch, modes)) == "FourierOperator(64 => 128, (16,), σ=identity, permuted=false)"
 
-    𝐱, _ = get_burgers_data(n=5)
+    𝐱 = rand(Float32, 2, 1024, 5)
     @test size(m(𝐱)) == (128, 1024, 5)
 
     loss(x, y) = Flux.mse(m(x), y)
@@ -65,7 +65,7 @@ end
     )
     @test repr(FourierOperator(ch, modes, permuted=true)) == "FourierOperator(64 => 128, (16,), σ=identity, permuted=true)"
 
-    𝐱, _ = get_burgers_data(n=5)
+    𝐱 = rand(Float32, 2, 1024, 5)
     𝐱 = permutedims(𝐱, (2, 1, 3))
     @test size(m(𝐱)) == (1024, 128, 5)
 
@@ -84,7 +84,7 @@ end
     )
     @test ndims(SpectralConv(ch, modes)) == 2
 
-    𝐱, _, _, _ = get_darcy_flow_data(n=5, Δsamples=20)
+    𝐱 = rand(Float32, 1, 22, 22, 5)
     @test size(m(𝐱)) == (64, 22, 22, 5)
 
     loss(x, y) = Flux.mse(m(x), y)
@@ -102,7 +102,7 @@ end
     )
     @test ndims(SpectralConv(ch, modes, permuted=true)) == 2
 
-    𝐱, _, _, _ = get_darcy_flow_data(n=5, Δsamples=20)
+    𝐱 = rand(Float32, 1, 22, 22, 5)
     𝐱 = permutedims(𝐱, (2, 3, 1, 4))
     @test size(m(𝐱)) == (22, 22, 64, 5)
 
@@ -120,7 +120,7 @@ end
         FourierOperator(ch, modes)
     )
 
-    𝐱, _, _, _ = get_darcy_flow_data(n=5, Δsamples=20)
+    𝐱 = rand(Float32, 1, 22, 22, 5)
     @test size(m(𝐱)) == (64, 22, 22, 5)
 
     loss(x, y) = Flux.mse(m(x), y)
@@ -137,7 +137,7 @@ end
         FourierOperator(ch, modes, permuted=true)
     )
 
-    𝐱, _, _, _ = get_darcy_flow_data(n=5, Δsamples=20)
+    𝐱 = rand(Float32, 1, 22, 22, 5)
     𝐱 = permutedims(𝐱, (2, 3, 1, 4))
     @test size(m(𝐱)) == (22, 22, 64, 5)
 

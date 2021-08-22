@@ -1,0 +1,16 @@
+name = "Burgers"
+uuid = "5b053d85-f964-4905-ae31-99551cd8d3ad"
+
+[deps]
+CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
+DataDeps = "124859b0-ceae-595e-8997-d05f6a7a8dfe"
+Fetch = "bb354801-46f6-40b6-9c3d-d42d7a74c775"
+Flux = "587475ba-b771-5e3f-ad9e-33799f191a9c"
+MAT = "23992714-dd62-5051-b70f-ba57cb901cac"
+NeuralOperators = "ea5c82af-86e5-48da-8ee1-382d6ad7af4b"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]

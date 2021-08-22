@@ -3,11 +3,23 @@ export
     FourierOperator
 
 struct SpectralConv{P, N, T, S, F}
+    permuted::Bool
     weight::T
     in_channel::S
     out_channel::S
     modes::NTuple{N, S}
     σ::F
+end
+
+function SpectralConv(
+    permuted::Bool,
+    weight::T,
+    in_channel::S,
+    out_channel::S,
+    modes::NTuple{N, S},
+    σ::F
+) where {N, T, S, F}
+    return SpectralConv{permuted, N, T, S, F}(permuted, weight, in_channel, out_channel, modes, σ)
 end
 
 """
@@ -50,17 +62,13 @@ function SpectralConv(
     in_chs, out_chs = ch
     scale = one(T) / (in_chs * out_chs)
     weights = scale * init(out_chs, in_chs, prod(modes))
-    W = typeof(weights)
-    F = typeof(σ)
 
-    return SpectralConv{permuted,N,W,S,F}(weights, in_chs, out_chs, modes, σ)
+    return SpectralConv(permuted, weights, in_chs, out_chs, modes, σ)
 end
 
 Flux.@functor SpectralConv
 
 Base.ndims(::SpectralConv{P,N}) where {P,N} = N
-
-permuted(::SpectralConv{P}) where {P} = P
 
 function Base.show(io::IO, l::SpectralConv{P}) where {P}
     print(io, "SpectralConv($(l.in_channel) => $(l.out_channel), $(l.modes), σ=$(string(l.σ)), permuted=$P)")
@@ -142,7 +150,7 @@ end
 Flux.@functor FourierOperator
 
 function Base.show(io::IO, l::FourierOperator)
-    print(io, "FourierOperator($(l.conv.in_channel) => $(l.conv.out_channel), $(l.conv.modes), σ=$(string(l.σ)), permuted=$(permuted(l.conv)))")
+    print(io, "FourierOperator($(l.conv.in_channel) => $(l.conv.out_channel), $(l.conv.modes), σ=$(string(l.σ)), permuted=$(l.conv.permuted))")
 end
 
 function (m::FourierOperator)(𝐱)
