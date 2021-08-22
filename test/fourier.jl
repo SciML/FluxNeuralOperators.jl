@@ -1,4 +1,4 @@
-@testset "SpectralConv1d" begin
+@testset "1D SpectralConv" begin
     modes = (16, )
     ch = 64 => 128
 
@@ -7,7 +7,7 @@
         SpectralConv(ch, modes)
     )
     @test ndims(SpectralConv(ch, modes)) == 1
-    @test repr(SpectralConv(ch, modes)) == "SpectralConv(64 => 128, (16,), σ=identity)"
+    @test repr(SpectralConv(ch, modes)) == "SpectralConv(64 => 128, (16,), σ=identity, permuted=false)"
 
     𝐱, _ = get_burgers_data(n=5)
     @test size(m(𝐱)) == (128, 1024, 5)
@@ -17,7 +17,7 @@
     Flux.train!(loss, params(m), data, Flux.ADAM())
 end
 
-@testset "SpectralConvPerm1d" begin
+@testset "permuted 1D SpectralConv" begin
     modes = (16, )
     ch = 64 => 128
 
@@ -26,6 +26,7 @@ end
         SpectralConv(ch, modes, permuted=true)
     )
     @test ndims(SpectralConv(ch, modes, permuted=true)) == 1
+    @test repr(SpectralConv(ch, modes, permuted=true)) == "SpectralConv(64 => 128, (16,), σ=identity, permuted=true)"
 
     𝐱, _ = get_burgers_data(n=5)
     𝐱 = permutedims(𝐱, (2, 1, 3))
@@ -36,7 +37,7 @@ end
     Flux.train!(loss, params(m), data, Flux.ADAM())
 end
 
-@testset "FourierOperator1d" begin
+@testset "1D FourierOperator" begin
     modes = (16, )
     ch = 64 => 128
 
@@ -44,6 +45,7 @@ end
         Dense(2, 64),
         FourierOperator(ch, modes)
     )
+    @test repr(FourierOperator(ch, modes)) == "FourierOperator(64 => 128, (16,), σ=identity, permuted=false)"
 
     𝐱, _ = get_burgers_data(n=5)
     @test size(m(𝐱)) == (128, 1024, 5)
@@ -53,7 +55,7 @@ end
     Flux.train!(loss, params(m), data, Flux.ADAM())
 end
 
-@testset "FourierOperatorPerm1d" begin
+@testset "permuted 1D FourierOperator" begin
     modes = (16, )
     ch = 64 => 128
 
@@ -61,6 +63,7 @@ end
         Conv((1, ), 2=>64),
         FourierOperator(ch, modes, permuted=true)
     )
+    @test repr(FourierOperator(ch, modes, permuted=true)) == "FourierOperator(64 => 128, (16,), σ=identity, permuted=true)"
 
     𝐱, _ = get_burgers_data(n=5)
     𝐱 = permutedims(𝐱, (2, 1, 3))
@@ -71,7 +74,7 @@ end
     Flux.train!(loss, params(m), data, Flux.ADAM())
 end
 
-@testset "SpectralConv2d" begin
+@testset "2D SpectralConv" begin
     modes = (16, 16)
     ch = 64 => 64
 
@@ -89,7 +92,7 @@ end
     Flux.train!(loss, params(m), data, Flux.ADAM())
 end
 
-@testset "SpectralConvPerm2d" begin
+@testset "permuted 2D SpectralConv" begin
     modes = (16, 16)
     ch = 64 => 64
 
@@ -108,7 +111,7 @@ end
     Flux.train!(loss, params(m), data, Flux.ADAM())
 end
 
-@testset "FourierOperator2d" begin
+@testset "2D FourierOperator" begin
     modes = (16, 16)
     ch = 64 => 64
 
@@ -125,7 +128,7 @@ end
     Flux.train!(loss, params(m), data, Flux.ADAM())
 end
 
-@testset "FourierOperatorPerm2d" begin
+@testset "permuted 2D FourierOperator" begin
     modes = (16, 16)
     ch = 64 => 64
 
