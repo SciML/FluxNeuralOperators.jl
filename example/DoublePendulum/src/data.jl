@@ -1,3 +1,7 @@
+using DataDeps
+
+export get_double_pendulum_chaotic_data
+
 function register_double_pendulum_chaotic()
     register(DataDep(
         "DoublePendulumChaotic",
@@ -15,10 +19,11 @@ function register_double_pendulum_chaotic()
         Page: https://developer.ibm.com/exchanges/data/all/double-pendulum-chaotic/
         """,
         "https://dax-cdn.cdn.appdomain.cloud/dax-double-pendulum-chaotic/2.0.1/double-pendulum-chaotic.tar.gz",
+        "4ca743b4b783094693d313ebedc2e8e53cf29821ee8b20abd99f8fb4c0866f8d",
         post_fetch_method=unpack
     ))
 end
 
 function get_double_pendulum_chaotic_data()
-
+    data_path = joinpath(datadep"DoublePendulumChaotic", "original", "dpc_dataset_csv")
 end
