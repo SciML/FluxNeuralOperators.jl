@@ -32,6 +32,8 @@ end
 * `ch`: Input and output channel size, e.g. `64=>64`.
 * `modes`: The Fourier modes to be preserved.
 * `σ`: Activation function.
+* `permuted`: Whether the dim is permuted. If `permuted=true`, layer accepts
+    data in the order of `(..., ch, batch)`, otherwise the order is `(ch, ..., batch)`.
 
 ## Example
 
@@ -112,6 +114,8 @@ end
 * `ch`: Input and output channel size for spectral convolution, e.g. `64=>64`.
 * `modes`: The Fourier modes to be preserved for spectral convolution.
 * `σ`: Activation function.
+* `permuted`: Whether the dim is permuted. If `permuted=true`, layer accepts
+    data in the order of `(..., ch, batch)`, otherwise the order is `(ch, ..., batch)`.
 
 ## Example
 
