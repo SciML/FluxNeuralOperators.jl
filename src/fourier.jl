@@ -28,15 +28,15 @@ end
 
 ```jldoctest
 julia> SpectralConv(2=>5, (16, ))
-SpectralConv(2 => 5, (16,), σ=identity)
+SpectralConv(2 => 5, (16,), σ=identity, permuted=false)
 
 julia> using Flux
 
 julia> SpectralConv(2=>5, (16, ), relu)
-SpectralConv(2 => 5, (16,), σ=relu)
+SpectralConv(2 => 5, (16,), σ=relu, permuted=false)
 
 julia> SpectralConv(2=>5, (16, ), relu, permuted=true)
-SpectralConv(2 => 5, (16,), σ=relu)
+SpectralConv(2 => 5, (16,), σ=relu, permuted=true)
 ```
 """
 function SpectralConv(
@@ -60,8 +60,10 @@ Flux.@functor SpectralConv
 
 Base.ndims(::SpectralConv{P,N}) where {P,N} = N
 
-function Base.show(io::IO, l::SpectralConv)
-    print(io, "SpectralConv($(l.in_channel) => $(l.out_channel), $(l.modes), σ=$(string(l.σ)))")
+permuted(::SpectralConv{P}) where {P} = P
+
+function Base.show(io::IO, l::SpectralConv{P}) where {P}
+    print(io, "SpectralConv($(l.in_channel) => $(l.out_channel), $(l.modes), σ=$(string(l.σ)), permuted=$P)")
 end
 
 function spectral_conv(m::SpectralConv, 𝐱::AbstractArray)
@@ -114,36 +116,15 @@ end
 
 ```jldoctest
 julia> FourierOperator(2=>5, (16, ))
-Chain(
-  Parallel(
-    +,
-    Dense(2, 5),                        # 15 parameters
-    SpectralConv(2 => 5, (16,), σ=identity),  # 160 parameters
-  ),
-  NeuralOperators.var"#activation_func#14"{typeof(identity)}(identity),
-)                   # Total: 3 arrays, 175 parameters, 1.668 KiB.
+FourierOperator(2 => 5, (16,), σ=identity, permuted=false)
 
 julia> using Flux
 
 julia> FourierOperator(2=>5, (16, ), relu)
-Chain(
-  Parallel(
-    +,
-    Dense(2, 5),                        # 15 parameters
-    SpectralConv(2 => 5, (16,), σ=identity),  # 160 parameters
-  ),
-  NeuralOperators.var"#activation_func#14"{typeof(relu)}(NNlib.relu),
-)                   # Total: 3 arrays, 175 parameters, 1.668 KiB.
+FourierOperator(2 => 5, (16,), σ=relu, permuted=false)
 
 julia> FourierOperator(2=>5, (16, ), relu, permuted=true)
-Chain(
-  Parallel(
-    +,
-    Conv((1,), 2 => 5),                 # 15 parameters
-    SpectralConvPerm(2 => 5, (16,), σ=identity),  # 160 parameters
-  ),
-  NeuralOperators.var"#activation_func#14"{typeof(relu)}(NNlib.relu),
-)                   # Total: 3 arrays, 175 parameters, 1.871 KiB.
+FourierOperator(2 => 5, (16,), σ=relu, permuted=true)
 ```
 """
 function FourierOperator(
@@ -159,6 +140,10 @@ function FourierOperator(
 end
 
 Flux.@functor FourierOperator
+
+function Base.show(io::IO, l::FourierOperator)
+    print(io, "FourierOperator($(l.conv.in_channel) => $(l.conv.out_channel), $(l.conv.modes), σ=$(string(l.σ)), permuted=$(permuted(l.conv)))")
+end
 
 function (m::FourierOperator)(𝐱)
     return m.σ.(m.linear(𝐱) + m.conv(𝐱))
