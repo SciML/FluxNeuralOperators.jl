@@ -68,7 +68,7 @@ end
 
 Flux.@functor SpectralConv
 
-Base.ndims(::SpectralConv{P,N}) where {P,N} = N
+Base.ndims(::SpectralConv{P, N}) where {P, N} = N
 
 function Base.show(io::IO, l::SpectralConv{P}) where {P}
     print(io, "SpectralConv($(l.in_channel) => $(l.out_channel), $(l.modes), σ=$(string(l.σ)), permuted=$P)")
@@ -150,7 +150,15 @@ end
 Flux.@functor FourierOperator
 
 function Base.show(io::IO, l::FourierOperator)
-    print(io, "FourierOperator($(l.conv.in_channel) => $(l.conv.out_channel), $(l.conv.modes), σ=$(string(l.σ)), permuted=$(l.conv.permuted))")
+    print(
+        io,
+        "FourierOperator(" *
+            "$(l.conv.in_channel) => $(l.conv.out_channel), " *
+            "$(l.conv.modes), " *
+            "σ=$(string(l.σ)), " *
+            "permuted=$(l.conv.permuted)" *
+        ")"
+    )
 end
 
 function (m::FourierOperator)(𝐱)
