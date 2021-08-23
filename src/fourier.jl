@@ -8,17 +8,16 @@ struct SpectralConv{P, N, T, S, F}
     out_channel::S
     modes::NTuple{N, S}
     σ::F
+end
 
-    function SpectralConv(
-        permuted::Bool,
-        weight::T,
-        in_channel::S,
-        out_channel::S,
-        modes::NTuple{N, S},
-        σ::F
-    ) where {N, T, S, F}
-        return new{permuted, N, T, S, F}(weight, in_channel, out_channel, modes, σ)
-    end
+function SpectralConv{P}(
+    weight::T,
+    in_channel::S,
+    out_channel::S,
+    modes::NTuple{N, S},
+    σ::F
+) where {P, N, T, S, F}
+    return SpectralConv{P, N, T, S, F}(weight, in_channel, out_channel, modes, σ)
 end
 
 """
@@ -62,10 +61,11 @@ function SpectralConv(
     scale = one(T) / (in_chs * out_chs)
     weights = scale * init(out_chs, in_chs, prod(modes))
 
-    return SpectralConv(permuted, weights, in_chs, out_chs, modes, σ)
+    return SpectralConv{permuted}(weights, in_chs, out_chs, modes, σ)
 end
 
-Flux.@functor SpectralConv
+Flux.@functor SpectralConv{true}
+Flux.@functor SpectralConv{false}
 
 Base.ndims(::SpectralConv{P, N}) where {P, N} = N
 
