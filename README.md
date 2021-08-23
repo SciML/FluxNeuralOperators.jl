@@ -68,25 +68,25 @@ PDE training examples are provided in `example` folder.
 Use following commend to train model:
 
 ```julia
-$ julia --proj=example/Burgers
+$ julia --proj
 
 julia> using Burgers; Burgers.train()
 ```
 
-### Two-dimensional Darcy flow equation
+### Double Pendulum
 
-WIP
+```julia
+$ julia --proj
 
-### Two-dimensional Navier-Stokes equation
-
-WIP
+julia> using DoublePendulum; DoublePendulum.train()
+```
 
 ## Roadmap
 
 - [x] `FourierOperator` layer
 - [x] One-dimensional Burgers' equation example
-- [ ] Two-dimensional Darcy flow equation example
-- [ ] Two-dimensional Navier-Stokes equation example
+- [ ] `Markov Neural Operators`
+- [x] Double Pendulum prediction example
 - [ ] `NeuralOperator` layer
 - [ ] Poisson equation example
 
