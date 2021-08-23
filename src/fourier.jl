@@ -3,23 +3,22 @@ export
     FourierOperator
 
 struct SpectralConv{P, N, T, S, F}
-    permuted::Bool
     weight::T
     in_channel::S
     out_channel::S
     modes::NTuple{N, S}
     σ::F
-end
 
-function SpectralConv(
-    permuted::Bool,
-    weight::T,
-    in_channel::S,
-    out_channel::S,
-    modes::NTuple{N, S},
-    σ::F
-) where {N, T, S, F}
-    return SpectralConv{permuted, N, T, S, F}(permuted, weight, in_channel, out_channel, modes, σ)
+    function SpectralConv(
+        permuted::Bool,
+        weight::T,
+        in_channel::S,
+        out_channel::S,
+        modes::NTuple{N, S},
+        σ::F
+    ) where {N, T, S, F}
+        return new{permuted, N, T, S, F}(weight, in_channel, out_channel, modes, σ)
+    end
 end
 
 """
@@ -69,6 +68,8 @@ end
 Flux.@functor SpectralConv
 
 Base.ndims(::SpectralConv{P, N}) where {P, N} = N
+
+ispermuted(::SpectralConv{P}) where {P} = P
 
 function Base.show(io::IO, l::SpectralConv{P}) where {P}
     print(io, "SpectralConv($(l.in_channel) => $(l.out_channel), $(l.modes), σ=$(string(l.σ)), permuted=$P)")
@@ -156,7 +157,7 @@ function Base.show(io::IO, l::FourierOperator)
             "$(l.conv.in_channel) => $(l.conv.out_channel), " *
             "$(l.conv.modes), " *
             "σ=$(string(l.σ)), " *
-            "permuted=$(l.conv.permuted)" *
+            "permuted=$(ispermuted(l.conv))" *
         ")"
     )
 end
