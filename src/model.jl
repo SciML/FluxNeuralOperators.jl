@@ -1,19 +1,19 @@
 export
     FourierNeuralOperator
 
-function FourierNeuralOperator()
-    modes = (16, )
-    ch = 64 => 64
-    σ = gelu
-
+function FourierNeuralOperator(;
+    ch=(2, 64, 64, 64, 64, 64, 128, 1),
+    modes=(16, ),
+    σ=gelu
+)
     return Chain(
-        Dense(2, 64),
-        FourierOperator(ch, modes, σ),
-        FourierOperator(ch, modes, σ),
-        FourierOperator(ch, modes, σ),
-        FourierOperator(ch, modes),
-        Dense(64, 128, σ),
-        Dense(128, 1),
+        Dense(ch[1], ch[2]),
+        FourierOperator(ch[2]=>ch[3], modes, σ),
+        FourierOperator(ch[3]=>ch[4], modes, σ),
+        FourierOperator(ch[4]=>ch[5], modes, σ),
+        FourierOperator(ch[5]=>ch[6], modes),
+        Dense(ch[6], ch[7], σ),
+        Dense(ch[7], ch[8]),
         flatten
     )
 end
