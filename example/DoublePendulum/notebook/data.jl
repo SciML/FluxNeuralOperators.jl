@@ -19,9 +19,9 @@ data = get_double_pendulum_chaotic_data(i=0, n=-1)
 # ╔═╡ 9c8b3f8a-1b85-4c32-a416-ead51b244b94
 begin
 	anim = @animate for i in 1:1000
-		scatter(legend=false, xlim=(0, 2500), ylim=(0, 2500))
+		scatter(legend=false, xlim=(0, 1), ylim=(0, 1))
 		scatter!(data[[1, 3, 5], i], data[[2, 4, 6], i], color=[:red, :green, :blue])
-		annotate!(250, 250, text("i=$i", :left))
+		annotate!(0.1, 0.1, text("i=$i", :left))
 	end
 
 	gif(anim, fps=10)
