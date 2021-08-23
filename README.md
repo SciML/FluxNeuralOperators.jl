@@ -25,39 +25,37 @@ Currently, `FourierOperator` is provided in this work.
 ## Usage
 
 ```julia
-function FourierNeuralOperator()
-    modes = (16, )
-    ch = 64 => 64
-    σ = gelu
-
-    return Chain(
-        # project finite-dimensional data to infinite-dimensional space
-        Dense(2, 64),
-        # operator projects data between infinite-dimensional spaces
-        FourierOperator(ch, modes, σ),
-        FourierOperator(ch, modes, σ),
-        FourierOperator(ch, modes, σ),
-        FourierOperator(ch, modes),
-        # project infinite-dimensional function to finite-dimensional space
-        Dense(64, 128, σ),
-        Dense(128, 1),
-        flatten
-    )
-end
+model = Chain(
+    # project finite-dimensional data to infinite-dimensional space
+    Dense(2, 64),
+    # operator projects data between infinite-dimensional spaces
+    FourierOperator(64=>64, (16, ), gelu),
+    FourierOperator(64=>64, (16, ), gelu),
+    FourierOperator(64=>64, (16, ), gelu),
+    FourierOperator(64=>64, (16, )),
+    # project infinite-dimensional function to finite-dimensional space
+    Dense(64, 128, gelu),
+    Dense(128, 1),
+    flatten
+)
 ```
 
 Or you can just call:
 
 ```julia
-fno = FourierNeuralOperator()
+model = FourierNeuralOperator(
+    ch=(2, 64, 64, 64, 64, 64, 128, 1),
+    modes=(16, ),
+    σ=gelu
+)
 ```
 
 And then train as a Flux model.
 
 ```julia
-loss(𝐱, 𝐲) = sum(abs2, 𝐲 .- fno(𝐱)) / size(𝐱)[end]
+loss(𝐱, 𝐲) = sum(abs2, 𝐲 .- model(𝐱)) / size(𝐱)[end]
 opt = Flux.Optimiser(WeightDecay(1f-4), Flux.ADAM(1f-3))
-Flux.@epochs 50 Flux.train!(loss, params(m), data, opt)
+Flux.@epochs 50 Flux.train!(loss, params(model), data, opt)
 ```
 
 ## Examples
@@ -66,7 +64,14 @@ PDE training examples are provided in `example` folder.
 
 ### One-dimensional Burgers' equation
 
-[Burgers' equation](https://en.wikipedia.org/wiki/Burgers%27_equation) example can be found in `example/burgers.jl`.
+[Burgers' equation](https://en.wikipedia.org/wiki/Burgers%27_equation) example can be found in `example/Burgers`.
+Use following commend to train model:
+
+```julia
+$ julia --proj=example/Burgers
+
+julia> using Burgers; Burgers.train()
+```
 
 ### Two-dimensional Darcy flow equation
 
