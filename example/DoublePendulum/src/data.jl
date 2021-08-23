@@ -1,4 +1,6 @@
 using DataDeps
+using CSV
+using DataFrames
 
 export get_double_pendulum_chaotic_data
 
@@ -24,6 +26,14 @@ function register_double_pendulum_chaotic()
     ))
 end
 
-function get_double_pendulum_chaotic_data()
+function get_double_pendulum_chaotic_data(; i=0, n=-1)
     data_path = joinpath(datadep"DoublePendulumChaotic", "original", "dpc_dataset_csv")
+    df = CSV.read(
+        joinpath(data_path, "$i.csv"),
+        DataFrame,
+        header=[:x_red, :y_red, :x_green, :y_green, :x_blue, :y_blue]
+    )
+    data = (n<0) ? collect(Matrix(df)') : collect(Matrix(df)')[:, 1:n]
+
+    return data
 end
