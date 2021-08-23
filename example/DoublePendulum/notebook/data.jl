@@ -21,6 +21,7 @@ begin
 	anim = @animate for i in 1:1000
 		scatter(legend=false, xlim=(0, 2500), ylim=(0, 2500))
 		scatter!(data[[1, 3, 5], i], data[[2, 4, 6], i], color=[:red, :green, :blue])
+		annotate!(250, 250, text("i=$i", :left))
 	end
 
 	gif(anim, fps=10)
