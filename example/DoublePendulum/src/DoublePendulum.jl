@@ -1,6 +1,7 @@
 module DoublePendulum
 
 using NeuralOperators
+using Flux
 
 include("data.jl")
 
