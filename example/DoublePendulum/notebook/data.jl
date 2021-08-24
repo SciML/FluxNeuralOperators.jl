@@ -14,7 +14,7 @@ begin
 end
 
 # ╔═╡ 5268feee-bda2-4612-9d4c-a1db424a11c7
-data = get_double_pendulum_chaotic_data(i=0, n=-1)
+data = get_data(i=0, n=-1)
 
 # ╔═╡ 9c8b3f8a-1b85-4c32-a416-ead51b244b94
 begin

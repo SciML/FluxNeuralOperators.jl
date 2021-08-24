@@ -2,8 +2,6 @@ using DataDeps
 using CSV
 using DataFrames
 
-export get_double_pendulum_chaotic_data
-
 function register_double_pendulum_chaotic()
     register(DataDep(
         "DoublePendulumChaotic",
@@ -26,7 +24,7 @@ function register_double_pendulum_chaotic()
     ))
 end
 
-function get_double_pendulum_chaotic_data(; i=0, n=-1)
+function get_data(; i=0, n=-1)
     data_path = joinpath(datadep"DoublePendulumChaotic", "original", "dpc_dataset_csv")
     df = CSV.read(
         joinpath(data_path, "$i.csv"),
@@ -41,7 +39,7 @@ function get_double_pendulum_chaotic_data(; i=0, n=-1)
 end
 
 function get_dataloader(; i=0, n_train=15001, n_test=1501, Δn=1024, batchsize=100)
-    x = reshape(get_double_pendulum_chaotic_data(; i=i, n=-1), :)
+    x = reshape(get_data(; i=i, n=-1), :)
     𝐱 = reshape(vcat([x[i:(i+6Δn-1)] for i in 1:6:(length(x)-6(Δn-1))]...), 1, 6, 1024, :)
 
     𝐱_train, 𝐲_train = 𝐱[:, :, :, 1:(n_train-1)], 𝐱[:, :, :, 2:n_train]

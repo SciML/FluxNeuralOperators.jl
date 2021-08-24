@@ -2,8 +2,6 @@ using DataDeps
 using Fetch
 using MAT
 
-export get_burgers_data
-
 function register_burgers()
     register(DataDep(
         "Burgers",
@@ -18,7 +16,7 @@ function register_burgers()
     ))
 end
 
-function get_burgers_data(; n=2048, Δsamples=2^3, grid_size=div(2^13, Δsamples), T=Float32)
+function get_data(; n=2048, Δsamples=2^3, grid_size=div(2^13, Δsamples), T=Float32)
     file = matopen(joinpath(datadep"Burgers", "burgers_data_R10.mat"))
     x_data = T.(collect(read(file, "a")[1:n, 1:Δsamples:end]'))
     y_data = T.(collect(read(file, "u")[1:n, 1:Δsamples:end]'))
@@ -32,7 +30,7 @@ function get_burgers_data(; n=2048, Δsamples=2^3, grid_size=div(2^13, Δsamples
 end
 
 function get_dataloader(; n_train=1800, n_test=200, batchsize=100)
-    𝐱, 𝐲 = get_burgers_data(n=2048)
+    𝐱, 𝐲 = get_data(n=2048)
 
     𝐱_train, 𝐲_train = 𝐱[:, :, 1:n_train], 𝐲[:, 1:n_train]
     loader_train = Flux.DataLoader((𝐱_train, 𝐲_train), batchsize=batchsize, shuffle=true)
