@@ -86,7 +86,7 @@ julia> using DoublePendulum; DoublePendulum.train()
 - [x] `FourierOperator` layer
 - [x] One-dimensional Burgers' equation example
 - [ ] `MarkovOperator` layer
-- [x] Double Pendulum prediction example
+- [x] Double pendulum prediction example
 - [ ] `NeuralOperator` layer
 - [ ] Poisson equation example
 
