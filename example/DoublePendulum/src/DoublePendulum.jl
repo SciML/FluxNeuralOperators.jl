@@ -15,7 +15,7 @@ function update_model!(model_file_path, model)
     @warn "model updated!"
 end
 
-function train(; loss_bounds=[1, 0.3, 0.1, 0.05])
+function train(; loss_bounds=[1, 0.2, 0.1, 0.05, 0.02])
     if has_cuda()
         @info "CUDA is on"
         device = gpu
@@ -26,7 +26,6 @@ function train(; loss_bounds=[1, 0.3, 0.1, 0.05])
 
     m = Chain(
         FourierOperator(6=>64, (16, ), relu),
-        FourierOperator(64=>64, (16, ), relu),
         FourierOperator(64=>64, (16, ), relu),
         FourierOperator(64=>64, (16, ), relu),
         FourierOperator(64=>6, (16, )),
@@ -56,7 +55,7 @@ function train(; loss_bounds=[1, 0.3, 0.1, 0.05])
         end
     end
     call_back = Flux.throttle(validate, 10, leading=false, trailing=true)
-    
+
     Flux.@epochs 50 @time(Flux.train!(loss, params(m), data, opt, cb=call_back))
 end
 
