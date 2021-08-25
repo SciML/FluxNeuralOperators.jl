@@ -33,19 +33,18 @@ function get_data(; i=0, n=-1)
     )
     data = (n < 0) ? collect(Matrix(df)') : collect(Matrix(df)')[:, 1:n]
 
-    data /= maximum(data)
-
     return Float32.(data)
 end
 
-function get_dataloader(; i=0, n_train=15734, n_test=2048, Δn=1024, batchsize=100)
-    x = reshape(get_data(; i=i, n=-1), :) # size==(6, 17782)
-    𝐱 = reshape(vcat([x[i:(i+6Δn-1)] for i in 1:6:(length(x)-6(Δn-1))]...), 1, 6, 1024, :)
+function get_dataloader(; i=0, n_train=15733, n_test=2048, Δn=1, batchsize=100)
+    𝐱 = get_data(i=i, n=-1) # size==(6, 17782)
+    ∇𝐱 = 𝐱[:, (1+Δn):end] - 𝐱[:, 1:(end-Δn)]
+    𝐱 = reshape(vcat(𝐱[:, 1:(end-Δn)], ∇𝐱), 1, 12, :)
 
-    𝐱_train, 𝐲_train = 𝐱[:, :, :, 1:(n_train-Δn)], 𝐱[:, :, :, 1+Δn:n_train]
+    𝐱_train, 𝐲_train = 𝐱[:, :, 1:(n_train-1)], 𝐱[:, :, 2:n_train]
     loader_train = Flux.DataLoader((𝐱_train, 𝐲_train), batchsize=batchsize, shuffle=true)
 
-    𝐱_test, 𝐲_test = 𝐱[:, :, :, (end-n_test+1):(end-Δn)], 𝐱[:, :, :, (end-n_test+1+Δn):end]
+    𝐱_test, 𝐲_test = 𝐱[:, :, (end-n_test+1):(end-1)], 𝐱[:, :, (end-n_test+2):end]
     loader_test = Flux.DataLoader((𝐱_test, 𝐲_test), batchsize=batchsize, shuffle=false)
 
     return loader_train, loader_test
