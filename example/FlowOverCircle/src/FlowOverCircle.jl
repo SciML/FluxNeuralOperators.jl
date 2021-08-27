@@ -35,7 +35,8 @@ function train()
 
     opt = Flux.Optimiser(WeightDecay(1f-4), Flux.ADAM(1f-3))
 
-    print("gen data... "); loader_train, loader_test = get_dataloader(); println("done")
+    @info "gen data... "
+    @time loader_train, loader_test = get_dataloader()
 
     losses = Float32[]
     function validate()
@@ -45,10 +46,10 @@ function train()
         push!(losses, validation_loss)
         (losses[end] == minimum(losses)) && update_model!(joinpath(@__DIR__, "../model/model.jld2"), m)
     end
-    call_back = Flux.throttle(validate, 1, leading=false, trailing=true)
+    call_back = Flux.throttle(validate, 5, leading=false, trailing=true)
 
     data = [(𝐱, 𝐲) for (𝐱, 𝐲) in loader_train] |> device
-    Flux.@epochs 500 @time(Flux.train!(loss, params(m), data, opt, cb=call_back))
+    Flux.@epochs 50 @time(Flux.train!(loss, params(m), data, opt, cb=call_back))
 end
 
 function get_model()
