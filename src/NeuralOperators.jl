@@ -9,6 +9,5 @@ module NeuralOperators
     using ChainRulesCore
 
     include("fourier.jl")
-    include("markov.jl")
     include("model.jl")
 end
