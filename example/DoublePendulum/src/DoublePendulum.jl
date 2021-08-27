@@ -15,7 +15,7 @@ function update_model!(model_file_path, model)
     @warn "model updated!"
 end
 
-function train(; loss_bounds=[])
+function train(; Δn=5, loss_bounds=[])
     if has_cuda()
         @info "CUDA is on"
         device = gpu
@@ -25,41 +25,31 @@ function train(; loss_bounds=[])
     end
 
     m = Chain(
-        Dense(1, 64, gelu),
+        Dense(1, 64),
         FourierOperator(64=>64, (12, ), gelu),
         FourierOperator(64=>64, (12, ), gelu),
         FourierOperator(64=>64, (12, ), gelu),
         FourierOperator(64=>64, (12, ), gelu),
-        FourierOperator(64=>64, (12, ), gelu),
-        FourierOperator(64=>64, (12, ), gelu),
-        FourierOperator(64=>64, (12, ), gelu),
-        FourierOperator(64=>64, (12, ), gelu),
-        FourierOperator(64=>64, (12, ), gelu),
-        FourierOperator(64=>64, (12, ), gelu),
-        FourierOperator(64=>64, (12, ), gelu),
-        FourierOperator(64=>64, (12, ), gelu),
-        FourierOperator(64=>64, (12, ), gelu),
-        FourierOperator(64=>64, (12, ), gelu),
-        FourierOperator(64=>64, (12, ), gelu),
-        FourierOperator(64=>64, (12, )),
-        Dense(64, 1)
+        Dense(64, 1),
     ) |> device
+    mo = MarkovOperator(m, Δn) |> device
 
-    loss(𝐱, 𝐲) = sum(abs2, 𝐲 .- m(𝐱)) / size(𝐱)[end]
+    loss(𝐱, 𝐲) = sum(abs2, 𝐲 .- mo(𝐱)) / size(𝐱)[end]
 
     opt = Flux.Optimiser(WeightDecay(1f-4), Flux.ADAM(1f-3))
 
-    loader_train, loader_test = get_dataloader()
+    loader_train, loader_test = get_dataloader(Δn=Δn)
 
     data = [(𝐱, 𝐲) for (𝐱, 𝐲) in loader_train] |> device
 
     losses = Float32[]
     function validate()
         validation_loss = sum(loss(device(𝐱), device(𝐲)) for (𝐱, 𝐲) in loader_test)/length(loader_test)
-        @info "loss: $validation_loss"
+        one_step__loss = sum(sum(abs2, device(𝐱[:, :, 2:end]) .- mo.m(device(𝐱[:, :, 1:end-1]))) / (size(𝐱)[end]-1) for (𝐱, 𝐲) in loader_test)/length(loader_test)
+        @info "loss: $validation_loss, $one_step__loss"
 
         push!(losses, validation_loss)
-        (losses[end] == minimum(losses)) && update_model!(joinpath(@__DIR__, "../model/model.jld2"), m)
+        (losses[end] == minimum(losses)) && update_model!(joinpath(@__DIR__, "../model/model.jld2"), mo)
 
         isempty(loss_bounds) && return
         if validation_loss < loss_bounds[1]
@@ -70,7 +60,7 @@ function train(; loss_bounds=[])
     end
     call_back = Flux.throttle(validate, 10, leading=false, trailing=true)
 
-    Flux.@epochs 50 @time(Flux.train!(loss, params(m), data, opt, cb=call_back))
+    Flux.@epochs 50 @time(Flux.train!(loss, params(mo), data, opt, cb=call_back))
 end
 
 function get_model()
