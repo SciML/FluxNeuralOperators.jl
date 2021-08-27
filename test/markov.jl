@@ -9,5 +9,5 @@
 
     loss(x, y) = Flux.mse(mo(x), y)
     data = [(rand(1, 5, 10), rand(1, 5, 10))]
-    Flux.train!(loss, params(m), data, Flux.ADAM())
+    Flux.train!(loss, params(mo), data, Flux.ADAM())
 end
