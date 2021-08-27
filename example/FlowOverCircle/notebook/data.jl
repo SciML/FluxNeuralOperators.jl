@@ -13,14 +13,17 @@ using FlowOverCircle, Plots
 # ╔═╡ 5268feee-bda2-4612-9d4c-a1db424a11c7
 begin 
 	n = 51
-	data = FlowOverCircle.gen_data(LinRange(100, 100-1+n, n))
+	data = FlowOverCircle.gen_data(LinRange(100, 100+n-1, n))
 end;
 
 # ╔═╡ 9b02b6a2-33c3-4ca6-bfba-0bd74b664830
 begin
 	anim = @animate for i in 1:size(data)[end]
 		heatmap(data[1, :, :, i]', color=:coolwarm, clim=(-1.5, 1.5))
-		scatter!([64], [63], markersize=45, color=:black, legend=false, ticks=false)
+		scatter!(
+			[size(data, 3)÷2], [size(data, 3)÷2-1], 
+			markersize=45, color=:black, legend=false, ticks=false
+		)
 		annotate!(5, 5, text("i=$i", :left))
 	end
 	gif(anim, fps=5)
@@ -41,7 +44,10 @@ end
 begin
 	anim_model = @animate for i in 1:size(states)[end]
 		heatmap(states[1, :, :, i]', color=:coolwarm, clim=(-1.5, 1.5))
-		scatter!([64], [63], markersize=45, color=:black, legend=false, ticks=false)
+		scatter!(
+			[size(data, 3)÷2], [size(data, 3)÷2-1], 
+			markersize=45, color=:black, legend=false, ticks=false
+		)
 		annotate!(5, 5, text("i=$i", :left))
 	end
 	gif(anim_model, fps=5)
@@ -51,6 +57,6 @@ end
 # ╟─194baef2-0417-11ec-05ab-4527ef614024
 # ╠═38c9ced5-dcf8-4e03-ac07-7c435687861b
 # ╠═5268feee-bda2-4612-9d4c-a1db424a11c7
-# ╟─9b02b6a2-33c3-4ca6-bfba-0bd74b664830
+# ╠═9b02b6a2-33c3-4ca6-bfba-0bd74b664830
 # ╠═fbc287b8-f232-4350-9948-2091908e5a30
-# ╟─a0b5e94c-a839-4cc0-a325-1a4ac39fafbc
+# ╠═a0b5e94c-a839-4cc0-a325-1a4ac39fafbc

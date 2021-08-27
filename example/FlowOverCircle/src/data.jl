@@ -16,7 +16,7 @@ function circle(n, m; Re=250)
 end
 
 function gen_data(ts::AbstractRange)
-    n, m = 3(2^6),  2^7
+    n, m = 3(2^5), 2^6
     circ = circle(n, m)
 
     𝐩s = Array{Float32}(undef, 1, n, m, length(ts))
@@ -28,7 +28,7 @@ function gen_data(ts::AbstractRange)
     return 𝐩s
 end
 
-function get_dataloader(; ts::AbstractRange=LinRange(100, 1100, 10000), ratio::Float64=0.995, batchsize=48)
+function get_dataloader(; ts::AbstractRange=LinRange(100, 11000, 10000), ratio::Float64=0.95, batchsize=100)
     data = gen_data(ts)
 
     n_train, n_test = floor(Int, length(ts)*ratio), floor(Int, length(ts)*(1-ratio))

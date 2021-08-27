@@ -45,14 +45,10 @@ function train()
         push!(losses, validation_loss)
         (losses[end] == minimum(losses)) && update_model!(joinpath(@__DIR__, "../model/model.jld2"), m)
     end
-    call_back = Flux.throttle(validate, 10, leading=false, trailing=true)
+    call_back = Flux.throttle(validate, 1, leading=false, trailing=true)
 
-    Flux.@epochs 500 @time begin
-        for (𝐱, 𝐲) in loader_train
-            data = [(𝐱, 𝐲)] |> device
-            Flux.train!(loss, params(m), data, opt, cb=call_back)
-        end
-    end
+    data = [(𝐱, 𝐲) for (𝐱, 𝐲) in loader_train] |> device
+    Flux.@epochs 500 @time(Flux.train!(loss, params(m), data, opt, cb=call_back))
 end
 
 function get_model()
