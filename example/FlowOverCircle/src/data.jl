@@ -16,19 +16,19 @@ function circle(n, m; Re=250)
 end
 
 function gen_data(ts::AbstractRange)
-    m, n = 3(2^6), 2^7
-    circ = circle(m, n)
+    n, m = 3(2^6),  2^7
+    circ = circle(n, m)
 
-    𝐩s = Array{Float32}(undef, 1, m+2, n+2, length(ts))
+    𝐩s = Array{Float32}(undef, 1, n, m, length(ts))
     for (i, t) in enumerate(ts)
         sim_step!(circ, t)
-        𝐩s[:, :, :, i] = Float32.(circ.flow.p)
+        𝐩s[:, :, :, i] = Float32.(circ.flow.p)[2:end-1, 2:end-1]
     end
 
     return 𝐩s
 end
 
-function get_dataloader(; ts::AbstractRange=LinRange(100, 1100, 10000), ratio::Float64=0.8, batchsize=100)
+function get_dataloader(; ts::AbstractRange=LinRange(100, 1100, 10000), ratio::Float64=0.995, batchsize=48)
     data = gen_data(ts)
 
     n_train, n_test = floor(Int, length(ts)*ratio), floor(Int, length(ts)*(1-ratio))

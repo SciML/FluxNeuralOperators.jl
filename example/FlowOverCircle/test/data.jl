@@ -1,5 +1,3 @@
-@testset "double pendulum" begin
-    xs = DoublePendulum.get_data(i=0, n=100)
+@testset "flow over circle" begin
 
-    @test size(xs) == (6, 100)
 end
