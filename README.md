@@ -20,7 +20,8 @@ between two continuous function spaces. The kernel can be trained on different g
 
 Fourier neural operator learns a neural operator with Dirichlet kernel to form a Fourier transformation. It performs Fourier transformation across infinite-dimensional function spaces and learns better than neural operator.
 
-Currently, `FourierOperator` is provided in this work.
+Currently, the `FourierOperator` layer is provided in this work.
+As for model, there are `FourierNeuralOperator` and `MarkovNeuralOperator` provided. Please take a glance at them [here](src/model.jl).
 
 ## Usage
 
@@ -73,20 +74,29 @@ $ julia --proj
 julia> using Burgers; Burgers.train()
 ```
 
-### Double Pendulum
+### Two-dimensional with time Navier-Stokes equation
+
+The Navier-Stokes equation is learned by the `MarkovNeuralOperator` with only one time step information. Example can be found in `example/FlowOverCircle`.
+
+| **Ground Truth** | **Inferenced** |
+|:----------------:|:--------------:|
+| ![](example/FlowOverCircle/gallery/ans.gif) | ![](example/FlowOverCircle/gallery/inferenced.gif) |
+
+Use following commend to train model:
 
 ```julia
 $ julia --proj
 
-julia> using DoublePendulum; DoublePendulum.train()
+julia> using FlowOverCircle; FlowOverCircle.train()
 ```
 
 ## Roadmap
 
 - [x] `FourierOperator` layer
 - [x] One-dimensional Burgers' equation example
-- [ ] `MarkovOperator` layer
-- [x] Double pendulum prediction example
+- [x] Two-dimensional with time Navier-Stokes equations example
+- [x] `MarkovNeuralOperator` model
+- [x] Flow over a circle prediction example
 - [ ] `NeuralOperator` layer
 - [ ] Poisson equation example
 
