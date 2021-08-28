@@ -113,4 +113,4 @@ julia> using FlowOverCircle; FlowOverCircle.train()
   - [zongyi-li/fourier_neural_operator](https://github.com/zongyi-li/fourier_neural_operator)
 - [Neural Operator: Graph Kernel Network for Partial Differential Equations](https://arxiv.org/abs/2003.03485)
   - [zongyi-li/graph-pde](https://github.com/zongyi-li/graph-pde)
-- [[Markov Neural Operators for Learning Chaotic Systems](https://arxiv.org/abs/2106.06898)]
+- [Markov Neural Operators for Learning Chaotic Systems](https://arxiv.org/abs/2106.06898)
