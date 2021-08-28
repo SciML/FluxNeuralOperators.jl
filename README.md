@@ -12,13 +12,20 @@
 [codecov badge]: https://codecov.io/gh/foldfelis/NeuralOperators.jl/branch/master/graph/badge.svg?token=JQH3MP1Y9R
 [codecov link]: https://codecov.io/gh/foldfelis/NeuralOperators.jl
 
-Neural operator is a novel deep learning architecture. It learns a operator, which is a mapping
-between infinite-dimensional function spaces. It can be used to resolve [partial differential equations (PDE)](https://en.wikipedia.org/wiki/Partial_differential_equation).
-Instead of solving by finite element method, a PDE problem can be resolved by learning a neural network to learn an operator
-mapping from infinite-dimensional space (u, t) to infinite-dimensional space f(u, t). Neural operator learns a continuous function
-between two continuous function spaces. The kernel can be trained on different geometry, which is learned from a graph.
+Neural operator is a novel deep learning architecture.
+It learns a operator, which is a mapping between infinite-dimensional function spaces.
+It can be used to resolve [partial differential equations (PDE)](https://en.wikipedia.org/wiki/Partial_differential_equation).
+Instead of solving by finite element method, a PDE problem can be resolved by training a neural network to learn an operator mapping
+from infinite-dimensional space (u, t) to infinite-dimensional space f(u, t).
+Neural operator learns a continuous function between two continuous function spaces.
+The kernel can be trained on different geometry, which is learned from a graph.
 
-Fourier neural operator learns a neural operator with Dirichlet kernel to form a Fourier transformation. It performs Fourier transformation across infinite-dimensional function spaces and learns better than neural operator.
+**Fourier neural operator** learns a neural operator with Dirichlet kernel to form a Fourier transformation.
+It performs Fourier transformation across infinite-dimensional function spaces and learns better than neural operator.
+
+**Markov neural operator** learns a neural operator with Fourier operators.
+With only one time step information of learning, it can predict the following few steps with low loss
+by linking the operators into a Markov chain.
 
 Currently, the `FourierOperator` layer is provided in this work.
 As for model, there are `FourierNeuralOperator` and `MarkovNeuralOperator` provided. Please take a glance at them [here](src/model.jl).
@@ -41,7 +48,7 @@ model = Chain(
 )
 ```
 
-Or you can just call:
+Or one can just call:
 
 ```julia
 model = FourierNeuralOperator(
@@ -106,3 +113,4 @@ julia> using FlowOverCircle; FlowOverCircle.train()
   - [zongyi-li/fourier_neural_operator](https://github.com/zongyi-li/fourier_neural_operator)
 - [Neural Operator: Graph Kernel Network for Partial Differential Equations](https://arxiv.org/abs/2003.03485)
   - [zongyi-li/graph-pde](https://github.com/zongyi-li/graph-pde)
+- [Markov Neural Operators for Learning Chaotic Systems](https://arxiv.org/abs/2106.06898)

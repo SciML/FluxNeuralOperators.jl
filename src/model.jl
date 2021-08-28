@@ -2,6 +2,16 @@ export
     FourierNeuralOperator,
     MarkovNeuralOperator
 
+"""
+    FourierNeuralOperator(;
+        ch=(2, 64, 64, 64, 64, 64, 128, 1),
+        modes=(16, ),
+        σ=gelu
+    )
+
+Fourier neural operator learns a neural operator with Dirichlet kernel to form a Fourier transformation.
+It performs Fourier transformation across infinite-dimensional function spaces and learns better than neural operator.
+"""
 function FourierNeuralOperator(;
     ch=(2, 64, 64, 64, 64, 64, 128, 1),
     modes=(16, ),
@@ -19,6 +29,17 @@ function FourierNeuralOperator(;
     )
 end
 
+"""
+    MarkovNeuralOperator(;
+        ch=(1, 64, 64, 64, 64, 64, 1),
+        modes=(24, 24),
+        σ=gelu
+    )
+
+Markov neural operator learns a neural operator with Fourier operators.
+With only one time step information of learning, it can predict the following few steps with low loss
+by linking the operators into a Markov chain.
+"""
 function MarkovNeuralOperator(;
     ch=(1, 64, 64, 64, 64, 64, 1),
     modes=(24, 24),
