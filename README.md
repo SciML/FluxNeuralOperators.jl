@@ -83,7 +83,9 @@ julia> using Burgers; Burgers.train()
 
 ### Two-dimensional with time Navier-Stokes equation
 
-The Navier-Stokes equation is learned by the `MarkovNeuralOperator` with only one time step information. Example can be found in `example/FlowOverCircle`.
+The Navier-Stokes equation is learned by the `MarkovNeuralOperator` with only one time step information.
+Example can be found in `example/FlowOverCircle`.
+The result is also provided [here](https://foldfelis.github.io/NeuralOperators.jl/dev/assets/notebook/mno.jl.html)
 
 | **Ground Truth** | **Inferenced** |
 |:----------------:|:--------------:|
