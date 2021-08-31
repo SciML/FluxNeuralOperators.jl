@@ -37,22 +37,32 @@ function get_data(; i=0, n=-1)
 end
 
 function preprocess(𝐱; Δt=2, ratio=0.9)
-    𝐱 = reshape(𝐱[:, 1:Δt:end], 1, 1, 6, :)
-    ∇𝐱 = 𝐱[:, :, :, 2:end] - 𝐱[:, :, :, 1:(end-1)]
+    xs_red, ys_red = 𝐱[1, :], 𝐱[2, :]
+    𝐱[1, :] -= xs_red; 𝐱[3, :] -= xs_red; 𝐱[5, :] -= xs_red
+    𝐱[2, :] -= ys_red; 𝐱[4, :] -= ys_red; 𝐱[6, :] -= ys_red
 
-    𝐱 = cat(𝐱[:, :, :, 1:(end-1)], ∇𝐱, dims=2)
+    𝐱 = reshape(𝐱[3:6, 1:Δt:end], 1, 4, :)
+    ∇𝐱 = 𝐱[:, :, 2:end] - 𝐱[:, :, 1:(end-1)]
+
+    𝐱 = cat(𝐱[:, :, 1:(end-1)], ∇𝐱, dims=1)
 
     n_train, n_test = floor(Int, ratio*size(𝐱)[end]), floor(Int, (1-ratio)*size(𝐱)[end])
 
-    𝐱_train, 𝐲_train = 𝐱[:, :, :, 1:(n_train-1)], 𝐱[:, :, :, 2:n_train]
-    𝐱_test, 𝐲_test = 𝐱[:, :, :, (end-n_test+1):(end-1)], 𝐱[:, :, :, (end-n_test+2):end]
+    𝐱_train, 𝐲_train = 𝐱[:, :, 1:(n_train-1)], 𝐱[:, :, 2:n_train]
+    𝐱_test, 𝐲_test = 𝐱[:, :, (end-n_test+1):(end-1)], 𝐱[:, :, (end-n_test+2):end]
 
     return 𝐱_train, 𝐲_train, 𝐱_test, 𝐲_test
 end
 
-function get_dataloader(; i=0, Δt=2, ratio=0.9, batchsize=100)
-    𝐱 = get_data(i=i) # size==(6, :)
-    𝐱_train, 𝐲_train, 𝐱_test, 𝐲_test = preprocess(𝐱, Δt=Δt, ratio=ratio) # size==(1, 2, 6, :)
+function get_dataloader(; n_file=10, Δt=2, ratio=0.9, batchsize=100)
+    𝐱_train, 𝐲_train = Array{Float32}(undef, 2, 4, 0), Array{Float32}(undef, 2, 4, 0)
+    𝐱_test, 𝐲_test = Array{Float32}(undef, 2, 4, 0), Array{Float32}(undef, 2, 4, 0)
+    for i in 0:(n_file-1)
+        𝐱_train_i, 𝐲_train_i, 𝐱_test_i, 𝐲_test_i = preprocess(get_data(i=i), Δt=Δt, ratio=ratio)
+
+        𝐱_train, 𝐲_train = cat(𝐱_train, 𝐱_train_i, dims=3), cat(𝐲_train, 𝐲_train_i, dims=3)
+        𝐱_test, 𝐲_test = cat(𝐱_test, 𝐱_test_i, dims=3), cat(𝐲_test, 𝐲_test_i, dims=3)
+    end
 
     loader_train = Flux.DataLoader((𝐱_train, 𝐲_train), batchsize=batchsize, shuffle=true)
     loader_test = Flux.DataLoader((𝐱_test, 𝐲_test), batchsize=batchsize, shuffle=false)

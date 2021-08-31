@@ -25,11 +25,11 @@ function train(; Δt=2)
     end
 
     m = Chain(
-        Dense(1, 350), # (1, 2, 6, :) -> (350, 2, 6, :)
-        x -> reshape(x, 1, 60, 70, :), # (350, 2, 6, :) -> (1, 60, 70, :)
+        Dense(2, Int(4096/4)),
+        x -> reshape(x, 1, 64, 64, :),
         MarkovNeuralOperator(),
-        x -> reshape(x, 350, 2, 6, :), # (1, 60, 70, :) -> (350, 2, 6, :)
-        Dense(350, 1), # (350, 2, 6, :) -> (1, 2, 6, :)
+        x -> reshape(x, Int(4096/4), 4, :),
+        Dense(Int(4096/4), 2),
     ) |> device
 
     loss(𝐱, 𝐲) = sum(abs2, 𝐲 .- m(𝐱)) / size(𝐱)[end]
