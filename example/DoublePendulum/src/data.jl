@@ -37,11 +37,14 @@ function get_data(; i=0, n=-1)
 end
 
 function preprocess(𝐱; Δt=2, ratio=0.9)
+    # move red point to (0, 0)
     xs_red, ys_red = 𝐱[1, :], 𝐱[2, :]
-    𝐱[1, :] -= xs_red; 𝐱[3, :] -= xs_red; 𝐱[5, :] -= xs_red
-    𝐱[2, :] -= ys_red; 𝐱[4, :] -= ys_red; 𝐱[6, :] -= ys_red
+    𝐱[3, :] -= xs_red; 𝐱[5, :] -= xs_red
+    𝐱[4, :] -= ys_red; 𝐱[6, :] -= ys_red
 
+    # needs only green and blue points
     𝐱 = reshape(𝐱[3:6, 1:Δt:end], 1, 4, :)
+    # velocity of green and blue points
     ∇𝐱 = 𝐱[:, :, 2:end] - 𝐱[:, :, 1:(end-1)]
 
     𝐱 = cat(𝐱[:, :, 1:(end-1)], ∇𝐱, dims=1)
@@ -54,7 +57,7 @@ function preprocess(𝐱; Δt=2, ratio=0.9)
     return 𝐱_train, 𝐲_train, 𝐱_test, 𝐲_test
 end
 
-function get_dataloader(; n_file=10, Δt=2, ratio=0.9, batchsize=100)
+function get_dataloader(; n_file=20, Δt=2, ratio=0.9, batchsize=100)
     𝐱_train, 𝐲_train = Array{Float32}(undef, 2, 4, 0), Array{Float32}(undef, 2, 4, 0)
     𝐱_test, 𝐲_test = Array{Float32}(undef, 2, 4, 0), Array{Float32}(undef, 2, 4, 0)
     for i in 0:(n_file-1)

@@ -49,7 +49,11 @@ function train(; Δt=2)
     call_back = Flux.throttle(validate, 10, leading=false, trailing=true)
 
     data = [(𝐱, 𝐲) for (𝐱, 𝐲) in loader_train] |> device
-    Flux.@epochs 50 @time(Flux.train!(loss, params(m), data, opt, cb=call_back))
+    for e in 1:50
+        @info "Epoch $e"
+        @time Flux.train!(loss, params(m), data, opt, cb=call_back)
+        (e%3 == 0) && (opt.os[2].eta /= 2)
+    end
 end
 
 function get_model()
