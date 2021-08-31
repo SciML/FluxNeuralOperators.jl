@@ -59,7 +59,7 @@ function SpectralConv(
 ) where {S<:Integer, N}
     in_chs, out_chs = ch
     scale = one(T) / (in_chs * out_chs)
-    weights = scale * init(out_chs, in_chs, prod(modes))
+    weights = scale * init(prod(modes), in_chs, out_chs)
 
     return SpectralConv{permuted}(weights, in_chs, out_chs, modes, σ)
 end
@@ -174,7 +174,7 @@ end
 c_glorot_uniform(dims...) = Flux.glorot_uniform(dims...) + Flux.glorot_uniform(dims...)*im
 
 # [prod(modes), out_chs, batch] <- [prod(modes), in_chs, batch] * [out_chs, in_chs, prod(modes)]
-apply_spectral_pattern(𝐱₁, 𝐱₂) = @tullio 𝐲[m, o, b] := 𝐱₁[m, i, b] * 𝐱₂[o, i, m]
+apply_spectral_pattern(𝐱₁, 𝐱₂) = @tullio 𝐲[m, o, b] := 𝐱₁[m, i, b] * 𝐱₂[m, i, o]
 
 spectral_pad(𝐱::AbstractArray, dims::NTuple) = spectral_pad!(similar(𝐱, dims), 𝐱)
 
