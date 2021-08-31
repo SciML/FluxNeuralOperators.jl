@@ -59,4 +59,12 @@ function train(; loss_bounds=[0.05])
     Flux.@epochs 50 @time(Flux.train!(loss, params(m), data, opt, cb=call_back))
 end
 
+function get_model()
+    f = jldopen(joinpath(@__DIR__, "../model/model.jld2"))
+    model = f["model"]
+    close(f)
+
+    return model
+end
+
 end
