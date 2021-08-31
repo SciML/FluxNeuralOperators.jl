@@ -35,6 +35,8 @@ function get_double_pendulum_chaotic_data(; i=0, n=-1)
     )
     data = (n < 0) ? collect(Matrix(df)') : collect(Matrix(df)')[:, 1:n]
 
+    data /= maximum(data)
+
     return Float32.(data)
 end
 
