@@ -1,0 +1,13 @@
+name = "DoublePendulum"
+uuid = "1fc04e5d-1dd1-42ff-8d75-1d53504b2476"
+
+[deps]
+DataDeps = "124859b0-ceae-595e-8997-d05f6a7a8dfe"
+Flux = "587475ba-b771-5e3f-ad9e-33799f191a9c"
+NeuralOperators = "ea5c82af-86e5-48da-8ee1-382d6ad7af4b"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
