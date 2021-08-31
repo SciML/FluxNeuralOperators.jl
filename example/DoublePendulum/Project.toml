@@ -1,5 +1,5 @@
 name = "DoublePendulum"
-uuid = "1fc04e5d-1dd1-42ff-8d75-1d53504b2476"
+uuid = "0c23c1c1-5f41-4617-a685-ac46aae913c3"
 
 [deps]
 CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
