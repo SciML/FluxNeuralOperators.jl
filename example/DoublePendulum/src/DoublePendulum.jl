@@ -8,7 +8,7 @@ include("data.jl")
 
 __init__() = register_double_pendulum_chaotic()
 
-function train()
+function train(; loss_bounds=[1, 0.2, 0.1, 0.05, 0.02])
     if has_cuda()
         @info "CUDA is on"
         device = gpu
@@ -18,22 +18,20 @@ function train()
     end
 
     m = Chain(
-        FourierOperator(6=>6, (16, ), relu),
-        FourierOperator(6=>6, (16, ), relu),
-        FourierOperator(6=>6, (16, ), relu),
-        FourierOperator(6=>6, (16, ), relu),
-        FourierOperator(6=>6, (16, )),
+        FourierOperator(6=>64, (16, ), relu),
+        FourierOperator(64=>64, (16, ), relu),
+        FourierOperator(64=>64, (16, ), relu),
+        FourierOperator(64=>6, (16, )),
     ) |> device
 
     loss(𝐱, 𝐲) = sum(abs2, 𝐲 .- m(𝐱)) / size(𝐱)[end]
 
-    opt = Flux.Optimiser(WeightDecay(1f-4), Flux.ADAM(1f-3))
+    opt = Flux.Optimiser(WeightDecay(1f-4), Flux.ADAM(1f-2))
 
     loader_train, loader_test = get_dataloader()
 
     data = [(𝐱, 𝐲) for (𝐱, 𝐲) in loader_train] |> device
 
-    loss_bounds = [0.3, 0.05, 0.01]
     function validate()
         validation_loss = sum(loss(device(𝐱), device(𝐲)) for (𝐱, 𝐲) in loader_test)/length(loader_test)
         @info "loss: $validation_loss"
