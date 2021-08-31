@@ -15,7 +15,7 @@ function update_model!(model_file_path, model)
     @warn "model updated!"
 end
 
-function train(; loss_bounds=[0.05])
+function train(; loss_bounds=[])
     if has_cuda()
         @info "CUDA is on"
         device = gpu
@@ -25,15 +25,29 @@ function train(; loss_bounds=[0.05])
     end
 
     m = Chain(
-        FourierOperator(1=>64, (6, 64, ), relu),
-        FourierOperator(64=>64, (6, 64, ), relu),
-        FourierOperator(64=>64, (6, 64, ), relu),
-        FourierOperator(64=>1, (6, 64, )),
+        Dense(1, 64, gelu),
+        FourierOperator(64=>64, (12, ), gelu),
+        FourierOperator(64=>64, (12, ), gelu),
+        FourierOperator(64=>64, (12, ), gelu),
+        FourierOperator(64=>64, (12, ), gelu),
+        FourierOperator(64=>64, (12, ), gelu),
+        FourierOperator(64=>64, (12, ), gelu),
+        FourierOperator(64=>64, (12, ), gelu),
+        FourierOperator(64=>64, (12, ), gelu),
+        FourierOperator(64=>64, (12, ), gelu),
+        FourierOperator(64=>64, (12, ), gelu),
+        FourierOperator(64=>64, (12, ), gelu),
+        FourierOperator(64=>64, (12, ), gelu),
+        FourierOperator(64=>64, (12, ), gelu),
+        FourierOperator(64=>64, (12, ), gelu),
+        FourierOperator(64=>64, (12, ), gelu),
+        FourierOperator(64=>64, (12, )),
+        Dense(64, 1)
     ) |> device
 
     loss(𝐱, 𝐲) = sum(abs2, 𝐲 .- m(𝐱)) / size(𝐱)[end]
 
-    opt = Flux.Optimiser(WeightDecay(1f-4), Flux.ADAM(1f-2))
+    opt = Flux.Optimiser(WeightDecay(1f-4), Flux.ADAM(1f-3))
 
     loader_train, loader_test = get_dataloader()
 
