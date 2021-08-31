@@ -33,7 +33,19 @@ function get_double_pendulum_chaotic_data(; i=0, n=-1)
         DataFrame,
         header=[:x_red, :y_red, :x_green, :y_green, :x_blue, :y_blue]
     )
-    data = (n<0) ? collect(Matrix(df)') : collect(Matrix(df)')[:, 1:n]
+    data = (n < 0) ? collect(Matrix(df)') : collect(Matrix(df)')[:, 1:n]
 
-    return data
+    return Float32.(data)
+end
+
+function get_dataloader(; i=0, n_train=15001, n_test=2501, batchsize=100)
+    𝐱 = get_double_pendulum_chaotic_data(; i=i, n=-1)
+
+    𝐱_train, 𝐲_train = reshape(𝐱[:, 1:(n_train-1)], 1, 6, :), reshape(𝐱[:, 2:n_train], 1, 6, :)
+    loader_train = Flux.DataLoader((𝐱_train, 𝐲_train), batchsize=batchsize, shuffle=true)
+
+    𝐱_test, 𝐲_test = reshape(𝐱[:, (end-n_test+1):(end-1)], 1, 6, :), reshape(𝐱[:, (end-n_test+2):end], 1, 6, :)
+    loader_test = Flux.DataLoader((𝐱_test, 𝐲_test), batchsize=batchsize, shuffle=false)
+
+    return loader_train, loader_test
 end
