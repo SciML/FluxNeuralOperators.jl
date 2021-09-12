@@ -70,27 +70,15 @@ Flux.@epochs 50 Flux.train!(loss, params(model), data, opt)
 
 PDE training examples are provided in `example` folder.
 
-### One-dimensional
+### One-dimensional Fourier neural operator
 
 [Burgers' equation](example/Burgers)
 
 ### Two-dimensional with time Navier-Stokes equation
 
-The Navier-Stokes equation is learned by the `MarkovNeuralOperator` with only one time step information.
-Example can be found in `example/FlowOverCircle`.
-The result is also provided [here](https://foldfelis.github.io/NeuralOperators.jl/dev/assets/notebook/mno.jl.html)
+### Markov Neural Operator
 
-| **Ground Truth** | **Inferenced** |
-|:----------------:|:--------------:|
-| ![](example/FlowOverCircle/gallery/ans.gif) | ![](example/FlowOverCircle/gallery/inferenced.gif) |
-
-Use following commend to train model:
-
-```julia
-$ julia --proj
-
-julia> using FlowOverCircle; FlowOverCircle.train()
-```
+[Time dependent Navier-Stokes equation](example/FlowOverCircle)
 
 ## Roadmap
 
