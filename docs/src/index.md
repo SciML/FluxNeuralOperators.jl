@@ -12,7 +12,6 @@ Documentation for [NeuralOperators](https://github.com/foldfelis/NeuralOperators
 
 The demonstration showing above is Navier-Stokes equation learned by the `MarkovNeuralOperator` with only one time step information.
 Example can be found in [`example/FlowOverCircle`](https://github.com/foldfelis/NeuralOperators.jl/tree/master/example/FlowOverCircle).
-The result is also provided [here](assets/notebook/mno.jl.html)
 
 ## Abstract
 

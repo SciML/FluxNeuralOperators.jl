@@ -12,6 +12,15 @@
 [codecov badge]: https://codecov.io/gh/foldfelis/NeuralOperators.jl/branch/master/graph/badge.svg?token=JQH3MP1Y9R
 [codecov link]: https://codecov.io/gh/foldfelis/NeuralOperators.jl
 
+| **Ground Truth** | **Inferenced** |
+|:----------------:|:--------------:|
+| ![](example/FlowOverCircle/gallery/ans.gif) | ![](example/FlowOverCircle/gallery/inferenced.gif) |
+
+The demonstration showing above is Navier-Stokes equation learned by the `MarkovNeuralOperator` with only one time step information.
+Example can be found in [`example/FlowOverCircle`](example/FlowOverCircle).
+
+## Abstract
+
 Neural operator is a novel deep learning architecture.
 It learns a operator, which is a mapping between infinite-dimensional function spaces.
 It can be used to resolve [partial differential equations (PDE)](https://en.wikipedia.org/wiki/Partial_differential_equation).
@@ -70,34 +79,17 @@ Flux.@epochs 50 Flux.train!(loss, params(model), data, opt)
 
 PDE training examples are provided in `example` folder.
 
-### One-dimensional Burgers' equation
+### One-dimensional Fourier Neural Operator
 
-[Burgers' equation](https://en.wikipedia.org/wiki/Burgers%27_equation) example can be found in `example/Burgers`.
-Use following commend to train model:
+[Burgers' equation](example/Burgers)
 
-```julia
-$ julia --proj
+### Two-dimensional Fourier Neural Operator
 
-julia> using Burgers; Burgers.train()
-```
+[Double Pendulum](example/DoublePendulum)
 
-### Two-dimensional with time Navier-Stokes equation
+### Markov Neural Operator
 
-The Navier-Stokes equation is learned by the `MarkovNeuralOperator` with only one time step information.
-Example can be found in `example/FlowOverCircle`.
-The result is also provided [here](https://foldfelis.github.io/NeuralOperators.jl/dev/assets/notebook/mno.jl.html)
-
-| **Ground Truth** | **Inferenced** |
-|:----------------:|:--------------:|
-| ![](example/FlowOverCircle/gallery/ans.gif) | ![](example/FlowOverCircle/gallery/inferenced.gif) |
-
-Use following commend to train model:
-
-```julia
-$ julia --proj
-
-julia> using FlowOverCircle; FlowOverCircle.train()
-```
+[Time dependent Navier-Stokes equation](example/FlowOverCircle)
 
 ## Roadmap
 
