@@ -15,7 +15,7 @@ function update_model!(model_file_path, model)
     @warn "model updated!"
 end
 
-function train(; Δt=2)
+function train(; Δt=1)
     if has_cuda()
         @info "CUDA is on"
         device = gpu
@@ -25,11 +25,13 @@ function train(; Δt=2)
     end
 
     m = Chain(
-        Dense(2, Int(4096/4)),
-        x -> reshape(x, 1, 64, 64, :),
-        MarkovNeuralOperator(),
-        x -> reshape(x, Int(4096/4), 4, :),
-        Dense(Int(4096/4), 2),
+        Dense(2, 64),
+        FourierOperator(64=>64, (4, 16), gelu),
+        FourierOperator(64=>64, (4, 16), gelu),
+        FourierOperator(64=>64, (4, 16), gelu),
+        FourierOperator(64=>64, (4, 16)),
+        Dense(64, 128, gelu),
+        Dense(128, 2),
     ) |> device
 
     loss(𝐱, 𝐲) = sum(abs2, 𝐲 .- m(𝐱)) / size(𝐱)[end]
@@ -49,8 +51,8 @@ function train(; Δt=2)
     call_back = Flux.throttle(validate, 10, leading=false, trailing=true)
 
     data = [(𝐱, 𝐲) for (𝐱, 𝐲) in loader_train] |> device
-    for e in 1:50
-        @info "Epoch $e"
+    for e in 1:20
+        @info "Epoch $e\n η: $(opt.os[2].eta)"
         @time Flux.train!(loss, params(m), data, opt, cb=call_back)
         (e%3 == 0) && (opt.os[2].eta /= 2)
     end
