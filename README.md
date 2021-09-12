@@ -70,16 +70,9 @@ Flux.@epochs 50 Flux.train!(loss, params(model), data, opt)
 
 PDE training examples are provided in `example` folder.
 
-### One-dimensional Burgers' equation
+### One-dimensional
 
-[Burgers' equation](https://en.wikipedia.org/wiki/Burgers%27_equation) example can be found in `example/Burgers`.
-Use following commend to train model:
-
-```julia
-$ julia --proj
-
-julia> using Burgers; Burgers.train()
-```
+[Burgers' equation](example/Burgers)
 
 ### Two-dimensional with time Navier-Stokes equation
 
