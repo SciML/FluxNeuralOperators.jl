@@ -70,11 +70,13 @@ Flux.@epochs 50 Flux.train!(loss, params(model), data, opt)
 
 PDE training examples are provided in `example` folder.
 
-### One-dimensional Fourier neural operator
+### One-dimensional Fourier Neural Operator
 
 [Burgers' equation](example/Burgers)
 
-### Two-dimensional with time Navier-Stokes equation
+### Two-dimensional Fourier Neural Operator
+
+[Double Pendulum](example/DoublePendulum)
 
 ### Markov Neural Operator
 
