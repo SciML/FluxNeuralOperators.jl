@@ -7,7 +7,7 @@
         SpectralConv(ch, modes)
     )
     @test ndims(SpectralConv(ch, modes)) == 1
-    @test repr(SpectralConv(ch, modes)) == "SpectralConv(64 => 128, (16,), σ=identity, permuted=false)"
+    @test repr(SpectralConv(ch, modes)) == "SpectralConv(64 => 128, (16,), permuted=false)"
 
     𝐱 = rand(Float32, 2, 1024, 5)
     @test size(m(𝐱)) == (128, 1024, 5)
@@ -26,7 +26,7 @@ end
         SpectralConv(ch, modes, permuted=true)
     )
     @test ndims(SpectralConv(ch, modes, permuted=true)) == 1
-    @test repr(SpectralConv(ch, modes, permuted=true)) == "SpectralConv(64 => 128, (16,), σ=identity, permuted=true)"
+    @test repr(SpectralConv(ch, modes, permuted=true)) == "SpectralConv(64 => 128, (16,), permuted=true)"
 
     𝐱 = rand(Float32, 2, 1024, 5)
     𝐱 = permutedims(𝐱, (2, 1, 3))

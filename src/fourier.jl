@@ -2,12 +2,11 @@ export
     SpectralConv,
     FourierOperator
 
-struct SpectralConv{P, N, T, S, F}
+struct SpectralConv{P, N, T, S}
     weight::T
     in_channel::S
     out_channel::S
     modes::NTuple{N, S}
-    σ::F
 end
 
 function SpectralConv{P}(
@@ -15,14 +14,13 @@ function SpectralConv{P}(
     in_channel::S,
     out_channel::S,
     modes::NTuple{N, S},
-    σ::F
-) where {P, N, T, S, F}
-    return SpectralConv{P, N, T, S, F}(weight, in_channel, out_channel, modes, σ)
+) where {P, N, T, S}
+    return SpectralConv{P, N, T, S}(weight, in_channel, out_channel, modes)
 end
 
 """
     SpectralConv(
-        ch, modes, σ=identity;
+        ch, modes;
         init=c_glorot_uniform, permuted=false, T=ComplexF32
     )
 
@@ -30,7 +28,6 @@ end
 
 * `ch`: Input and output channel size, e.g. `64=>64`.
 * `modes`: The Fourier modes to be preserved.
-* `σ`: Activation function.
 * `permuted`: Whether the dim is permuted. If `permuted=true`, layer accepts
     data in the order of `(ch, ..., batch)`, otherwise the order is `(..., ch, batch)`.
 
@@ -38,21 +35,15 @@ end
 
 ```jldoctest
 julia> SpectralConv(2=>5, (16, ))
-SpectralConv(2 => 5, (16,), σ=identity, permuted=false)
+SpectralConv(2 => 5, (16,), permuted=false)
 
-julia> using Flux
-
-julia> SpectralConv(2=>5, (16, ), relu)
-SpectralConv(2 => 5, (16,), σ=relu, permuted=false)
-
-julia> SpectralConv(2=>5, (16, ), relu, permuted=true)
-SpectralConv(2 => 5, (16,), σ=relu, permuted=true)
+julia> SpectralConv(2=>5, (16, ), permuted=true)
+SpectralConv(2 => 5, (16,), permuted=true)
 ```
 """
 function SpectralConv(
     ch::Pair{S, S},
-    modes::NTuple{N, S},
-    σ=identity;
+    modes::NTuple{N, S};
     init=c_glorot_uniform,
     permuted=false,
     T::DataType=ComplexF32
@@ -61,7 +52,7 @@ function SpectralConv(
     scale = one(T) / (in_chs * out_chs)
     weights = scale * init(prod(modes), in_chs, out_chs)
 
-    return SpectralConv{permuted}(weights, in_chs, out_chs, modes, σ)
+    return SpectralConv{permuted}(weights, in_chs, out_chs, modes)
 end
 
 Flux.@functor SpectralConv{true}
@@ -72,7 +63,7 @@ Base.ndims(::SpectralConv{P, N}) where {P, N} = N
 ispermuted(::SpectralConv{P}) where {P} = P
 
 function Base.show(io::IO, l::SpectralConv{P}) where {P}
-    print(io, "SpectralConv($(l.in_channel) => $(l.out_channel), $(l.modes), σ=$(string(l.σ)), permuted=$P)")
+    print(io, "SpectralConv($(l.in_channel) => $(l.out_channel), $(l.modes), permuted=$P)")
 end
 
 function spectral_conv(m::SpectralConv, 𝐱::AbstractArray)
@@ -85,7 +76,7 @@ function spectral_conv(m::SpectralConv, 𝐱::AbstractArray)
     𝐱_padded = spectral_pad(𝐱_shaped, (size(𝐱_fft)[1:end-2]..., size(𝐱_weighted, 2), size(𝐱_weighted, 3))) # [x, out_chs, batch] <- [modes, out_chs, batch]
     𝐱_ifft = real(ifft(𝐱_padded, 1:ndims(m))) # [x, out_chs, batch]
 
-    return m.σ.(𝐱_ifft)
+    return 𝐱_ifft
 end
 
 function (m::SpectralConv{false})(𝐱)
