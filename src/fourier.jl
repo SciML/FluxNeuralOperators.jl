@@ -139,11 +139,12 @@ FourierOperator(2 => 5, (16,), σ=relu, permuted=true)
 function FourierOperator(
     ch::Pair{S, S},
     modes::NTuple{N, S},
-    σ=identity;
+    σ=identity,
+    σₘ=identity;
     permuted=false
 ) where {S<:Integer, N}
     linear = permuted ? Conv(Tuple(ones(Int, length(modes))), ch) : Dense(ch.first, ch.second)
-    conv = SpectralConv(ch, modes; permuted=permuted)
+    conv = SpectralConv(ch, modes, σₘ; permuted=permuted)
 
     return FourierOperator(linear, conv, σ)
 end
@@ -157,6 +158,7 @@ function Base.show(io::IO, l::FourierOperator)
             "$(l.conv.in_channel) => $(l.conv.out_channel), " *
             "$(l.conv.modes), " *
             "σ=$(string(l.σ)), " *
+            "σₘ=$(string(l.conv.σ)), " *
             "permuted=$(ispermuted(l.conv))" *
         ")"
     )
