@@ -24,19 +24,21 @@ function train(; Δt=1)
         device = cpu
     end
 
+    σ = gelu
+    σₘ = elu
     m = Chain(
         Dense(2, 64),
-        FourierOperator(64=>64, (4, 16), gelu),
-        FourierOperator(64=>64, (4, 16), gelu),
-        FourierOperator(64=>64, (4, 16), gelu),
+        FourierOperator(64=>64, (4, 16), σ, σₘ),
+        FourierOperator(64=>64, (4, 16), σ, σₘ),
+        FourierOperator(64=>64, (4, 16), σ, σₘ),
         FourierOperator(64=>64, (4, 16)),
-        Dense(64, 128, gelu),
+        Dense(64, 128, σ),
         Dense(128, 2),
     ) |> device
 
     loss(𝐱, 𝐲) = sum(abs2, 𝐲 .- m(𝐱)) / size(𝐱)[end]
 
-    opt = Flux.Optimiser(WeightDecay(1f-4), Flux.ADAM(1f-3))
+    opt = Flux.Optimiser(WeightDecay(1f-4), Flux.ADAM(1e-3))
 
     loader_train, loader_test = get_dataloader(Δt=Δt)
 

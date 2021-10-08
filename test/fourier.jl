@@ -45,7 +45,7 @@ end
         Dense(2, 64),
         FourierOperator(ch, modes)
     )
-    @test repr(FourierOperator(ch, modes)) == "FourierOperator(64 => 128, (16,), σ=identity, permuted=false)"
+    @test repr(FourierOperator(ch, modes)) == "FourierOperator(64 => 128, (16,), σ=identity, σₘ=identity, permuted=false)"
 
     𝐱 = rand(Float32, 2, 1024, 5)
     @test size(m(𝐱)) == (128, 1024, 5)
@@ -63,7 +63,7 @@ end
         Conv((1, ), 2=>64),
         FourierOperator(ch, modes, permuted=true)
     )
-    @test repr(FourierOperator(ch, modes, permuted=true)) == "FourierOperator(64 => 128, (16,), σ=identity, permuted=true)"
+    @test repr(FourierOperator(ch, modes, permuted=true)) == "FourierOperator(64 => 128, (16,), σ=identity, σₘ=identity, permuted=true)"
 
     𝐱 = rand(Float32, 2, 1024, 5)
     𝐱 = permutedims(𝐱, (2, 1, 3))
