@@ -22,7 +22,7 @@ function gen_data(ts::AbstractRange)
     𝐩s = Array{Float32}(undef, 1, n, m, length(ts))
     for (i, t) in enumerate(ts)
         sim_step!(circ, t)
-        𝐩s[:, :, :, i] = Float32.(circ.flow.p)[2:end-1, 2:end-1]
+        𝐩s[1, :, :, i] .= Float32.(circ.flow.p)[2:end-1, 2:end-1]
     end
 
     return 𝐩s
