@@ -91,6 +91,10 @@ PDE training examples are provided in `example` folder.
 
 [Time dependent Navier-Stokes equation](example/FlowOverCircle)
 
+### Super Resolution with MNO
+
+[Super resolution on time dependent Navier-Stokes equation](example/SuperResolution)
+
 ## Roadmap
 
 - [x] `FourierOperator` layer

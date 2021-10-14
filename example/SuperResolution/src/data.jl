@@ -16,7 +16,7 @@ function circle(n, m; Re=250)
 end
 
 function gen_data(ts::AbstractRange)
-    n, m = 3(2^5), 2^6
+    n, m = 2 * 3(2^5), 2 * 2^6
     circ = circle(n, m)
 
     𝐩s = Array{Float32}(undef, 1, n, m, length(ts))
@@ -33,7 +33,7 @@ function get_dataloader(; ts::AbstractRange=LinRange(100, 11000, 10000), ratio::
 
     n_train, n_test = floor(Int, length(ts)*ratio), floor(Int, length(ts)*(1-ratio))
 
-    𝐱_train, 𝐲_train = data[:, :, :, 1:(n_train-1)], data[:, :, :, 2:n_train]
+    𝐱_train, 𝐲_train = data[:, 1:2:end, 1:2:end, 1:(n_train-1)], data[:, 1:2:end, 1:2:end, 2:n_train]
     loader_train = Flux.DataLoader((𝐱_train, 𝐲_train), batchsize=batchsize, shuffle=true)
 
     𝐱_test, 𝐲_test = data[:, :, :, (end-n_test+1):(end-1)], data[:, :, :, (end-n_test+2):end]

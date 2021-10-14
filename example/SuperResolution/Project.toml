@@ -1,0 +1,19 @@
+name = "SuperResolution"
+uuid = "a8258e1f-331c-4af2-83e9-878628278453"
+
+[deps]
+CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
+Flux = "587475ba-b771-5e3f-ad9e-33799f191a9c"
+JLD2 = "033835bb-8acc-5ee8-8aae-3f567f8a3819"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+NeuralOperators = "ea5c82af-86e5-48da-8ee1-382d6ad7af4b"
+Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
+Pluto = "c3e4b0f8-55cb-11ea-2926-15256bba5781"
+StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
+WaterLily = "ed894a53-35f9-47f1-b17f-85db9237eebd"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
