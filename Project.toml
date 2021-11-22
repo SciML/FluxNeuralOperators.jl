@@ -14,9 +14,9 @@ Tullio = "bc48ee85-29a4-5162-ae0b-a64e1601d4bc"
 Zygote = "e88e6eb3-aa80-5325-afca-941959d7151f"
 
 [compat]
-CUDA = "3.4"
+CUDA = "3.5"
 CUDAKernels = "0.3"
-ChainRulesCore = "1.7"
+ChainRulesCore = "1.11"
 FFTW = "1.4"
 Flux = "0.12"
 KernelAbstractions = "0.7"
