@@ -46,14 +46,15 @@ pkg> add NeuralOperators
 
 ```julia
 model = Chain(
-    # project finite-dimensional data to infinite-dimensional space
+    # lift (d + 1)-dimensional vector field to n-dimensional vector field
+    # here, d == 1 and n == 64
     Dense(2, 64),
-    # operator projects data between infinite-dimensional spaces
+    # map each hidden representation to the next by integral kernel operator
     FourierOperator(64=>64, (16, ), gelu),
     FourierOperator(64=>64, (16, ), gelu),
     FourierOperator(64=>64, (16, ), gelu),
     FourierOperator(64=>64, (16, )),
-    # project infinite-dimensional function to finite-dimensional space
+    # project back to the scalar field of interest space
     Dense(64, 128, gelu),
     Dense(128, 1),
     flatten
