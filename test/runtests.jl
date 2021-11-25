@@ -6,3 +6,10 @@ using Flux
     include("fourier.jl")
     include("model.jl")
 end
+
+#=
+    　 ／l、    meow?
+    ﾞ（ﾟ､ ｡ ７
+    　l、ﾞ ~ヽ
+    　じしf_, )ノ
+=#
