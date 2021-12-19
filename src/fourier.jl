@@ -68,12 +68,15 @@ end
 
 function spectral_conv(m::SpectralConv, 𝐱::AbstractArray)
     n_dims = ndims(𝐱)
+    batch_size = size(𝐱, n_dims)
+    in_chs = m.in_channel
+    out_chs = m.out_channel
 
     𝐱_fft = fft(Zygote.hook(real, 𝐱), 1:ndims(m)) # [x, in_chs, batch]
-    𝐱_flattened = reshape(view(𝐱_fft, map(d->1:d, m.modes)..., :, :), :, size(𝐱_fft, n_dims-1), size(𝐱_fft, n_dims))
+    𝐱_flattened = reshape(view(𝐱_fft, map(d->1:d, m.modes)..., :, :), :, in_chs, batch_size)
     𝐱_weighted = apply_spectral_pattern(𝐱_flattened, m.weight) # [prod(m.modes), out_chs, batch], only 3-dims
-    𝐱_shaped = reshape(𝐱_weighted, m.modes..., size(𝐱_weighted, 2), size(𝐱_weighted, 3))
-    𝐱_padded = spectral_pad(𝐱_shaped, (size(𝐱_fft)[1:end-2]..., size(𝐱_weighted, 2), size(𝐱_weighted, 3))) # [x, out_chs, batch] <- [modes, out_chs, batch]
+    𝐱_shaped = reshape(𝐱_weighted, m.modes..., out_chs, batch_size)
+    𝐱_padded = spectral_pad(𝐱_shaped, (size(𝐱_fft)[1:end-2]..., out_chs, batch_size)) # [x, out_chs, batch] <- [modes, out_chs, batch]
     𝐱_ifft = real(ifft(𝐱_padded, 1:ndims(m))) # [x, out_chs, batch]
 
     return 𝐱_ifft
