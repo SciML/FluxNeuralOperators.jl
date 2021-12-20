@@ -1,23 +1,52 @@
-struct SparseKernel1d{T,S}
+struct SparseKernel{T,S}
     k::Int
     conv_blk::S
     out_weight::T
 end
 
-function SparseKernel1d(k::Int, c::Int=1; init=Flux.glorot_uniform)
+function SparseKernel1d(k::Int, α, c::Int=1; init=Flux.glorot_uniform)
     input_dim = c*k
     emb_dim = 128
     conv = Conv((3,), input_dim=>emb_dim, relu; stride=1, pad=1, init=init)
     W_out = Dense(emb_dim, input_dim; init=init)
-    return SparseKernel1d(k, conv, W_out)
+    return SparseKernel(k, conv, W_out)
 end
 
-function (l::SparseKernel1d)(X::AbstractArray)
-    X_ = l.conv_blk(batched_transpose(X))
-    Y = l.out_weight(batched_transpose(X_))
-    return Y
+function SparseKernel2d(k::Int, α, c::Int=1; init=Flux.glorot_uniform)
+    input_dim = c*k^2
+    emb_dim = α*k^2
+    conv = Conv((3, 3), input_dim=>emb_dim, relu; stride=1, pad=1, init=init)
+    W_out = Dense(emb_dim, input_dim; init=init)
+    return SparseKernel(k, conv, W_out)
 end
 
+function SparseKernel3d(k::Int, α, c::Int=1; init=Flux.glorot_uniform)
+    input_dim = c*k^2
+    emb_dim = α*k^2
+    conv = Conv((3, 3, 3), emb_dim=>emb_dim, relu; stride=1, pad=1, init=init)
+    W_out = Dense(emb_dim, input_dim; init=init)
+    return SparseKernel(k, conv, W_out)
+end
+
+function (l::SparseKernel)(X::AbstractArray)
+    bch_sz, _, dims_r... = reverse(size(X))
+    dims = reverse(dims_r)
+
+    X_ = l.conv_blk(X)  # (dims..., emb_dims, B)
+    X_ = reshape(X_, prod(dims), :, bch_sz)  # (prod(dims), emb_dims, B)
+    Y = l.out_weight(batched_transpose(X_))  # (in_dims, prod(dims), B)
+    Y = reshape(batched_transpose(Y), dims..., :, bch_sz)  # (dims..., in_dims, B)
+    return collect(Y)
+end
+
+
+# struct MWT_CZ1d
+
+# end
+
+# function MWT_CZ1d(k::Int=3, c::Int=1; init=Flux.glorot_uniform)
+    
+# end
 
 # class MWT_CZ1d(nn.Module):
 #     def __init__(self,
