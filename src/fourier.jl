@@ -167,13 +167,24 @@ end
 
 c_glorot_uniform(dims...) = Flux.glorot_uniform(dims...) + Flux.glorot_uniform(dims...)*im
 
-# [prod(modes), out_chs, batch] <- [prod(modes), in_chs, batch] * [out_chs, in_chs, prod(modes)]
-apply_spectral_pattern(𝐱₁, 𝐱₂) = @tullio 𝐲[m, o, b] := 𝐱₁[m, i, b] * 𝐱₂[m, i, o]
+"""
+    apply_spectral_pattern(𝐱₁, 𝐱₂)
+
+Returns array `𝐲` of size `(prod(modes), out_chs, batch)` as result of
+product of `𝐱₁` and `𝐱₂`.
+
+# Arguments
+
+- `𝐱₁`: Array of size `(prod(modes), in_chs, batch)`.
+- `𝐱₂`: Array of size `(prod(modes), in_chs, out_chs)`.
+"""
+apply_spectral_pattern(𝐱₁::AbstractArray{T,3}, 𝐱₂::AbstractArray{T,3}) where {T} =
+    @tullio 𝐲[m, o, b] := 𝐱₁[m, i, b] * 𝐱₂[m, i, o]
 
 spectral_pad(𝐱::AbstractArray, dims::NTuple) = spectral_pad!(similar(𝐱, dims), 𝐱)
 
-function spectral_pad!(𝐱_padded::AbstractArray, 𝐱::AbstractArray)
-    fill!(𝐱_padded, eltype(𝐱)(0)) # zeros(eltype(𝐱), dims)
+function spectral_pad!(𝐱_padded::AbstractArray, 𝐱::AbstractArray{T}) where {T}
+    fill!(𝐱_padded, zero(T))
     𝐱_padded[map(d->1:d, size(𝐱))...] .= 𝐱
 
     return 𝐱_padded
