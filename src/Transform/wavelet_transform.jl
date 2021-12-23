@@ -1,32 +1,43 @@
-struct SparseKernel{T,S}
-    k::Int
-    conv_blk::S
-    out_weight::T
+export
+    SparseKernel,
+    SparseKernel1D,
+    SparseKernel2D,
+    SparseKernel3D
+
+
+struct SparseKernel{N,T,S}
+    conv_blk::T
+    out_weight::S
 end
 
-function SparseKernel1d(k::Int, α, c::Int=1; init=Flux.glorot_uniform)
+function SparseKernel(filter::NTuple{N,T}, ch::Pair{S, S}; init=Flux.glorot_uniform) where {N,T,S}
+    input_dim, emb_dim = ch
+    conv = Conv(filter, input_dim=>emb_dim, relu; stride=1, pad=1, init=init)
+    W_out = Dense(emb_dim, input_dim; init=init)
+    return SparseKernel{N,typeof(conv),typeof(W_out)}(conv, W_out)
+end
+
+function SparseKernel1D(k::Int, α, c::Int=1; init=Flux.glorot_uniform)
     input_dim = c*k
     emb_dim = 128
-    conv = Conv((3,), input_dim=>emb_dim, relu; stride=1, pad=1, init=init)
-    W_out = Dense(emb_dim, input_dim; init=init)
-    return SparseKernel(k, conv, W_out)
+    return SparseKernel((3, ), input_dim=>emb_dim; init=init)
 end
 
-function SparseKernel2d(k::Int, α, c::Int=1; init=Flux.glorot_uniform)
+function SparseKernel2D(k::Int, α, c::Int=1; init=Flux.glorot_uniform)
     input_dim = c*k^2
     emb_dim = α*k^2
-    conv = Conv((3, 3), input_dim=>emb_dim, relu; stride=1, pad=1, init=init)
-    W_out = Dense(emb_dim, input_dim; init=init)
-    return SparseKernel(k, conv, W_out)
+    return SparseKernel((3, 3), input_dim=>emb_dim; init=init)
 end
 
-function SparseKernel3d(k::Int, α, c::Int=1; init=Flux.glorot_uniform)
+function SparseKernel3D(k::Int, α, c::Int=1; init=Flux.glorot_uniform)
     input_dim = c*k^2
     emb_dim = α*k^2
     conv = Conv((3, 3, 3), emb_dim=>emb_dim, relu; stride=1, pad=1, init=init)
     W_out = Dense(emb_dim, input_dim; init=init)
-    return SparseKernel(k, conv, W_out)
+    return SparseKernel{3,typeof(conv),typeof(W_out)}(conv, W_out)
 end
+
+Flux.@functor SparseKernel
 
 function (l::SparseKernel)(X::AbstractArray)
     bch_sz, _, dims_r... = reverse(size(X))
