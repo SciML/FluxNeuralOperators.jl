@@ -1,3 +1,13 @@
+function get_filter(base::Symbol, k)
+    if base == :legendre
+        return legendre_filter(k)
+    elseif base == :chebyshev
+        return chebyshev_filter(k)
+    else
+        throw(ArgumentError("base must be one of :legendre or :chebyshev."))
+    end
+end
+
 function legendre_ϕ_ψ(k)
     # TODO: row-major -> column major
     ϕ_coefs = zeros(k, k)
