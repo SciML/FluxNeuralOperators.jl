@@ -31,7 +31,6 @@ end
 
 function proj_factor(a, b; complement::Bool=false)
     prod_ = convolve(a, b)
-    zero_out!(prod_)
     r = collect(1:length(prod_))
     s = complement ? (1 .- 0.5 .^ r) : (0.5 .^ r)
     proj_ = sum(prod_ ./ r .* s)

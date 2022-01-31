@@ -22,23 +22,24 @@ function legendre_ϕ_ψ(k)
         ϕ_2x_coefs[ki+1, 1:(ki+1)] .= sqrt(2*(2*ki+1)) .* coeffs(l(p2))
     end
     
-    ψ1_coefs .= ϕ_2x_coefs
+    ψ1_coefs = zeros(k, k)
     ψ2_coefs = zeros(k, k)
     for ki in 0:(k-1)
+        ψ1_coefs[ki+1, :] .= ϕ_2x_coefs[ki+1, :]
         for i in 0:(k-1)
             a = ϕ_2x_coefs[ki+1, 1:(ki+1)]
             b = ϕ_coefs[i+1, 1:(i+1)]
             proj_ = proj_factor(a, b)
-            view(ψ1_coefs, ki+1, :) .-= proj_ .* view(ϕ_coefs, i+1, :)
-            view(ψ2_coefs, ki+1, :) .-= proj_ .* view(ϕ_coefs, i+1, :)
+            ψ1_coefs[ki+1, :] .-= proj_ .* view(ϕ_coefs, i+1, :)
+            ψ2_coefs[ki+1, :] .-= proj_ .* view(ϕ_coefs, i+1, :)
         end
 
         for j in 0:(k-1)
             a = ϕ_2x_coefs[ki+1, 1:(ki+1)]
             b = ψ1_coefs[j+1, :]
             proj_ = proj_factor(a, b)
-            view(ψ1_coefs, ki+1, :) .-= proj_ .* view(ψ1_coefs, j+1, :)
-            view(ψ2_coefs, ki+1, :) .-= proj_ .* view(ψ2_coefs, j+1, :)
+            ψ1_coefs[ki+1, :] .-= proj_ .* view(ψ1_coefs, j+1, :)
+            ψ2_coefs[ki+1, :] .-= proj_ .* view(ψ2_coefs, j+1, :)
         end
 
         a = ψ1_coefs[ki+1, :]
@@ -129,16 +130,11 @@ end
 # end
 
 function legendre_filter(k)
-    # x = Symbol('x')
-    # H0 = np.zeros((k,k))
-    # H1 = np.zeros((k,k))
-    # G0 = np.zeros((k,k))
-    # G1 = np.zeros((k,k))
-    # PHI0 = np.zeros((k,k))
-    # PHI1 = np.zeros((k,k))
-    # phi, psi1, psi2 = get_phi_psi(k, base)
-
-    # ----------------------------------------------------------
+    H0 = zeros(k, k)legendre
+    H1 = zeros(k, k)
+    G0 = zeros(k, k)
+    G1 = zeros(k, k)
+    ϕ, ψ1, ψ2 = legendre_ϕ_ψ(k)
 
     # roots = Poly(legendre(k, 2*x-1)).all_roots()
     # x_m = np.array([rt.evalf(20) for rt in roots]).astype(np.float64)
@@ -150,29 +146,23 @@ function legendre_filter(k)
     #         G0[ki, kpi] = 1/np.sqrt(2) * (wm * psi(psi1, psi2, ki, x_m/2) * phi[kpi](x_m)).sum()
     #         H1[ki, kpi] = 1/np.sqrt(2) * (wm * phi[ki]((x_m+1)/2) * phi[kpi](x_m)).sum()
     #         G1[ki, kpi] = 1/np.sqrt(2) * (wm * psi(psi1, psi2, ki, (x_m+1)/2) * phi[kpi](x_m)).sum()
-            
-    # PHI0 = np.eye(k)
-    # PHI1 = np.eye(k)
 
-    # ----------------------------------------------------------
-
-    # H0[np.abs(H0)<1e-8] = 0
-    # H1[np.abs(H1)<1e-8] = 0
-    # G0[np.abs(G0)<1e-8] = 0
-    # G1[np.abs(G1)<1e-8] = 0
+    zero_out!(H0)
+    zero_out!(H1)
+    zero_out!(G0)
+    zero_out!(G1)
         
-    # return H0, H1, G0, G1, PHI0, PHI1
+    return H0, H1, G0, G1, I(k), I(k)
 end
 
 function chebyshev_filter(k)
-    # x = Symbol('x')
-    # H0 = np.zeros((k,k))
-    # H1 = np.zeros((k,k))
-    # G0 = np.zeros((k,k))
-    # G1 = np.zeros((k,k))
-    # PHI0 = np.zeros((k,k))
-    # PHI1 = np.zeros((k,k))
-    # phi, psi1, psi2 = get_phi_psi(k, base)
+    H0 = zeros(k, k)
+    H1 = zeros(k, k)
+    G0 = zeros(k, k)
+    G1 = zeros(k, k)
+    Φ0 = zeros(k, k)
+    Φ1 = zeros(k, k)
+    ϕ, ψ1, ψ2 = chebyshev_ϕ_ψ(k)
 
     # ----------------------------------------------------------
 
@@ -193,16 +183,13 @@ function chebyshev_filter(k)
 
     #         PHI0[ki, kpi] = (wm * phi[ki](2*x_m) * phi[kpi](2*x_m)).sum() * 2
     #         PHI1[ki, kpi] = (wm * phi[ki](2*x_m-1) * phi[kpi](2*x_m-1)).sum() * 2
-            
-    # PHI0[np.abs(PHI0)<1e-8] = 0
-    # PHI1[np.abs(PHI1)<1e-8] = 0
 
-    # ----------------------------------------------------------
-
-    # H0[np.abs(H0)<1e-8] = 0
-    # H1[np.abs(H1)<1e-8] = 0
-    # G0[np.abs(G0)<1e-8] = 0
-    # G1[np.abs(G1)<1e-8] = 0
+    zero_out!(H0)
+    zero_out!(H1)
+    zero_out!(G0)
+    zero_out!(G1)
+    zero_out!(Φ0)
+    zero_out!(Φ1)
         
-    # return H0, H1, G0, G1, PHI0, PHI1
+    return H0, H1, G0, G1, Φ0, Φ1
 end

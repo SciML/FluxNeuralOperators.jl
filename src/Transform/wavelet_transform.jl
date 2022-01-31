@@ -65,11 +65,11 @@ struct MWT_CZ1d{T,S,R,Q,P}
 end
 
 function MWT_CZ1d(k::Int=3, α::Int=5, L::Int=0, c::Int=1; base::Symbol=:legendre, init=Flux.glorot_uniform)
-    H0, H1, G0, G1, ϕ0, ϕ1 = get_filter(base, k)
-    H0r = zero_out!(H0 * ϕ0)
-    G0r = zero_out!(G0 * ϕ0)
-    H1r = zero_out!(H1 * ϕ1)
-    G1r = zero_out!(G1 * ϕ1)
+    H0, H1, G0, G1, Φ0, Φ1 = get_filter(base, k)
+    H0r = zero_out!(H0 * Φ0)
+    G0r = zero_out!(G0 * Φ0)
+    H1r = zero_out!(H1 * Φ1)
+    G1r = zero_out!(G1 * Φ1)
 
     dim = c*k
     A = SpectralConv(dim=>dim, (α,); init=init)
