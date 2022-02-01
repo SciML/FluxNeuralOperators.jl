@@ -128,22 +128,25 @@ function chebyshev_ϕ_ψ(k)
 end
 
 function legendre_filter(k)
-    H0 = zeros(k, k)legendre
+    H0 = zeros(k, k)
     H1 = zeros(k, k)
     G0 = zeros(k, k)
     G1 = zeros(k, k)
     ϕ, ψ1, ψ2 = legendre_ϕ_ψ(k)
 
-    # roots = Poly(legendre(k, 2*x-1)).all_roots()
-    # x_m = np.array([rt.evalf(20) for rt in roots]).astype(np.float64)
-    # wm = 1/k/legendreDer(k,2*x_m-1)/eval_legendre(k-1,2*x_m-1)
+    l = convert(Polynomial, gen_poly(Legendre, k))
+    x_m = roots(l(Polynomial([-1, 2])))  # 2x-1
+    m = 2 .* x_m .- 1
+    wm = 1 ./ k ./ legendre_der.(k, m) ./ gen_poly(Legendre, k-1).(m)
     
-    # for ki in range(k):
-    #     for kpi in range(k):
-    #         H0[ki, kpi] = 1/np.sqrt(2) * (wm * phi[ki](x_m/2) * phi[kpi](x_m)).sum()
-    #         G0[ki, kpi] = 1/np.sqrt(2) * (wm * psi(psi1, psi2, ki, x_m/2) * phi[kpi](x_m)).sum()
-    #         H1[ki, kpi] = 1/np.sqrt(2) * (wm * phi[ki]((x_m+1)/2) * phi[kpi](x_m)).sum()
-    #         G1[ki, kpi] = 1/np.sqrt(2) * (wm * psi(psi1, psi2, ki, (x_m+1)/2) * phi[kpi](x_m)).sum()
+    for ki in 0:(k-1)
+        for kpi in 0:(k-1)
+            H0[ki+1, kpi+1] = 1/sqrt(2) * sum(wm .* ϕ[ki+1].(x_m/2) .* ϕ[kpi+1].(x_m))
+            G0[ki+1, kpi+1] = 1/sqrt(2) * sum(wm .* ψ(ψ1, ψ2, ki, x_m/2) .* ϕ[kpi+1].(x_m))
+            H1[ki+1, kpi+1] = 1/sqrt(2) * sum(wm .* ϕ[ki+1].((x_m.+1)/2) .* ϕ[kpi+1].(x_m))
+            G1[ki+1, kpi+1] = 1/sqrt(2) * sum(wm .* ψ(ψ1, ψ2, ki, (x_m.+1)/2) .* ϕ[kpi+1].(x_m))
+        end
+    end
 
     zero_out!(H0)
     zero_out!(H1)

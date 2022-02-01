@@ -3,6 +3,7 @@ using CUDA
 using Flux
 using GeometricFlux
 using Graphs
+using LinearAlgebra
 using Polynomials
 using Zygote
 using Test

@@ -7,8 +7,8 @@ function ϕ_(ϕ_coefs; lb::Real=0., ub::Real=1.)
 end
 
 function ψ(ψ1, ψ2, i, inp)
-    mask = (inp ≤ 0.5) * 1.0
-    return ψ1[i](inp) * mask + ψ2[i](inp) * (1-mask)
+    mask = (inp .> 0.5) .* 1.0
+    return ψ1[i+1].(inp) .* mask .+ ψ2[i+1].(inp) .* mask
 end
 
 zero_out!(x; tol=1e-8) = (x[abs.(x) .< tol] .= 0)
@@ -34,4 +34,14 @@ function proj_factor(a, b; complement::Bool=false)
     s = complement ? (1 .- 0.5 .^ r) : (0.5 .^ r)
     proj_ = sum(prod_ ./ r .* s)
     return proj_
+end
+
+_legendre(k, x) = (2k+1) * gen_poly(Legendre, k)(x)
+
+function legendre_der(k, x)
+    out = 0
+    for i in k-1:-2:-1
+        out += _legendre(i, x)
+    end
+    return out
 end

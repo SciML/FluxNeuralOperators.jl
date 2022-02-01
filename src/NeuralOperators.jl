@@ -12,6 +12,7 @@ using GeometricFlux
 using Statistics
 using Polynomials
 using SpecialPolynomials
+using LinearAlgebra
 
 include("abstracttypes.jl")
 
