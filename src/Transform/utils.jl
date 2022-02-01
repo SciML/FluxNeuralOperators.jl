@@ -1,11 +1,10 @@
-# function ϕ_(ϕ_coefs; lb::Real=0., ub::Real=1.)
-#     mask = 
-#     return Polynomial(ϕ_coefs)
-# end
-
-# def phi_(phi_c, x, lb = 0, ub = 1):
-# mask = np.logical_or(x<lb, x>ub) * 1.0
-# return np.polynomial.polynomial.Polynomial(phi_c)(x) * (1-mask)
+function ϕ_(ϕ_coefs; lb::Real=0., ub::Real=1.)
+    function partial(x)
+        mask = (lb ≤ x ≤ ub) * 1.
+        return Polynomial(ϕ_coefs)(x) * mask
+    end
+    return partial
+end
 
 function ψ(ψ1, ψ2, i, inp)
     mask = (inp ≤ 0.5) * 1.0
