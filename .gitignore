@@ -24,3 +24,4 @@ docs/site/
 Manifest.toml
 
 *.jld2
+.vscode

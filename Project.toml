@@ -14,15 +14,15 @@ Tullio = "bc48ee85-29a4-5162-ae0b-a64e1601d4bc"
 Zygote = "e88e6eb3-aa80-5325-afca-941959d7151f"
 
 [compat]
-CUDA = "3.5"
+CUDA = "3.8"
 CUDAKernels = "0.3"
-ChainRulesCore = "1.11"
+ChainRulesCore = "1.12"
 FFTW = "1.4"
 Flux = "0.12"
 KernelAbstractions = "0.7"
 Tullio = "0.3"
 Zygote = "0.6"
-julia = "1.6"
+julia = "1.7"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
