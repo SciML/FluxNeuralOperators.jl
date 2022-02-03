@@ -79,7 +79,7 @@ function Permeability(μ, d::Discretizer)
     return Permeability(μ, μx, μy)
 end
 
-struct Simulator
+mutable struct Simulator
     bound::Bound
     discretizer::Discretizer
     light::Light
@@ -89,6 +89,8 @@ struct Simulator
     ez::Matrix{Float64}
     hx::Matrix{Float64}
     hy::Matrix{Float64}
+
+    t::Int64
 end
 
 function Simulator(;
@@ -104,7 +106,7 @@ function Simulator(;
     permittivity = RandPermittivity(n, r, bound, discretizer)
     permeability = Permeability(μ, discretizer)
 
-    Δx, Δy, Δt = discretizer.Δx, discretizer.Δy, discretizer.Δt
+    Δx, Δt = discretizer.Δx, discretizer.Δt
 
     ez = zeros(Float64, nx, ny)
     ez[2:nx, 1] .= 0.1exp.(
@@ -121,8 +123,38 @@ function Simulator(;
 
         ez,
         zeros(Float64, nx, ny),
-        zeros(Float64, nx, ny)
+        zeros(Float64, nx, ny),
+
+        0
     )
+end
+
+function next!(s::Simulator)
+    max_x = s.bound.max_x
+    nx, ny, Δx, Δt = s.discretizer.nx, s.discretizer.ny, s.discretizer.Δx, s.discretizer.Δt
+    k = s.light.k
+    ϵx, ϵy = s.permittivity.ϵx, s.permittivity.ϵy
+    μx, μy = s.permeability.μx, s.permeability.μy
+
+    s.ez[2:nx, 1] .+= + 0.1exp.(
+        -(Δx * ((2:nx) .- nx/2)).^2 ./
+        (max_x/4)^2
+    ) * sin(k * C*Δt*s.t)
+
+    for y in 2:(ny-1), x in 2:(nx-1)
+        s.hx[x, y] += -μx*(s.ez[x, y] - s.ez[x, y-1])
+        s.hy[x, y] += μy*(s.ez[x, y] - s.ez[x-1, y])
+    end
+
+    for y in 2:(ny-1), x in 2:(nx-1)
+        s.ez[x, y] +=
+            ϵx[x, y]*(s.hy[x+1, y] - s.hy[x, y]) -
+            ϵy[x, y]*(s.hx[x, y+1] - s.hx[x, y])
+    end
+
+    s.t += 1
+
+    return s
 end
 
 function plot_ϵ(s::Simulator; size=(350, 750), left_margin=-100px)
@@ -134,12 +166,12 @@ function plot_ϵ(s::Simulator; size=(350, 750), left_margin=-100px)
 
     return heatmap(
 		LinRange(0, max_x, nx), LinRange(0, max_y, ny), ϵ',
-		color=:coolwarm,
+		color=:algae,
 		size=size, left_margin=left_margin
 	)
 end
 
-function plot_e_field(s::Simulator; size=(350, 750), left_margin=-100px)
+function plot_e_field(s::Simulator; size=(300, 750), left_margin=-100px)
     plotly()
 
     max_x, max_y = s.bound.max_x, s.bound.max_y
@@ -148,16 +180,16 @@ function plot_e_field(s::Simulator; size=(350, 750), left_margin=-100px)
     ϵ = s.permittivity.ϵ
 
     lim = maximum(abs.(ez))
-	p = heatmap(
+    p = heatmap(
 		LinRange(0, max_x, nx), LinRange(0, max_y, ny), ez',
 		color=:coolwarm, clim=(-lim, lim), colorbar=false,
 		size=size, left_margin=left_margin
 	)
-
+    lim_ϵ = maximum(abs.(ϵ))
     p = contour!(
         p,
-        LinRange(0, max_x, nx), LinRange(0, max_y, ny), ϵ',
-        color=:grays, colorbar=false
+        LinRange(0, max_x, nx), LinRange(0, max_y, ny), (lim .* ϵ./lim_ϵ)',
+        color=:algae, colorbar=false
     )
 
     return p
