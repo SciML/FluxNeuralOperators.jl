@@ -1,125 +1,164 @@
 using Plots.PlotMeasures
 using Plots
 
-struct Simulator
-    # computational size
+const C = 299792458
+
+struct Bound
     max_x::Float64
     max_y::Float64
     max_t::Float64
+end
 
-    # wave length
-    λ::Float64
-
-    # radious of defect
-    r::Float64
-
-    # discretization
+struct Discretizer
     nx::Int64
     ny::Int64
 
-    # ##### internal field #####
-
-    # speed of light
-    c::Float64
-
-    # difference
     Δx::Float64
     Δy::Float64
 
-    # discretization of time is determined by Δx and Δy
     Δt::Float64
     nt::Int64
+end
 
-    # permittivity
+function Discretizer(nx, ny, b::Bound)
+    Δx = b.max_x / nx
+    Δy = b.max_y / ny
+
+    Δt = 1 / C / √(1/Δx^2 + 1/Δy^2)
+    nt = round(Int, b.max_t/Δt)
+
+    return Discretizer(nx, ny, Δx, Δy, Δt, nt)
+end
+
+struct Light
+    λ::Float64
+    k::Float64
+end
+
+function Light(λ)
+    return Light(λ, 2π/λ)
+end
+
+struct Permittivity
     ϵ::Matrix{Float64}
     ϵx::Matrix{Float64}
     ϵy::Matrix{Float64}
+end
 
-    # permeability
+function RandPermittivity(n::Integer, r::Float64, b::Bound, d::Discretizer)
+    ϵ = 9 * ones(d.nx, d.ny)
+
+    xs = b.max_x .* rand(n)
+    ys = b.max_y .* rand(n)
+    rs = r .* rand(n)
+
+    in_circle(i, j) = true in [
+        √((i*d.Δx - xs[c])^2 + (j*d.Δy - ys[c])^2) < rs[c] for c in 1:n
+    ]
+
+    for i in 1:d.nx, j in 1:d.ny
+        in_circle(i, j) && (ϵ[i, j] = 1)
+    end
+
+    ϵx = C * d.Δt/d.Δx ./ ϵ
+    ϵy = C * d.Δt/d.Δy ./ ϵ
+
+    return Permittivity(ϵ, ϵx, ϵy)
+end
+
+struct Permeability
     μ::Float64
     μx::Float64
     μy::Float64
+end
 
-    # wavenumber
-    k::Float64
+function Permeability(μ, d::Discretizer)
+    μx = C * d.Δt/d.Δx / μ
+    μy = C * d.Δt/d.Δy / μ
+
+    return Permeability(μ, μx, μy)
+end
+
+struct Simulator
+    bound::Bound
+    discretizer::Discretizer
+    light::Light
+    permittivity::Permittivity
+    permeability::Permeability
+
+    ez::Matrix{Float64}
+    hx::Matrix{Float64}
+    hy::Matrix{Float64}
 end
 
 function Simulator(;
     max_x=3e-6, max_y=10e-6, max_t=1e-12,
+    nx=120, ny=400,
     λ=2.04e-6,
-    r=0.45e-6,
-    nx=120, ny=400
+    n=rand(1:5), r=0.45e-6,
+    μ=1
 )
-    c = 299792458
+    bound = Bound(max_x, max_y, max_t)
+    discretizer = Discretizer(nx, ny, bound)
+    light = Light(λ)
+    permittivity = RandPermittivity(n, r, bound, discretizer)
+    permeability = Permeability(μ, discretizer)
 
-    Δx = max_x/nx
-    Δy = max_x/ny
-    Δt = 1 / c / √(1/Δx^2 + 1/Δy^2)
-    nt = round(Int, max_t/Δt)
+    Δx, Δy, Δt = discretizer.Δx, discretizer.Δy, discretizer.Δt
 
-    μ = 1
-    μx = c * Δt/Δx / μ
-    μy = c * Δt/Δy / μ
+    ez = zeros(Float64, nx, ny)
+    ez[2:nx, 1] .= 0.1exp.(
+        -(Δx * ((2:nx) .- nx/2)).^2 ./
+        (max_x/4)^2
+    ) * sin(light.k * C*Δt)
 
-    k = 2π/λ
+    return Simulator(
+        bound,
+        discretizer,
+        light,
+        permittivity,
+        permeability,
 
-    s = Simulator(
-        max_x, max_y, max_t,
-        λ,
-        r,
-        nx, ny,
-
-        c, Δx, Δy, Δt, nt,
-        ones(nx, ny), ones(nx, ny), ones(nx, ny),
-        μ, μx, μy,
-
-        k
+        ez,
+        zeros(Float64, nx, ny),
+        zeros(Float64, nx, ny)
     )
-    set_rand_ϵ!(s)
-
-    return s
 end
 
-function set_rand_ϵ!(s::Simulator)
-    ϵ = 9 * ones(s.nx, s.ny)
-
-    n = rand(1:5)
-    xs = s.max_x .* rand(n)
-    ys = s.max_y .* rand(n)
-    rs = s.r .* rand(n)
-
-    function in_circle(i, j)
-        return true in [√((i*s.Δx - xs[c])^2 + (j*s.Δy - ys[c])^2) < rs[c] for c in 1:n]
-    end
-
-    for i in 1:s.nx
-        for j in 1:s.ny
-            in_circle(i, j) && (ϵ[i, j] = 1)
-        end
-    end
-
-    s.ϵ .= ϵ
-    s.ϵx .= s.c * s.Δt/s.Δx ./ ϵ
-    s.ϵy .= s.c * s.Δt/s.Δy ./ ϵ
-
-    return s
-end
-
-function plot_ϵ(s::Simulator)
+function plot_ϵ(s::Simulator; size=(350, 750), left_margin=-100px)
     plotly()
 
+    max_x, max_y = s.bound.max_x, s.bound.max_y
+    nx, ny = s.discretizer.nx, s.discretizer.ny
+    ϵ = s.permittivity.ϵ
+
     return heatmap(
-		LinRange(0, s.max_x, s.nx), LinRange(0, s.max_y, s.ny), s.ϵ',
+		LinRange(0, max_x, nx), LinRange(0, max_y, ny), ϵ',
 		color=:coolwarm,
-		size=(350, 750), left_margin=-100px
+		size=size, left_margin=left_margin
 	)
 end
 
-function plot_sim(s::Simulator)
+function plot_e_field(s::Simulator; size=(350, 750), left_margin=-100px)
     plotly()
 
-    contour!(
-        LinRange(0, s.max_x, s.nx), LinRange(0, s.max_y, s.ny), s.ϵ',
-        color=:coolwarm,
+    max_x, max_y = s.bound.max_x, s.bound.max_y
+    nx, ny = s.discretizer.nx, s.discretizer.ny
+    ez = s.ez
+    ϵ = s.permittivity.ϵ
+
+    lim = maximum(abs.(ez))
+	p = heatmap(
+		LinRange(0, max_x, nx), LinRange(0, max_y, ny), ez',
+		color=:coolwarm, clim=(-lim, lim), colorbar=false,
+		size=size, left_margin=left_margin
+	)
+
+    p = contour!(
+        p,
+        LinRange(0, max_x, nx), LinRange(0, max_y, ny), ϵ',
+        color=:grays, colorbar=false
     )
+
+    return p
 end
