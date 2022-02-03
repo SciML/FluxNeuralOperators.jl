@@ -165,25 +165,23 @@ function chebyshev_filter(k)
     Φ1 = zeros(k, k)
     ϕ, ψ1, ψ2 = chebyshev_ϕ_ψ(k)
 
-    # ----------------------------------------------------------
+    k_use = 2k
+    c = convert(Polynomial, gen_poly(Chebyshev, k_use))
+    x_m = roots(c(Polynomial([-1, 2])))  # 2x-1
+    # x_m[x_m==0.5] = 0.5 + 1e-8 # add small noise to avoid the case of 0.5 belonging to both phi(2x) and phi(2x-1)
+    # not needed for our purpose here, we use even k always to avoid
+    wm = π / k_use / 2
 
-    # x = Symbol('x')
-    # kUse = 2*k
-    # roots = Poly(chebyshevt(kUse, 2*x-1)).all_roots()
-    # x_m = np.array([rt.evalf(20) for rt in roots]).astype(np.float64)
-    # # x_m[x_m==0.5] = 0.5 + 1e-8 # add small noise to avoid the case of 0.5 belonging to both phi(2x) and phi(2x-1)
-    # # not needed for our purpose here, we use even k always to avoid
-    # wm = np.pi / kUse / 2
-
-    # for ki in range(k):
-    #     for kpi in range(k):
-    #         H0[ki, kpi] = 1/np.sqrt(2) * (wm * phi[ki](x_m/2) * phi[kpi](x_m)).sum()
-    #         G0[ki, kpi] = 1/np.sqrt(2) * (wm * psi(psi1, psi2, ki, x_m/2) * phi[kpi](x_m)).sum()
-    #         H1[ki, kpi] = 1/np.sqrt(2) * (wm * phi[ki]((x_m+1)/2) * phi[kpi](x_m)).sum()
-    #         G1[ki, kpi] = 1/np.sqrt(2) * (wm * psi(psi1, psi2, ki, (x_m+1)/2) * phi[kpi](x_m)).sum()
-
-    #         PHI0[ki, kpi] = (wm * phi[ki](2*x_m) * phi[kpi](2*x_m)).sum() * 2
-    #         PHI1[ki, kpi] = (wm * phi[ki](2*x_m-1) * phi[kpi](2*x_m-1)).sum() * 2
+    for ki in 0:(k-1)
+        for kpi in 0:(k-1)
+            H0[ki+1, kpi+1] = 1/sqrt(2) * sum(wm .* ϕ[ki+1].(x_m/2) .* ϕ[kpi+1].(x_m))
+            H1[ki+1, kpi+1] = 1/sqrt(2) * sum(wm .* ϕ[ki+1].((x_m.+1)/2) .* ϕ[kpi+1].(x_m))
+            G0[ki+1, kpi+1] = 1/sqrt(2) * sum(wm .* ψ(ψ1, ψ2, ki, x_m/2) .* ϕ[kpi+1].(x_m))
+            G1[ki+1, kpi+1] = 1/sqrt(2) * sum(wm .* ψ(ψ1, ψ2, ki, (x_m.+1)/2) .* ϕ[kpi+1].(x_m))
+            Φ0[ki+1, kpi+1] = 2*sum(wm .* ϕ[ki+1].(2x_m) .* ϕ[kpi+1].(2x_m))
+            Φ1[ki+1, kpi+1] = 2*sum(wm .* ϕ[ki+1].(2 .* x_m .- 1) .* ϕ[kpi+1].(2 .* x_m .- 1))
+        end
+    end
 
     zero_out!(H0)
     zero_out!(H1)
