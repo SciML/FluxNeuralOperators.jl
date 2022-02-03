@@ -157,6 +157,16 @@ function next!(s::Simulator)
     return s
 end
 
+function simulate!(s::Simulator)
+    ez = Array{Float64, 3}(undef, s.discretizer.nx, s.discretizer.ny, s.discretizer.nt)
+    for t in 1:(s.discretizer.nt)
+        next!(s)
+        ez[:, :, t] .= s.ez
+    end
+
+    return ez
+end
+
 function plot_ϵ(s::Simulator; size=(350, 750), left_margin=-100px)
     plotly()
 
