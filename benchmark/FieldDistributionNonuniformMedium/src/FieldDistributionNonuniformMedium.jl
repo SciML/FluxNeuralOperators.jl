@@ -2,6 +2,7 @@ module FieldDistributionNonuniformMedium
 
 using Plots.PlotMeasures
 using Plots
+using JLD2
 
 const C = 299792458
 
@@ -212,14 +213,20 @@ function get_grid(s::Simulator)
 end
 
 function gen_data(; nx=60, ny=200, n=10000)
-
+    xs = Array{Float64, 4}(undef, nx-2, ny-2, 3, n)
+    ys = Array{Float64, 4}(undef, nx-2, ny-2, 1, n)
     for i in 1:n
         @info "data $i:"
         @time begin
             s = Simulator(nx=nx, ny=ny)
             simulate!(s)
+
+            xs[:, :, 1, i] .= s.permittivity.ϵ[2:(nx-1), 2:(ny-1)]
+            xs[:, :, 2:3, i] .= get_grid(s)[2:(nx-1), 2:(ny-1), :]
+            ys[:, :, 1, i] .= s.ez[2:(nx-1), 2:(ny-1)]
         end
     end
+    jldsave("data.jld2"; xs, ys)
 end
 
 end # module
