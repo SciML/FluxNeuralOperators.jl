@@ -136,21 +136,17 @@ function next!(s::Simulator)
     ϵx, ϵy = s.permittivity.ϵx, s.permittivity.ϵy
     μx, μy = s.permeability.μx, s.permeability.μy
 
-    s.ez[2:nx, 1] .+= + 0.1exp.(
+    s.ez[2:nx, 1] .+= 0.1exp.(
         -(Δx * ((2:nx) .- nx/2)).^2 ./
         (max_x/4)^2
     ) * sin(k * C*Δt*s.t)
 
-    for y in 2:(ny-1), x in 2:(nx-1)
-        s.hx[x, y] += -μx*(s.ez[x, y] - s.ez[x, y-1])
-        s.hy[x, y] += μy*(s.ez[x, y] - s.ez[x-1, y])
-    end
+    s.hx[2:(nx-1), 2:(ny-1)] .+= -μx*(s.ez[2:(nx-1), 2:(ny-1)] - s.ez[2:(nx-1), 1:(ny-2)])
+    s.hy[2:(nx-1), 2:(ny-1)] .+= +μy*(s.ez[2:(nx-1), 2:(ny-1)] - s.ez[1:(nx-2), 2:(ny-1)])
 
-    for y in 2:(ny-1), x in 2:(nx-1)
-        s.ez[x, y] +=
-            ϵx[x, y]*(s.hy[x+1, y] - s.hy[x, y]) -
-            ϵy[x, y]*(s.hx[x, y+1] - s.hx[x, y])
-    end
+    s.ez[2:(nx-1), 2:(ny-1)] .+=
+        ϵx[2:(nx-1), 2:(ny-1)].*(s.hy[3:nx, 2:(ny-1)] - s.hy[2:(nx-1), 2:(ny-1)]) -
+        ϵy[2:(nx-1), 2:(ny-1)].*(s.hx[2:(nx-1), 3:ny] - s.hx[2:(nx-1), 2:(ny-1)])
 
     s.t += 1
 
@@ -158,13 +154,11 @@ function next!(s::Simulator)
 end
 
 function simulate!(s::Simulator)
-    ez = Array{Float64, 3}(undef, s.discretizer.nx, s.discretizer.ny, s.discretizer.nt)
-    for t in 1:(s.discretizer.nt)
+    for _ in 1:(s.discretizer.nt)
         next!(s)
-        ez[:, :, t] .= s.ez
     end
 
-    return ez
+    return s
 end
 
 function plot_ϵ(s::Simulator; size=(350, 750), left_margin=-100px)
@@ -198,7 +192,7 @@ function plot_e_field(s::Simulator; size=(300, 750), left_margin=-100px)
     lim_ϵ = maximum(abs.(ϵ))
     p = contour!(
         p,
-        LinRange(0, max_x, nx), LinRange(0, max_y, ny), (lim .* ϵ./lim_ϵ)',
+        LinRange(0, max_x, nx), LinRange(0, max_y, ny), lim .* ϵ' ./ lim_ϵ,
         color=:algae, colorbar=false
     )
 
