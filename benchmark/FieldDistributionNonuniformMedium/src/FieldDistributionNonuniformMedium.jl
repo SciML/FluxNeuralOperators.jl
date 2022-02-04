@@ -226,7 +226,7 @@ function gen_data(; nx=60, ny=200, n=10000)
             ys[:, :, 1, i] .= s.ez[2:(nx-1), 2:(ny-1)]
         end
     end
-    jldsave("data.jld2"; xs, ys)
+    jldsave(joinpath(mkpath(joinpath(@__DIR__, "..", "data")), "data.jld2"); xs, ys)
 end
 
 end # module
