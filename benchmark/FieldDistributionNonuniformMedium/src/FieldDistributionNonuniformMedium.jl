@@ -33,22 +33,22 @@ function Discretizer(nx, ny, b::Bound)
     return Discretizer(nx, ny, Δx, Δy, Δt, nt)
 end
 
-struct Light
-    λ::Float64
-    k::Float64
+struct Light{T<:Real}
+    λ::T
+    k::T
 end
 
 function Light(λ)
     return Light(λ, 2π/λ)
 end
 
-struct Permittivity
-    ϵ::Matrix{Float64}
-    ϵx::Matrix{Float64}
-    ϵy::Matrix{Float64}
+struct Permittivity{T<:AbstractMatrix}
+    ϵ::T
+    ϵx::T
+    ϵy::T
 end
 
-function RandPermittivity(n::Integer, r::Float64, b::Bound, d::Discretizer)
+function Base.rand(::Type{Permittivity}, n::Integer, r::Float64, b::Bound, d::Discretizer)
     ϵ = 9 * ones(d.nx, d.ny)
 
     xs = b.max_x .* rand(n)
@@ -69,10 +69,10 @@ function RandPermittivity(n::Integer, r::Float64, b::Bound, d::Discretizer)
     return Permittivity(ϵ, ϵx, ϵy)
 end
 
-struct Permeability
-    μ::Float64
-    μx::Float64
-    μy::Float64
+struct Permeability{T<:Real}
+    μ::T
+    μx::T
+    μy::T
 end
 
 function Permeability(μ, d::Discretizer)
@@ -93,7 +93,7 @@ mutable struct Simulator
     hx::Matrix{Float64}
     hy::Matrix{Float64}
 
-    t::Int64
+    t::Int
 end
 
 function Simulator(;
@@ -101,12 +101,12 @@ function Simulator(;
     nx=300, ny=1000,
     λ=2.04e-6,
     n=rand(1:5), r=0.45e-6,
-    μ=1
+    μ=1.
 )
     bound = Bound(max_x, max_y, max_t)
     discretizer = Discretizer(nx, ny, bound)
     light = Light(λ)
-    permittivity = RandPermittivity(n, r, bound, discretizer)
+    permittivity = rand(Permittivity, n, r, bound, discretizer)
     permeability = Permeability(μ, discretizer)
 
     Δx, Δt = discretizer.Δx, discretizer.Δt
