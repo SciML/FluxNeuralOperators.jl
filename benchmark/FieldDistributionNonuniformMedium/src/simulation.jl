@@ -14,7 +14,7 @@ struct Grid{T<:Real}
     max_t::T
 end
 
-function Grid(nx, ny, max_x, max_y, max_t)
+function Grid(; nx=300, ny=1000, max_x=3e-6, max_y=10e-6, max_t=5e-12)
     Δx = max_x / nx
     Δy = max_y / ny
 
@@ -90,81 +90,76 @@ function Permeability(μ, grid::Grid)
     return Permeability(μ, μx, μy)
 end
 
-mutable struct Simulator
-    grid::Grid
+mutable struct Simulator{T<:AbstractMatrix}
     light::Light
     permittivity::Permittivity
     permeability::Permeability
 
-    ez::Matrix{Float64}
-    hx::Matrix{Float64}
-    hy::Matrix{Float64}
+    ez::T
+    hx::T
+    hy::T
 
     t::Int
 end
 
-function Simulator(;
-    max_x=3e-6, max_y=10e-6, max_t=5e-12,
-    nx=300, ny=1000,
+function Simulator(grid::Grid;
     λ=2.04e-6,
     n=rand(1:5), r=0.45e-6,
     μ=1.
 )
-    grid = Grid(nx, ny, max_x, max_y, max_t)
     light = Light(λ)
     permittivity = rand(Permittivity, n, r, grid)
     permeability = Permeability(μ, grid)
-
-    Δx, Δt = grid.Δx, grid.Δt
-
-    ez = zeros(Float64, size(grid))
-    ez[2:nx, 1] .= 0.1exp.(
-        -(Δx * ((2:nx) .- nx/2)).^2 ./
-        (max_x/4)^2
-    ) * sin(light.k * C*Δt)
+    ez, hx, hy = init(grid, light.k)
 
     return Simulator(
-        grid,
         light,
         permittivity,
         permeability,
 
-        ez,
-        zeros(Float64, size(grid)),
-        zeros(Float64, size(grid)),
+        ez, hx, hy,
 
         0
     )
 end
 
-function next!(s::Simulator)
-    nx, ny = size(s.grid)
-    Δx, Δt, max_x = s.grid.Δx, s.grid.Δt, s.grid.max_x
+function simulate!(s::Simulator, grid::Grid)
+    nx, ny = size(grid)
+    Δx, Δt, max_x = grid.Δx, grid.Δt, grid.max_x
     k = s.light.k
     ϵx, ϵy = s.permittivity.ϵx, s.permittivity.ϵy
     μx, μy = s.permeability.μx, s.permeability.μy
 
-    s.ez[2:nx, 1] .+= 0.1exp.(
-        -(Δx * ((2:nx) .- nx/2)).^2 ./
-        (max_x/4)^2
-    ) * sin(k * C*Δt*s.t)
+    for _ in 1:(grid.nt)
+        s.ez[2:nx, 1] .+= 0.1exp.(
+            -(Δx * ((2:nx) .- nx/2)).^2 ./
+            (max_x/4)^2
+        ) * sin(k * C*Δt*s.t)
 
-    s.hx[2:(nx-1), 2:(ny-1)] .+= -μx*(s.ez[2:(nx-1), 2:(ny-1)] - s.ez[2:(nx-1), 1:(ny-2)])
-    s.hy[2:(nx-1), 2:(ny-1)] .+= +μy*(s.ez[2:(nx-1), 2:(ny-1)] - s.ez[1:(nx-2), 2:(ny-1)])
+        s.hx[2:(nx-1), 2:(ny-1)] .+= -μx*(s.ez[2:(nx-1), 2:(ny-1)] - s.ez[2:(nx-1), 1:(ny-2)])
+        s.hy[2:(nx-1), 2:(ny-1)] .+= +μy*(s.ez[2:(nx-1), 2:(ny-1)] - s.ez[1:(nx-2), 2:(ny-1)])
 
-    s.ez[2:(nx-1), 2:(ny-1)] .+=
-        ϵx[2:(nx-1), 2:(ny-1)].*(s.hy[3:nx, 2:(ny-1)] - s.hy[2:(nx-1), 2:(ny-1)]) -
-        ϵy[2:(nx-1), 2:(ny-1)].*(s.hx[2:(nx-1), 3:ny] - s.hx[2:(nx-1), 2:(ny-1)])
+        s.ez[2:(nx-1), 2:(ny-1)] .+=
+            ϵx[2:(nx-1), 2:(ny-1)].*(s.hy[3:nx, 2:(ny-1)] - s.hy[2:(nx-1), 2:(ny-1)]) -
+            ϵy[2:(nx-1), 2:(ny-1)].*(s.hx[2:(nx-1), 3:ny] - s.hx[2:(nx-1), 2:(ny-1)])
 
-    s.t += 1
+        s.t += 1
+    end
 
     return s
 end
 
-function simulate!(s::Simulator)
-    for _ in 1:(s.grid.nt)
-        next!(s)
-    end
+function init(grid::Grid{T}, k) where {T}
+    nx, Δx, Δt, max_x = grid.nx, grid.Δx, grid.Δt, grid.max_x
 
-    return s
+    ez = zeros(T, size(grid))
+    hx = zeros(T, size(grid))
+    hy = zeros(T, size(grid))
+
+    ez[2:nx, 1] .= 0.1exp.(
+        -(Δx * ((2:nx) .- nx/2)).^2 ./
+        (max_x/4)^2
+    ) * sin(k * C*Δt)
+
+    return ez, hx, hy
 end

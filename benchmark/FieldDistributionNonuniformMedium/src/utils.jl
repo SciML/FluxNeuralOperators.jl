@@ -1,11 +1,11 @@
 using Plots.PlotMeasures
 using Plots
 
-function plot_ϵ(s::Simulator; figsize=(350, 750), left_margin=-100px)
+function plot_ϵ(s::Simulator, grid::Grid; figsize=(350, 750), left_margin=-100px)
     plotly()
 
-    max_x, max_y = boundary(s.grid)
-    nx, ny = size(s.grid)
+    max_x, max_y = boundary(grid)
+    nx, ny = size(grid)
     ϵ = s.permittivity.ϵ
 
     return heatmap(
@@ -15,11 +15,11 @@ function plot_ϵ(s::Simulator; figsize=(350, 750), left_margin=-100px)
 	)
 end
 
-function plot_e_field(s::Simulator; figsize=(300, 750), left_margin=-100px)
+function plot_e_field(s::Simulator, grid::Grid; figsize=(300, 750), left_margin=-100px)
     plotly()
 
-    max_x, max_y = boundary(s.grid)
-    nx, ny = size(s.grid)
+    max_x, max_y = boundary(grid)
+    nx, ny = size(grid)
     ez = s.ez
     ϵ = s.permittivity.ϵ
 
