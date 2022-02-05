@@ -212,11 +212,11 @@ function get_grid(s::Simulator)
     )
 end
 
-function gen_data(; nx=60, ny=200, n=10000)
+function gen_data(; nx=60, ny=200, n=7000)
     xs = Array{Float64, 4}(undef, nx-2, ny-2, 3, n)
     ys = Array{Float64, 4}(undef, nx-2, ny-2, 1, n)
-    for i in 1:n
-        @info "data $i:"
+    tasks = ["." for _ in 1:n]
+    Threads.@threads for i in 1:n
         @time begin
             s = Simulator(nx=nx, ny=ny)
             simulate!(s)
@@ -224,7 +224,10 @@ function gen_data(; nx=60, ny=200, n=10000)
             xs[:, :, 1, i] .= s.permittivity.ϵ[2:(nx-1), 2:(ny-1)]
             xs[:, :, 2:3, i] .= get_grid(s)[2:(nx-1), 2:(ny-1), :]
             ys[:, :, 1, i] .= s.ez[2:(nx-1), 2:(ny-1)]
+
+            print("\e[H\e[2J");
         end
+        tasks[i] = "#"; print(tasks...)
     end
     jldsave(joinpath(mkpath(joinpath(@__DIR__, "..", "data")), "data.jld2"); xs, ys)
 end
