@@ -2,6 +2,7 @@ module FieldDistributionNonuniformMedium
 
 using Plots.PlotMeasures
 using Plots
+using ProgressMeter
 using JLD2
 
 const C = 299792458
@@ -216,7 +217,7 @@ end
 function gen_data(; nx=60, ny=200, n=7000)
     xs = Array{Float64, 4}(undef, nx-2, ny-2, 3, n)
     ys = Array{Float64, 4}(undef, nx-2, ny-2, 1, n)
-    tasks = ["." for _ in 1:n]
+    p = Progress(n)
     Threads.@threads for i in 1:n
         @time begin
             s = Simulator(nx=nx, ny=ny)
@@ -228,7 +229,7 @@ function gen_data(; nx=60, ny=200, n=7000)
 
             print("\e[H\e[2J");
         end
-        tasks[i] = "#"; print(tasks...)
+        ProgressMeter.next!(p)
     end
     jldsave(joinpath(mkpath(joinpath(@__DIR__, "..", "data")), "data.jld2"); xs, ys)
 end
