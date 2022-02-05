@@ -7,7 +7,7 @@ using JLD2
 
 const C = 299792458
 
-struct GridParameter{T<:Real}
+struct Grid{T<:Real}
     nx::Int
     ny::Int
     nt::Int
@@ -21,18 +21,18 @@ struct GridParameter{T<:Real}
     max_t::T
 end
 
-function discretize(nx, ny; max_x=3e-6, max_y=10e-6, max_t=5e-12)
+function Grid(nx, ny, max_x, max_y, max_t)
     Δx = max_x / nx
     Δy = max_y / ny
 
     Δt = 1 / C / √(1/Δx^2 + 1/Δy^2)
     nt = round(Int, max_t/Δt)
 
-    return GridParameter(nx, ny, nt, Δx, Δy, Δt, max_x, max_y, max_t)
+    return Grid(nx, ny, nt, Δx, Δy, Δt, max_x, max_y, max_t)
 end
 
-function init(gp::GridParameter)
-    Δx, Δy, nx, ny = gp.Δx, gp.Δy, gp.nx, gp.ny
+function build(grid::Grid)
+    Δx, Δy, nx, ny = grid.Δx, grid.Δy, grid.nx, grid.ny
 
     return cat(
         repeat(Δx * ((1:nx) .- nx/2), 1, ny, 1),
@@ -41,12 +41,12 @@ function init(gp::GridParameter)
     )
 end
 
-Base.size(gp::GridParameter) = (gp.nx, gp.ny)
-Base.size(gp::GridParameter, d) = d::Integer <= 2 ? size(gp)[d] : 1
-Base.axes(gp::GridParameter) = (Base.OneTo(gp.nx), Base.OneTo(gp.ny))
-Base.axes(gp::GridParameter, d) = d::Integer <= 2 ? axes(gp)[d] : 1
-boundary(gp::GridParameter) = (gp.max_x, gp.max_y)
-boundary(gp::GridParameter, d) = d::Integer <= 2 ? boundary(gp)[d] : 1
+Base.size(grid::Grid) = (grid.nx, grid.ny)
+Base.size(grid::Grid, d) = d::Integer <= 2 ? size(grid)[d] : 1
+Base.axes(grid::Grid) = (Base.OneTo(grid.nx), Base.OneTo(grid.ny))
+Base.axes(grid::Grid, d) = d::Integer <= 2 ? axes(grid)[d] : 1
+boundary(grid::Grid) = (grid.max_x, grid.max_y)
+boundary(grid::Grid, d) = d::Integer <= 2 ? boundary(grid)[d] : 1
 
 struct Light{T<:Real}
     λ::T
@@ -63,23 +63,23 @@ struct Permittivity{T<:AbstractMatrix}
     ϵy::T
 end
 
-function Base.rand(::Type{Permittivity}, n::Integer, r::Real, gp::GridParameter)
-    ϵ = 9 * ones(size(gp))
+function Base.rand(::Type{Permittivity}, n::Integer, r::Real, grid::Grid)
+    ϵ = 9 * ones(size(grid))
 
-    xs = gp.max_x .* rand(n)
-    ys = gp.max_y .* rand(n)
+    xs = grid.max_x .* rand(n)
+    ys = grid.max_y .* rand(n)
     rs = r .* rand(n)
 
     in_circle(i, j) = true in [
-        √((i*gp.Δx - xs[c])^2 + (j*gp.Δy - ys[c])^2) < rs[c] for c in 1:n
+        √((i*grid.Δx - xs[c])^2 + (j*grid.Δy - ys[c])^2) < rs[c] for c in 1:n
     ]
 
-    for i in 1:gp.nx, j in 1:gp.ny
+    for i in 1:grid.nx, j in 1:grid.ny
         in_circle(i, j) && (ϵ[i, j] = 1)
     end
 
-    ϵx = C * gp.Δt/gp.Δx ./ ϵ
-    ϵy = C * gp.Δt/gp.Δy ./ ϵ
+    ϵx = C * grid.Δt/grid.Δx ./ ϵ
+    ϵy = C * grid.Δt/grid.Δy ./ ϵ
 
     return Permittivity(ϵ, ϵx, ϵy)
 end
@@ -90,15 +90,15 @@ struct Permeability{T<:Real}
     μy::T
 end
 
-function Permeability(μ, gp::GridParameter)
-    μx = C * gp.Δt/gp.Δx / μ
-    μy = C * gp.Δt/gp.Δy / μ
+function Permeability(μ, grid::Grid)
+    μx = C * grid.Δt/grid.Δx / μ
+    μy = C * grid.Δt/grid.Δy / μ
 
     return Permeability(μ, μx, μy)
 end
 
 mutable struct Simulator
-    grid::GridParameter
+    grid::Grid
     light::Light
     permittivity::Permittivity
     permeability::Permeability
@@ -117,28 +117,28 @@ function Simulator(;
     n=rand(1:5), r=0.45e-6,
     μ=1.
 )
-    gp = discretize(nx, ny, max_x=max_x, max_y=max_y, max_t=max_t)
+    grid = Grid(nx, ny, max_x, max_y, max_t)
     light = Light(λ)
-    permittivity = rand(Permittivity, n, r, gp)
-    permeability = Permeability(μ, gp)
+    permittivity = rand(Permittivity, n, r, grid)
+    permeability = Permeability(μ, grid)
 
-    Δx, Δt = gp.Δx, gp.Δt
+    Δx, Δt = grid.Δx, grid.Δt
 
-    ez = zeros(Float64, size(gp))
+    ez = zeros(Float64, size(grid))
     ez[2:nx, 1] .= 0.1exp.(
         -(Δx * ((2:nx) .- nx/2)).^2 ./
         (max_x/4)^2
     ) * sin(light.k * C*Δt)
 
     return Simulator(
-        gp,
+        grid,
         light,
         permittivity,
         permeability,
 
         ez,
-        zeros(Float64, size(gp)),
-        zeros(Float64, size(gp)),
+        zeros(Float64, size(grid)),
+        zeros(Float64, size(grid)),
 
         0
     )
@@ -219,16 +219,13 @@ function gen_data(; nx=60, ny=200, n=7000)
     ys = Array{Float64, 4}(undef, nx-2, ny-2, 1, n)
     p = Progress(n)
     Threads.@threads for i in 1:n
-        @time begin
-            s = Simulator(nx=nx, ny=ny)
-            simulate!(s)
+        s = Simulator(nx=nx, ny=ny)
+        simulate!(s)
 
-            xs[:, :, 1, i] .= s.permittivity.ϵ[2:(nx-1), 2:(ny-1)]
-            xs[:, :, 2:3, i] .= init(s.grid)[2:(nx-1), 2:(ny-1), :]
-            ys[:, :, 1, i] .= s.ez[2:(nx-1), 2:(ny-1)]
+        xs[:, :, 1, i] .= s.permittivity.ϵ[2:(nx-1), 2:(ny-1)]
+        xs[:, :, 2:3, i] .= build(s.grid)[2:(nx-1), 2:(ny-1), :]
+        ys[:, :, 1, i] .= s.ez[2:(nx-1), 2:(ny-1)]
 
-            print("\e[H\e[2J");
-        end
         ProgressMeter.next!(p)
     end
     jldsave(joinpath(mkpath(joinpath(@__DIR__, "..", "data")), "data.jld2"); xs, ys)
