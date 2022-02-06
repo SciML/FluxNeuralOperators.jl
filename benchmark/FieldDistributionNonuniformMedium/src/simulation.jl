@@ -1,3 +1,11 @@
+export 
+    Grid,
+    boundary,
+    build,
+    Simulator,
+    simulate!
+
+
 const C = 299792458
 
 struct Grid{T<:Real}
@@ -144,33 +152,27 @@ function Simulator(;
     )
 end
 
-function next!(s::Simulator)
+function simulate!(s::Simulator)
     nx, ny = size(s.grid)
     Δx, Δt, max_x = s.grid.Δx, s.grid.Δt, s.grid.max_x
     k = s.light.k
     ϵx, ϵy = s.permittivity.ϵx, s.permittivity.ϵy
     μx, μy = s.permeability.μx, s.permeability.μy
 
-    s.ez[2:nx, 1] .+= 0.1exp.(
-        -(Δx * ((2:nx) .- nx/2)).^2 ./
-        (max_x/4)^2
-    ) * sin(k * C*Δt*s.t)
-
-    s.hx[2:(nx-1), 2:(ny-1)] .+= -μx*(s.ez[2:(nx-1), 2:(ny-1)] - s.ez[2:(nx-1), 1:(ny-2)])
-    s.hy[2:(nx-1), 2:(ny-1)] .+= +μy*(s.ez[2:(nx-1), 2:(ny-1)] - s.ez[1:(nx-2), 2:(ny-1)])
-
-    s.ez[2:(nx-1), 2:(ny-1)] .+=
-        ϵx[2:(nx-1), 2:(ny-1)].*(s.hy[3:nx, 2:(ny-1)] - s.hy[2:(nx-1), 2:(ny-1)]) -
-        ϵy[2:(nx-1), 2:(ny-1)].*(s.hx[2:(nx-1), 3:ny] - s.hx[2:(nx-1), 2:(ny-1)])
-
-    s.t += 1
-
-    return s
-end
-
-function simulate!(s::Simulator)
     for _ in 1:(s.grid.nt)
-        next!(s)
+        s.ez[2:nx, 1] .+= 0.1exp.(
+            -(Δx * ((2:nx) .- nx/2)).^2 ./
+            (max_x/4)^2
+        ) * sin(k * C*Δt*s.t)
+
+        s.hx[2:(nx-1), 2:(ny-1)] .+= -μx*(s.ez[2:(nx-1), 2:(ny-1)] - s.ez[2:(nx-1), 1:(ny-2)])
+        s.hy[2:(nx-1), 2:(ny-1)] .+= +μy*(s.ez[2:(nx-1), 2:(ny-1)] - s.ez[1:(nx-2), 2:(ny-1)])
+
+        s.ez[2:(nx-1), 2:(ny-1)] .+=
+            ϵx[2:(nx-1), 2:(ny-1)].*(s.hy[3:nx, 2:(ny-1)] - s.hy[2:(nx-1), 2:(ny-1)]) -
+            ϵy[2:(nx-1), 2:(ny-1)].*(s.hx[2:(nx-1), 3:ny] - s.hx[2:(nx-1), 2:(ny-1)])
+
+        s.t += 1
     end
 
     return s

@@ -14,7 +14,7 @@ function gen_data(; nx=60, ny=200, n=7000)
         xs[:, :, 2:3, i] .= build(s.grid)[2:(nx-1), 2:(ny-1), :]
         ys[:, :, 1, i] .= s.ez[2:(nx-1), 2:(ny-1)]
 
-        ProgressMeter.next!(p)
+        next!(p)
     end
     jldsave(joinpath(mkpath(joinpath(@__DIR__, "..", "data")), "data.jld2"); xs, ys)
 end
