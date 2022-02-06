@@ -1,3 +1,11 @@
+export 
+    Grid,
+    boundary,
+    build,
+    Simulator,
+    simulate!
+
+
 const C = 299792458
 
 struct Grid{T<:Real}
