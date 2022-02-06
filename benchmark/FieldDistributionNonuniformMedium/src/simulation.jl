@@ -56,12 +56,12 @@ struct Permittivity{T<:AbstractMatrix}
     ϵy::T
 end
 
-function Base.rand(::Type{Permittivity}, n::Integer, r::Real, grid::Grid)
+function implant(::Type{Permittivity}, xs::AbstractVector, ys::AbstractVector, rs::AbstractVector, grid::Grid)
     ϵ = 9 * ones(size(grid))
 
-    xs = grid.max_x .* rand(n)
-    ys = grid.max_y .* rand(n)
-    rs = r .* rand(n)
+    length(xs) == length(ys) == length(rs) || throw(DimensionMismatch("xs, ys, rs must have same length"))
+
+    n = length(xs)
 
     in_circle(i, j) = true in [
         √((i*grid.Δx - xs[c])^2 + (j*grid.Δy - ys[c])^2) < rs[c] for c in 1:n
@@ -77,6 +77,13 @@ function Base.rand(::Type{Permittivity}, n::Integer, r::Real, grid::Grid)
     return Permittivity(ϵ, ϵx, ϵy)
 end
 
+function Base.rand(Tϵ::Type{Permittivity}, n::Integer, r::Real, grid::Grid)
+    xs = grid.max_x .* rand(n)
+    ys = grid.max_y .* rand(n)
+    rs = r .* rand(n)
+
+    return implant(Tϵ, xs, ys, rs, grid)
+end
 struct Permeability{T<:Real}
     μ::T
     μx::T
@@ -90,15 +97,15 @@ function Permeability(μ, grid::Grid)
     return Permeability(μ, μx, μy)
 end
 
-mutable struct Simulator
+mutable struct Simulator{T<:AbstractArray}
     grid::Grid
     light::Light
     permittivity::Permittivity
     permeability::Permeability
 
-    ez::Matrix{Float64}
-    hx::Matrix{Float64}
-    hy::Matrix{Float64}
+    ez::T
+    hx::T
+    hy::T
 
     t::Int
 end
