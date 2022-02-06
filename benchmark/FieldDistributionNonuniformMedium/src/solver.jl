@@ -8,7 +8,7 @@ function update_model!(model_file_path, model)
     @warn "model updated!"
 end
 
-function train()
+function train(η, batchsize=10)
     if has_cuda()
         @info "CUDA is on"
         device = gpu
@@ -29,9 +29,9 @@ function train()
 
     loss(𝐱, 𝐲) = sum(abs2, 𝐲 .- m(𝐱)) / size(𝐱)[end]
 
-    opt = Flux.Optimiser(WeightDecay(1f-4), Flux.ADAM(1f-3))
+    opt = Flux.Optimiser(WeightDecay(1f-4), Flux.ADAM(η))
 
-    loader_train, loader_test = get_dataloader()
+    loader_train, loader_test = get_dataloader(batchsize=batchsize)
 
     losses = Float32[]
     function validate()
