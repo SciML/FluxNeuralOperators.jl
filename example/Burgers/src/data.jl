@@ -1,5 +1,4 @@
 using DataDeps
-using Fetch
 using MAT
 
 function register_burgers()
@@ -9,9 +8,8 @@ function register_burgers()
         Burgers' equation dataset from
         [fourier_neural_operator](https://github.com/zongyi-li/fourier_neural_operator)
         """,
-        "https://drive.google.com/file/d/17MYsKzxUQVaLMWodzPbffR8hhDHoadPp/view?usp=sharing",
+        "http://www.med.cgu.edu.tw/NeuralOperators/Burgers_R10.zip",
         "9cbbe5070556c777b1ba3bacd49da5c36ea8ed138ba51b6ee76a24b971066ecd",
-        fetch_method=gdownload,
         post_fetch_method=unpack
     ))
 end
