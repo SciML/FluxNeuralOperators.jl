@@ -6,11 +6,11 @@ DocMeta.setdocmeta!(NeuralOperators, :DocTestSetup, :(using NeuralOperators); re
 makedocs(;
     modules=[NeuralOperators],
     authors="JingYu Ning <foldfelis@gmail.com> and contributors",
-    repo="https://github.com/foldfelis/NeuralOperators.jl/blob/{commit}{path}#{line}",
+    repo="https://github.com/SciML/NeuralOperators.jl/blob/{commit}{path}#{line}",
     sitename="NeuralOperators.jl",
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
-        canonical="https://foldfelis.github.io/NeuralOperators.jl",
+        canonical="http://neuraloperators.sciml.ai",
         assets=String[],
     ),
     pages=[
@@ -20,5 +20,5 @@ makedocs(;
 )
 
 deploydocs(;
-    repo="github.com/foldfelis/NeuralOperators.jl",
+    repo="github.com/SciML/NeuralOperators.jl",
 )
