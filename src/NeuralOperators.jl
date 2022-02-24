@@ -8,6 +8,10 @@ module NeuralOperators
     using Zygote
     using ChainRulesCore
 
+    export DeepONet
+
     include("fourier.jl")
     include("model.jl")
+    include("DeepONet.jl")
+    include("subnets.jl")
 end
