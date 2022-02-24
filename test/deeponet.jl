@@ -1,4 +1,4 @@
-using Test, Random, Flux, MAT
+using Test, Flux, MAT
 
 @testset "DeepONet" begin
     @testset "dimensions" begin
