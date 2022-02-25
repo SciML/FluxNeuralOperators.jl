@@ -34,34 +34,3 @@ mgrad = Flux.Zygote.gradient((x,p)->sum(model(x,p)),a,sensors)
 @test !iszero(Flux.Zygote.gradient((x,p)->sum(model(x,p)),a,sensors)[2])
 
 #training
-#dataset containing first 300 initial conditions from the Burgers' equation
-#dataset used by Li et al. for Fourier neural operator. The data for the initial
-#conditions is sampled at an interval of 8 points, so, the original data has
-#2048 ICs at 8192 points, while here we have 300 ICs at 1024 points
-vars = matread("burgerset.mat")
-
-xtrain = vars["a"][1:280, :]'
-xval = vars["a"][end-19:end, :]'
-
-ytrain = vars["u"][1:280, :]
-yval = vars["u"][end-19:end, :]
-
-grid = collect(range(0, 1, length=1024))'
-model = DeepONet((1024,1024,1024),(1,1024,1024),gelu,gelu)
-
-learning_rate = 0.001
-opt = ADAM(learning_rate)
-
-parameters = params(model)
-
-loss(xtrain,ytrain,sensor) = Flux.Losses.mse(model(xtrain,sensor),ytrain)
-
-evalcb() = @show(loss(xval,yval,grid))
-
-Flux.@epochs 400 Flux.train!(loss, parameters, [(xtrain,ytrain,grid)], opt, cb = evalcb)
-
-ỹ = model(xval, grid)
-
-diffvec = vec(abs.((yval .- ỹ)))
-mean_diff = sum(diffvec)/length(diffvec)
-@test mean_diff < 0.4

@@ -5,6 +5,7 @@ using Flux
 using CUDA
 
 include("data.jl")
+include("Burgers_deeponet.jl")
 
 __init__() = register_burgers()
 
@@ -30,7 +31,7 @@ function train()
         Dense(128, 1),
         flatten
     ) |> device
-    
+
     loss(𝐱, 𝐲) = sum(abs2, 𝐲 .- m(𝐱)) / size(𝐱)[end]
 
     loader_train, loader_test = get_dataloader()
