@@ -33,4 +33,9 @@ mgrad = Flux.Zygote.gradient((x,p)->sum(model(x,p)),a,sensors)
 @test !iszero(Flux.Zygote.gradient((x,p)->sum(model(x,p)),a,sensors)[1])
 @test !iszero(Flux.Zygote.gradient((x,p)->sum(model(x,p)),a,sensors)[2])
 
-#training
+#Output size of branch and trunk subnets should be same
+branch = Chain(Dense(16, 22), Dense(22, 30))
+trunk = Chain(Dense(1, 16), Dense(16, 24), Dense(24, 32))
+m = DeepONet(branch, trunk)
+@test_throws AssertionError DeepONet((32,64,70), (24,48,72), σ, tanh)
+@test_throws DimensionMismatch m(a, sensors)
