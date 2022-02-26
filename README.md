@@ -43,7 +43,7 @@ As for model, there are `FourierNeuralOperator` and `MarkovNeuralOperator` provi
 
 ## Usage
 
-Fourier Neural Operator
+### Fourier Neural Operator
 
 ```julia
 model = Chain(
@@ -80,7 +80,7 @@ opt = Flux.Optimiser(WeightDecay(1f-4), Flux.ADAM(1f-3))
 Flux.@epochs 50 Flux.train!(loss, params(model), data, opt)
 ```
 
-DeepONet
+### DeepONet
 
 ```julia
 #tuple of Ints for branch net architecture and then for trunk net, followed by activations for branch and trunk respectively
@@ -116,7 +116,7 @@ PDE training examples are provided in `example` folder.
 
 ### DeepONet implementation for solving Burgers' equation
 
-[Burgers' equation](example/Burgers/Burgers_deeponet)
+[Burgers' equation](example/Burgers/src/Burgers_deeponet.jl)
 
 ### Two-dimensional Fourier Neural Operator
 
