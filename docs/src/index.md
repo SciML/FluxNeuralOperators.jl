@@ -109,4 +109,4 @@ opt = ADAM(learning_rate)
 parameters = params(model)
 Flux.@epochs 400 Flux.train!(loss, parameters, [(xtrain,ytrain,grid)], opt, cb = evalcb)
 ```
-A more complete example using DeepONet architecture to solve Burgers can be found in the [examples]()
+A more complete example using DeepONet architecture to solve Burgers' equation can be found in the [examples](../../example/Burgers/src/Burgers_deeponet.jl)
