@@ -86,7 +86,25 @@ DeepONet
 #tuple of Ints for branch net architecture and then for trunk net, followed by activations for branch and trunk respectively
 model = DeepONet((32,64,72), (24,64,72), σ, tanh)
 ```
+Or specify branch and trunk as separate `Chain` from Flux and pass to `DeepONet`
+
+```julia
+branch = Chain(Dense(32,64,σ), Dense(64,72,σ))
+trunk = Chain(Dense(24,64,tanh), Dense(64,72,tanh))
+model = DeepONet(branch,trunk)
+```
+
 You can again specify loss, optimization and training parameters just as you would for a simple neural network with Flux.
+
+```julia
+loss(xtrain,ytrain,sensor) = Flux.Losses.mse(model(xtrain,sensor),ytrain)
+evalcb() = @show(loss(xval,yval,grid))
+
+learning_rate = 0.001
+opt = ADAM(learning_rate)
+parameters = params(model)
+Flux.@epochs 400 Flux.train!(loss, parameters, [(xtrain,ytrain,grid)], opt, cb = evalcb)
+```
 
 ## Examples
 
@@ -95,6 +113,10 @@ PDE training examples are provided in `example` folder.
 ### One-dimensional Fourier Neural Operator
 
 [Burgers' equation](example/Burgers)
+
+### DeepONet implementation for solving Burgers' equation
+
+[Burgers' equation](example/Burgers/Burgers_deeponet)
 
 ### Two-dimensional Fourier Neural Operator
 
