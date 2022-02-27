@@ -36,10 +36,14 @@ It performs Fourier transformation across infinite-dimensional function spaces a
 With only one time step information of learning, it can predict the following few steps with low loss
 by linking the operators into a Markov chain.
 
+**DeepONet operator** (Deep Operator Network)learns a neural operator with the help of two sub-neural net structures described as the branch and the trunk network. The branch network is fed the initial conditions data, whereas the trunk is fed with the locations where the target(output) is evaluated from the corresponding initial conditions. It is important that the output size of the branch and trunk subnets is same so that a dot product can be performed between them.
+
 Currently, the `FourierOperator` layer is provided in this work.
 As for model, there are `FourierNeuralOperator` and `MarkovNeuralOperator` provided. Please take a glance at them [here](src/model.jl).
 
 ## Usage
+
+### Fourier Neural Operator
 
 ```julia
 model = Chain(
@@ -76,6 +80,32 @@ opt = Flux.Optimiser(WeightDecay(1f-4), Flux.ADAM(1f-3))
 Flux.@epochs 50 Flux.train!(loss, params(model), data, opt)
 ```
 
+### DeepONet
+
+```julia
+#tuple of Ints for branch net architecture and then for trunk net, followed by activations for branch and trunk respectively
+model = DeepONet((32,64,72), (24,64,72), σ, tanh)
+```
+Or specify branch and trunk as separate `Chain` from Flux and pass to `DeepONet`
+
+```julia
+branch = Chain(Dense(32,64,σ), Dense(64,72,σ))
+trunk = Chain(Dense(24,64,tanh), Dense(64,72,tanh))
+model = DeepONet(branch,trunk)
+```
+
+You can again specify loss, optimization and training parameters just as you would for a simple neural network with Flux.
+
+```julia
+loss(xtrain,ytrain,sensor) = Flux.Losses.mse(model(xtrain,sensor),ytrain)
+evalcb() = @show(loss(xval,yval,grid))
+
+learning_rate = 0.001
+opt = ADAM(learning_rate)
+parameters = params(model)
+Flux.@epochs 400 Flux.train!(loss, parameters, [(xtrain,ytrain,grid)], opt, cb = evalcb)
+```
+
 ## Examples
 
 PDE training examples are provided in `example` folder.
@@ -83,6 +113,10 @@ PDE training examples are provided in `example` folder.
 ### One-dimensional Fourier Neural Operator
 
 [Burgers' equation](example/Burgers)
+
+### DeepONet implementation for solving Burgers' equation
+
+[Burgers' equation](example/Burgers/src/Burgers_deeponet.jl)
 
 ### Two-dimensional Fourier Neural Operator
 
@@ -113,3 +147,4 @@ PDE training examples are provided in `example` folder.
 - [Neural Operator: Graph Kernel Network for Partial Differential Equations](https://arxiv.org/abs/2003.03485)
   - [zongyi-li/graph-pde](https://github.com/zongyi-li/graph-pde)
 - [Markov Neural Operators for Learning Chaotic Systems](https://arxiv.org/abs/2106.06898)
+- [DeepONet: Learning nonlinear operators for identifying  differential equations based on the universal approximation theorem of operators](https://arxiv.org/abs/1910.03193)

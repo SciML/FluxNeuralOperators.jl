@@ -27,6 +27,15 @@ function get_data(; n=2048, Δsamples=2^3, grid_size=div(2^13, Δsamples), T=Flo
     return x_loc_data, y_data
 end
 
+function get_data_don(; n=2048, Δsamples=2^3, grid_size=div(2^13, Δsamples))
+    file = matopen(joinpath(datadep"Burgers", "burgers_data_R10.mat"))
+    x_data = collect(read(file, "a")[1:n, 1:Δsamples:end])
+    y_data = collect(read(file, "u")[1:n, 1:Δsamples:end])
+    close(file)
+
+    return x_data, y_data
+end
+
 function get_dataloader(; n_train=1800, n_test=200, batchsize=100)
     𝐱, 𝐲 = get_data(n=2048)
 
