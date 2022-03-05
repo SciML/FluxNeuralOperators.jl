@@ -32,7 +32,7 @@ by linking the operators into a Markov chain.
 
 **DeepONet operator** (Deep Operator Network)learns a neural operator with the help of two sub-neural net structures described as the branch and the trunk network. The branch network is fed the initial conditions data, whereas the trunk is fed with the locations where the target(output) is evaluated from the corresponding initial conditions. It is important that the output size of the branch and trunk subnets is same so that a dot product can be performed between them.
 
-Currently, the `FourierOperator` layer is provided in this work.
+Currently, the `OperatorKernel` layer is provided in this work.
 As for model, there are `FourierNeuralOperator` and `MarkovNeuralOperator` provided.
 Please take a glance at them [here](apis.html#Models).
 
@@ -54,10 +54,10 @@ model = Chain(
     # here, d == 1 and n == 64
     Dense(2, 64),
     # map each hidden representation to the next by integral kernel operator
-    FourierOperator(64=>64, (16, ), gelu),
-    FourierOperator(64=>64, (16, ), gelu),
-    FourierOperator(64=>64, (16, ), gelu),
-    FourierOperator(64=>64, (16, )),
+    OperatorKernel(64=>64, (16, ), gelu),
+    OperatorKernel(64=>64, (16, ), gelu),
+    OperatorKernel(64=>64, (16, ), gelu),
+    OperatorKernel(64=>64, (16, )),
     # project back to the scalar field of interest space
     Dense(64, 128, gelu),
     Dense(128, 1),

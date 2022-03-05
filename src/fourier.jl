@@ -1,6 +1,6 @@
 export
     SpectralConv,
-    FourierOperator
+    OperatorKernel
 
 struct SpectralConv{P, N, T, S}
     weight::T
@@ -95,14 +95,14 @@ end
 # operator #
 ############
 
-struct FourierOperator{L, C, F}
+struct OperatorKernel{L, C, F}
     linear::L
     conv::C
     σ::F
 end
 
 """
-    FourierOperator(ch, modes, σ=identity; permuted=false)
+    OperatorKernel(ch, modes, σ=identity; permuted=false)
 
 ## Arguments
 
@@ -115,19 +115,19 @@ end
 ## Example
 
 ```jldoctest
-julia> FourierOperator(2=>5, (16, ))
-FourierOperator(2 => 5, (16,), σ=identity, permuted=false)
+julia> OperatorKernel(2=>5, (16, ))
+OperatorKernel(2 => 5, (16,), σ=identity, permuted=false)
 
 julia> using Flux
 
-julia> FourierOperator(2=>5, (16, ), relu)
-FourierOperator(2 => 5, (16,), σ=relu, permuted=false)
+julia> OperatorKernel(2=>5, (16, ), relu)
+OperatorKernel(2 => 5, (16,), σ=relu, permuted=false)
 
-julia> FourierOperator(2=>5, (16, ), relu, permuted=true)
-FourierOperator(2 => 5, (16,), σ=relu, permuted=true)
+julia> OperatorKernel(2=>5, (16, ), relu, permuted=true)
+OperatorKernel(2 => 5, (16,), σ=relu, permuted=true)
 ```
 """
-function FourierOperator(
+function OperatorKernel(
     ch::Pair{S, S},
     modes::NTuple{N, S},
     σ=identity;
@@ -136,15 +136,15 @@ function FourierOperator(
     linear = permuted ? Conv(Tuple(ones(Int, length(modes))), ch) : Dense(ch.first, ch.second)
     conv = SpectralConv(ch, modes; permuted=permuted)
 
-    return FourierOperator(linear, conv, σ)
+    return OperatorKernel(linear, conv, σ)
 end
 
-Flux.@functor FourierOperator
+Flux.@functor OperatorKernel
 
-function Base.show(io::IO, l::FourierOperator)
+function Base.show(io::IO, l::OperatorKernel)
     print(
         io,
-        "FourierOperator(" *
+        "OperatorKernel(" *
             "$(l.conv.in_channel) => $(l.conv.out_channel), " *
             "$(l.conv.modes), " *
             "σ=$(string(l.σ)), " *
@@ -153,7 +153,7 @@ function Base.show(io::IO, l::FourierOperator)
     )
 end
 
-function (m::FourierOperator)(𝐱)
+function (m::OperatorKernel)(𝐱)
     return m.σ.(m.linear(𝐱) + m.conv(𝐱))
 end
 
