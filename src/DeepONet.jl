@@ -77,9 +77,9 @@ branch net: (Chain(Dense(2, 128), Dense(128, 64), Dense(64, 72)))
 Trunk net: (Chain(Dense(1, 24), Dense(24, 72)))
 ```
 """
-struct DeepONet
-    branch_net::Flux.Chain
-    trunk_net::Flux.Chain
+struct DeepONet{T1, T2}
+    branch_net::T1
+    trunk_net::T2
 end
 
 # Declare the function that assigns Weights and biases to the layer
@@ -99,7 +99,7 @@ function DeepONet(architecture_branch::Tuple, architecture_trunk::Tuple,
     trunk_net = construct_subnet(architecture_trunk, act_trunk;
                                     init=init_trunk, bias=bias_trunk)
 
-    return DeepONet(branch_net, trunk_net)
+    return DeepONet{typeof(branch_net),typeof(trunk_net)}(branch_net, trunk_net)
 end
 
 Flux.@functor DeepONet
@@ -116,7 +116,7 @@ function (a::DeepONet)(x::AbstractArray, y::AbstractVecOrMat)
     However, we perform the transformations by the NNs always in the first dim
     so we need to adjust (i.e. transpose) one of the inputs,
     which we do on the branch input here =#
-    return branch(x)' * trunk(y)
+    return Array(branch(x)') * trunk(y)
 end
 
 # Sensors stay the same and shouldn't be batched
