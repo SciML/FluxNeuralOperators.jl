@@ -10,6 +10,7 @@ module NeuralOperators
 
     export DeepONet
 
+    include("Transform/Transform.jl")
     include("fourier.jl")
     include("model.jl")
     include("DeepONet.jl")
