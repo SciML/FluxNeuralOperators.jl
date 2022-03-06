@@ -145,3 +145,12 @@ end
     data = [(𝐱, rand(Float32, 22, 22, 64, 5))]
     Flux.train!(loss, params(m), data, Flux.ADAM())
 end
+
+@testset "SpectralConv" begin
+    modes = (16, 16)
+    ch = 64 => 64
+    permuted = false
+
+    @test SpectralConv(ch, modes) isa OperatorConv
+    @test SpectralConv(ch, modes).transform isa FourierTransform
+end
