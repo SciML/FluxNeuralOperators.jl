@@ -66,29 +66,28 @@ function Base.show(io::IO, l::OperatorConv{P}) where {P}
     print(io, "OperatorConv($(l.in_channel) => $(l.out_channel), $(l.modes), permuted=$P)")
 end
 
-function spectral_conv(m::OperatorConv, 𝐱::AbstractArray)
-    n_dims = ndims(𝐱)
+function operator_conv(m::OperatorConv, 𝐱::AbstractArray)
+    ft = FourierTransform(m.modes)
 
-    𝐱_fft = fft(Zygote.hook(real, 𝐱), 1:ndims(m)) # [x, in_chs, batch]
-    𝐱_flattened = reshape(view(𝐱_fft, map(d->1:d, m.modes)..., :, :), :, size(𝐱_fft, n_dims-1), size(𝐱_fft, n_dims))
-    𝐱_weighted = apply_pattern(𝐱_flattened, m.weight) # [prod(m.modes), out_chs, batch], only 3-dims
-    𝐱_shaped = reshape(𝐱_weighted, m.modes..., size(𝐱_weighted, 2), size(𝐱_weighted, 3))
-    𝐱_padded = pad_modes(𝐱_shaped, (size(𝐱_fft)[1:end-2]..., size(𝐱_weighted, 2), size(𝐱_weighted, 3))) # [x, out_chs, batch] <- [modes, out_chs, batch]
-    𝐱_ifft = real(ifft(𝐱_padded, 1:ndims(m))) # [x, out_chs, batch]
+    𝐱_fft = transform(ft, 𝐱) # [size(x)..., in_chs, batch]
+    𝐱_truncated = truncate_modes(ft, 𝐱_fft) # [modes..., in_chs, batch]
+    𝐱_applied_pattern = apply_pattern(𝐱_truncated, m.weight) # [modes..., out_chs, batch]
+    𝐱_padded = pad_modes(𝐱_applied_pattern, (size(𝐱_fft)[1:end-2]..., size(𝐱_applied_pattern)[end-1:end]...)) # [size(x)..., out_chs, batch] <- [modes..., out_chs, batch]
+    𝐱_ifft = inverse(ft, 𝐱_padded)
 
     return 𝐱_ifft
 end
 
 function (m::OperatorConv{false})(𝐱)
     𝐱ᵀ = permutedims(𝐱, (ntuple(i->i+1, ndims(m))..., 1, ndims(m)+2)) # [x, in_chs, batch] <- [in_chs, x, batch]
-    𝐱_out = spectral_conv(m, 𝐱ᵀ) # [x, out_chs, batch]
+    𝐱_out = operator_conv(m, 𝐱ᵀ) # [x, out_chs, batch]
     𝐱_outᵀ = permutedims(𝐱_out, (ndims(m)+1, 1:ndims(m)..., ndims(m)+2)) # [out_chs, x, batch] <- [x, out_chs, batch]
 
     return 𝐱_outᵀ
 end
 
 function (m::OperatorConv{true})(𝐱)
-    return spectral_conv(m, 𝐱) # [x, out_chs, batch]
+    return operator_conv(m, 𝐱) # [x, out_chs, batch]
 end
 
 ############
@@ -167,7 +166,17 @@ const SpectralConv = OperatorConv
 c_glorot_uniform(dims...) = Flux.glorot_uniform(dims...) + Flux.glorot_uniform(dims...)*im
 
 # [prod(modes), out_chs, batch] <- [prod(modes), in_chs, batch] * [out_chs, in_chs, prod(modes)]
-apply_pattern(𝐱₁, 𝐱₂) = @tullio 𝐲[m, o, b] := 𝐱₁[m, i, b] * 𝐱₂[m, i, o]
+einsum(𝐱₁, 𝐱₂) = @tullio 𝐲[m, o, b] := 𝐱₁[m, i, b] * 𝐱₂[m, i, o]
+
+function apply_pattern(𝐱_truncated, 𝐰)
+    x_size = size(𝐱_truncated) # [m.modes..., in_chs, batch]
+
+    𝐱_flattened = reshape(𝐱_truncated, :, x_size[end-1:end]...) # [prod(m.modes), out_chs, batch], only 3-dims
+    𝐱_weighted = einsum(𝐱_flattened, 𝐰) # [prod(m.modes), out_chs, batch], only 3-dims
+    𝐱_shaped = reshape(𝐱_weighted, x_size[1:end-2]..., size(𝐱_weighted, 2), size(𝐱_weighted, 3)) # [m.modes..., out_chs, batch]
+
+    return 𝐱_shaped
+end
 
 pad_modes(𝐱::AbstractArray, dims::NTuple) = pad_modes!(similar(𝐱, dims), 𝐱)
 
