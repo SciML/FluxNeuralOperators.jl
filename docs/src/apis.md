@@ -18,7 +18,7 @@ where ``v(x)`` and ``v'(x)`` denotes input and output function,
 Function ``g`` is a linear transform for lowering Fouier modes.
 
 ```@docs
-SpectralConv
+OperatorConv
 ```
 
 Reference: [Fourier Neural Operator for Parametric Partial Differential Equations](https://arxiv.org/abs/2010.08895)

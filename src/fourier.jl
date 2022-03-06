@@ -1,25 +1,25 @@
 export
-    SpectralConv,
+    OperatorConv,
     OperatorKernel
 
-struct SpectralConv{P, N, T, S}
+struct OperatorConv{P, N, T, S}
     weight::T
     in_channel::S
     out_channel::S
     modes::NTuple{N, S}
 end
 
-function SpectralConv{P}(
+function OperatorConv{P}(
     weight::T,
     in_channel::S,
     out_channel::S,
     modes::NTuple{N, S},
 ) where {P, N, T, S}
-    return SpectralConv{P, N, T, S}(weight, in_channel, out_channel, modes)
+    return OperatorConv{P, N, T, S}(weight, in_channel, out_channel, modes)
 end
 
 """
-    SpectralConv(
+    OperatorConv(
         ch, modes;
         init=c_glorot_uniform, permuted=false, T=ComplexF32
     )
@@ -34,14 +34,14 @@ end
 ## Example
 
 ```jldoctest
-julia> SpectralConv(2=>5, (16, ))
-SpectralConv(2 => 5, (16,), permuted=false)
+julia> OperatorConv(2=>5, (16, ))
+OperatorConv(2 => 5, (16,), permuted=false)
 
-julia> SpectralConv(2=>5, (16, ), permuted=true)
-SpectralConv(2 => 5, (16,), permuted=true)
+julia> OperatorConv(2=>5, (16, ), permuted=true)
+OperatorConv(2 => 5, (16,), permuted=true)
 ```
 """
-function SpectralConv(
+function OperatorConv(
     ch::Pair{S, S},
     modes::NTuple{N, S};
     init=c_glorot_uniform,
@@ -52,21 +52,21 @@ function SpectralConv(
     scale = one(T) / (in_chs * out_chs)
     weights = scale * init(prod(modes), in_chs, out_chs)
 
-    return SpectralConv{permuted}(weights, in_chs, out_chs, modes)
+    return OperatorConv{permuted}(weights, in_chs, out_chs, modes)
 end
 
-Flux.@functor SpectralConv{true}
-Flux.@functor SpectralConv{false}
+Flux.@functor OperatorConv{true}
+Flux.@functor OperatorConv{false}
 
-Base.ndims(::SpectralConv{P, N}) where {P, N} = N
+Base.ndims(::OperatorConv{P, N}) where {P, N} = N
 
-ispermuted(::SpectralConv{P}) where {P} = P
+ispermuted(::OperatorConv{P}) where {P} = P
 
-function Base.show(io::IO, l::SpectralConv{P}) where {P}
-    print(io, "SpectralConv($(l.in_channel) => $(l.out_channel), $(l.modes), permuted=$P)")
+function Base.show(io::IO, l::OperatorConv{P}) where {P}
+    print(io, "OperatorConv($(l.in_channel) => $(l.out_channel), $(l.modes), permuted=$P)")
 end
 
-function spectral_conv(m::SpectralConv, 𝐱::AbstractArray)
+function spectral_conv(m::OperatorConv, 𝐱::AbstractArray)
     n_dims = ndims(𝐱)
 
     𝐱_fft = fft(Zygote.hook(real, 𝐱), 1:ndims(m)) # [x, in_chs, batch]
@@ -79,7 +79,7 @@ function spectral_conv(m::SpectralConv, 𝐱::AbstractArray)
     return 𝐱_ifft
 end
 
-function (m::SpectralConv{false})(𝐱)
+function (m::OperatorConv{false})(𝐱)
     𝐱ᵀ = permutedims(𝐱, (ntuple(i->i+1, ndims(m))..., 1, ndims(m)+2)) # [x, in_chs, batch] <- [in_chs, x, batch]
     𝐱_out = spectral_conv(m, 𝐱ᵀ) # [x, out_chs, batch]
     𝐱_outᵀ = permutedims(𝐱_out, (ndims(m)+1, 1:ndims(m)..., ndims(m)+2)) # [out_chs, x, batch] <- [x, out_chs, batch]
@@ -87,7 +87,7 @@ function (m::SpectralConv{false})(𝐱)
     return 𝐱_outᵀ
 end
 
-function (m::SpectralConv{true})(𝐱)
+function (m::OperatorConv{true})(𝐱)
     return spectral_conv(m, 𝐱) # [x, out_chs, batch]
 end
 
@@ -134,7 +134,7 @@ function OperatorKernel(
     permuted=false
 ) where {S<:Integer, N}
     linear = permuted ? Conv(Tuple(ones(Int, length(modes))), ch) : Dense(ch.first, ch.second)
-    conv = SpectralConv(ch, modes; permuted=permuted)
+    conv = OperatorConv(ch, modes; permuted=permuted)
 
     return OperatorKernel(linear, conv, σ)
 end
