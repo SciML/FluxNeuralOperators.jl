@@ -157,6 +157,8 @@ function (m::OperatorKernel)(𝐱)
     return m.σ.(m.linear(𝐱) + m.conv(𝐱))
 end
 
+const SpectralConv = OperatorConv
+
 
 #########
 # utils #
