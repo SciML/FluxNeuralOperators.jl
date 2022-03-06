@@ -4,10 +4,10 @@
 
     m = Chain(
         Dense(2, 64),
-        OperatorConv(ch, modes)
+        OperatorConv(ch, modes, FourierTransform)
     )
-    @test ndims(OperatorConv(ch, modes)) == 1
-    @test repr(OperatorConv(ch, modes)) == "OperatorConv(64 => 128, (16,), permuted=false)"
+    @test ndims(OperatorConv(ch, modes, FourierTransform)) == 1
+    @test repr(OperatorConv(ch, modes, FourierTransform)) == "OperatorConv(64 => 128, (16,), permuted=false)"
 
     𝐱 = rand(Float32, 2, 1024, 5)
     @test size(m(𝐱)) == (128, 1024, 5)
@@ -23,10 +23,10 @@ end
 
     m = Chain(
         Conv((1, ), 2=>64),
-        OperatorConv(ch, modes, permuted=true)
+        OperatorConv(ch, modes, FourierTransform, permuted=true)
     )
-    @test ndims(OperatorConv(ch, modes, permuted=true)) == 1
-    @test repr(OperatorConv(ch, modes, permuted=true)) == "OperatorConv(64 => 128, (16,), permuted=true)"
+    @test ndims(OperatorConv(ch, modes, FourierTransform, permuted=true)) == 1
+    @test repr(OperatorConv(ch, modes, FourierTransform, permuted=true)) == "OperatorConv(64 => 128, (16,), permuted=true)"
 
     𝐱 = rand(Float32, 2, 1024, 5)
     𝐱 = permutedims(𝐱, (2, 1, 3))
@@ -43,9 +43,9 @@ end
 
     m = Chain(
         Dense(2, 64),
-        OperatorKernel(ch, modes)
+        OperatorKernel(ch, modes, FourierTransform)
     )
-    @test repr(OperatorKernel(ch, modes)) == "OperatorKernel(64 => 128, (16,), σ=identity, permuted=false)"
+    @test repr(OperatorKernel(ch, modes, FourierTransform)) == "OperatorKernel(64 => 128, (16,), σ=identity, permuted=false)"
 
     𝐱 = rand(Float32, 2, 1024, 5)
     @test size(m(𝐱)) == (128, 1024, 5)
@@ -61,9 +61,9 @@ end
 
     m = Chain(
         Conv((1, ), 2=>64),
-        OperatorKernel(ch, modes, permuted=true)
+        OperatorKernel(ch, modes, FourierTransform, permuted=true)
     )
-    @test repr(OperatorKernel(ch, modes, permuted=true)) == "OperatorKernel(64 => 128, (16,), σ=identity, permuted=true)"
+    @test repr(OperatorKernel(ch, modes, FourierTransform, permuted=true)) == "OperatorKernel(64 => 128, (16,), σ=identity, permuted=true)"
 
     𝐱 = rand(Float32, 2, 1024, 5)
     𝐱 = permutedims(𝐱, (2, 1, 3))
@@ -80,9 +80,9 @@ end
 
     m = Chain(
         Dense(1, 64),
-        OperatorConv(ch, modes)
+        OperatorConv(ch, modes, FourierTransform)
     )
-    @test ndims(OperatorConv(ch, modes)) == 2
+    @test ndims(OperatorConv(ch, modes, FourierTransform)) == 2
 
     𝐱 = rand(Float32, 1, 22, 22, 5)
     @test size(m(𝐱)) == (64, 22, 22, 5)
@@ -98,9 +98,9 @@ end
 
     m = Chain(
         Conv((1, 1), 1=>64),
-        OperatorConv(ch, modes, permuted=true)
+        OperatorConv(ch, modes, FourierTransform, permuted=true)
     )
-    @test ndims(OperatorConv(ch, modes, permuted=true)) == 2
+    @test ndims(OperatorConv(ch, modes, FourierTransform, permuted=true)) == 2
 
     𝐱 = rand(Float32, 1, 22, 22, 5)
     𝐱 = permutedims(𝐱, (2, 3, 1, 4))
@@ -117,7 +117,7 @@ end
 
     m = Chain(
         Dense(1, 64),
-        OperatorKernel(ch, modes)
+        OperatorKernel(ch, modes, FourierTransform)
     )
 
     𝐱 = rand(Float32, 1, 22, 22, 5)
@@ -134,7 +134,7 @@ end
 
     m = Chain(
         Conv((1, 1), 1=>64),
-        OperatorKernel(ch, modes, permuted=true)
+        OperatorKernel(ch, modes, FourierTransform, permuted=true)
     )
 
     𝐱 = rand(Float32, 1, 22, 22, 5)

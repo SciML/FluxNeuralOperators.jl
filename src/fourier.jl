@@ -1,12 +1,14 @@
 export
     OperatorConv,
+    SpectralConv,
     OperatorKernel
 
-struct OperatorConv{P, N, T, S}
+struct OperatorConv{P, N, T, S, TT}
     weight::T
     in_channel::S
     out_channel::S
     modes::NTuple{N, S}
+    transform::TT
 end
 
 function OperatorConv{P}(
@@ -14,36 +16,39 @@ function OperatorConv{P}(
     in_channel::S,
     out_channel::S,
     modes::NTuple{N, S},
-) where {P, N, T, S}
-    return OperatorConv{P, N, T, S}(weight, in_channel, out_channel, modes)
+    transform::TT
+) where {P, N, T, S, TT<:AbstractTransform}
+    return OperatorConv{P, N, T, S, TT}(weight, in_channel, out_channel, modes, transform)
 end
 
 """
     OperatorConv(
-        ch, modes;
+        ch, modes, transform;
         init=c_glorot_uniform, permuted=false, T=ComplexF32
     )
 
 ## Arguments
 
 * `ch`: Input and output channel size, e.g. `64=>64`.
-* `modes`: The Fourier modes to be preserved.
+* `modes`: The modes to be preserved.
+* `Transform`: The trafo to operator the transformation.
 * `permuted`: Whether the dim is permuted. If `permuted=true`, layer accepts
     data in the order of `(ch, ..., batch)`, otherwise the order is `(..., ch, batch)`.
 
 ## Example
 
 ```jldoctest
-julia> OperatorConv(2=>5, (16, ))
+julia> OperatorConv(2=>5, (16, ), FourierTransform)
 OperatorConv(2 => 5, (16,), permuted=false)
 
-julia> OperatorConv(2=>5, (16, ), permuted=true)
+julia> OperatorConv(2=>5, (16, ), FourierTransform, permuted=true)
 OperatorConv(2 => 5, (16,), permuted=true)
 ```
 """
 function OperatorConv(
     ch::Pair{S, S},
-    modes::NTuple{N, S};
+    modes::NTuple{N, S},
+    Transform::Type{<:AbstractTransform};
     init=c_glorot_uniform,
     permuted=false,
     T::DataType=ComplexF32
@@ -51,8 +56,19 @@ function OperatorConv(
     in_chs, out_chs = ch
     scale = one(T) / (in_chs * out_chs)
     weights = scale * init(prod(modes), in_chs, out_chs)
+    transform = Transform(modes)
 
-    return OperatorConv{permuted}(weights, in_chs, out_chs, modes)
+    return OperatorConv{permuted}(weights, in_chs, out_chs, modes, transform)
+end
+
+function SpectralConv(
+    ch::Pair{S, S},
+    modes::NTuple{N, S};
+    init=c_glorot_uniform,
+    permuted=false,
+    T::DataType=ComplexF32
+) where {S<:Integer, N}
+    return OperatorConv(ch, modes, FourierTransform, init=init, permuted=permuted, T=T)
 end
 
 Flux.@functor OperatorConv{true}
@@ -67,15 +83,15 @@ function Base.show(io::IO, l::OperatorConv{P}) where {P}
 end
 
 function operator_conv(m::OperatorConv, 𝐱::AbstractArray)
-    ft = FourierTransform(m.modes)
+    # ft = FourierTransform(m.modes)
 
-    𝐱_fft = transform(ft, 𝐱) # [size(x)..., in_chs, batch]
-    𝐱_truncated = truncate_modes(ft, 𝐱_fft) # [modes..., in_chs, batch]
+    𝐱_transformed = transform(m.transform, 𝐱) # [size(x)..., in_chs, batch]
+    𝐱_truncated = truncate_modes(m.transform, 𝐱_transformed) # [modes..., in_chs, batch]
     𝐱_applied_pattern = apply_pattern(𝐱_truncated, m.weight) # [modes..., out_chs, batch]
-    𝐱_padded = pad_modes(𝐱_applied_pattern, (size(𝐱_fft)[1:end-2]..., size(𝐱_applied_pattern)[end-1:end]...)) # [size(x)..., out_chs, batch] <- [modes..., out_chs, batch]
-    𝐱_ifft = inverse(ft, 𝐱_padded)
+    𝐱_padded = pad_modes(𝐱_applied_pattern, (size(𝐱_transformed)[1:end-2]..., size(𝐱_applied_pattern)[end-1:end]...)) # [size(x)..., out_chs, batch] <- [modes..., out_chs, batch]
+    𝐱_inversed = inverse(m.transform, 𝐱_padded)
 
-    return 𝐱_ifft
+    return 𝐱_inversed
 end
 
 function (m::OperatorConv{false})(𝐱)
@@ -114,26 +130,27 @@ end
 ## Example
 
 ```jldoctest
-julia> OperatorKernel(2=>5, (16, ))
+julia> OperatorKernel(2=>5, (16, ), FourierTransform)
 OperatorKernel(2 => 5, (16,), σ=identity, permuted=false)
 
 julia> using Flux
 
-julia> OperatorKernel(2=>5, (16, ), relu)
+julia> OperatorKernel(2=>5, (16, ), FourierTransform, relu)
 OperatorKernel(2 => 5, (16,), σ=relu, permuted=false)
 
-julia> OperatorKernel(2=>5, (16, ), relu, permuted=true)
+julia> OperatorKernel(2=>5, (16, ), FourierTransform, relu, permuted=true)
 OperatorKernel(2 => 5, (16,), σ=relu, permuted=true)
 ```
 """
 function OperatorKernel(
     ch::Pair{S, S},
     modes::NTuple{N, S},
+    Transform::Type{<:AbstractTransform},
     σ=identity;
     permuted=false
 ) where {S<:Integer, N}
     linear = permuted ? Conv(Tuple(ones(Int, length(modes))), ch) : Dense(ch.first, ch.second)
-    conv = OperatorConv(ch, modes; permuted=permuted)
+    conv = OperatorConv(ch, modes, Transform; permuted=permuted)
 
     return OperatorKernel(linear, conv, σ)
 end
@@ -155,9 +172,6 @@ end
 function (m::OperatorKernel)(𝐱)
     return m.σ.(m.linear(𝐱) + m.conv(𝐱))
 end
-
-const SpectralConv = OperatorConv
-
 
 #########
 # utils #
