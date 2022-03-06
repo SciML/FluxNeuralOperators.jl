@@ -1,7 +1,7 @@
 # Flow over the circle
 
 The time dependent Navier-Stokes equation is learned by the `MarkovNeuralOperator` with only one time step information.
-The result of this example can be found [here](https://foldfelis.github.io/NeuralOperators.jl/dev/assets/notebook/mno.jl.html).
+The result of this example can be found [here](https://neuraloperators.sciml.ai/dev/assets/notebook/mno.jl.html).
 
 | **Ground Truth** | **Inferenced** |
 |:----------------:|:--------------:|
