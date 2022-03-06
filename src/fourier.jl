@@ -71,7 +71,7 @@ function spectral_conv(m::OperatorConv, 𝐱::AbstractArray)
 
     𝐱_fft = fft(Zygote.hook(real, 𝐱), 1:ndims(m)) # [x, in_chs, batch]
     𝐱_flattened = reshape(view(𝐱_fft, map(d->1:d, m.modes)..., :, :), :, size(𝐱_fft, n_dims-1), size(𝐱_fft, n_dims))
-    𝐱_weighted = apply_spectral_pattern(𝐱_flattened, m.weight) # [prod(m.modes), out_chs, batch], only 3-dims
+    𝐱_weighted = apply_pattern(𝐱_flattened, m.weight) # [prod(m.modes), out_chs, batch], only 3-dims
     𝐱_shaped = reshape(𝐱_weighted, m.modes..., size(𝐱_weighted, 2), size(𝐱_weighted, 3))
     𝐱_padded = spectral_pad(𝐱_shaped, (size(𝐱_fft)[1:end-2]..., size(𝐱_weighted, 2), size(𝐱_weighted, 3))) # [x, out_chs, batch] <- [modes, out_chs, batch]
     𝐱_ifft = real(ifft(𝐱_padded, 1:ndims(m))) # [x, out_chs, batch]
@@ -167,7 +167,7 @@ const SpectralConv = OperatorConv
 c_glorot_uniform(dims...) = Flux.glorot_uniform(dims...) + Flux.glorot_uniform(dims...)*im
 
 # [prod(modes), out_chs, batch] <- [prod(modes), in_chs, batch] * [out_chs, in_chs, prod(modes)]
-apply_spectral_pattern(𝐱₁, 𝐱₂) = @tullio 𝐲[m, o, b] := 𝐱₁[m, i, b] * 𝐱₂[m, i, o]
+apply_pattern(𝐱₁, 𝐱₂) = @tullio 𝐲[m, o, b] := 𝐱₁[m, i, b] * 𝐱₂[m, i, o]
 
 spectral_pad(𝐱::AbstractArray, dims::NTuple) = spectral_pad!(similar(𝐱, dims), 𝐱)
 
