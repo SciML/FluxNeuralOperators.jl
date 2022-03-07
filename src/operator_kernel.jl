@@ -29,7 +29,7 @@ end
 
 * `ch`: Input and output channel size, e.g. `64=>64`.
 * `modes`: The modes to be preserved.
-* `Transform`: The trafo to operator the transformation.
+* `Transform`: The trafo to operate the transformation.
 * `permuted`: Whether the dim is permuted. If `permuted=true`, layer accepts
     data in the order of `(ch, ..., batch)`, otherwise the order is `(..., ch, batch)`.
 
