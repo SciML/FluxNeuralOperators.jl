@@ -5,7 +5,7 @@
 
 ## Layers
 
-### Spectral convolutional layer
+### Operator convolutional layer
 
 ```math
 F(s) = \mathcal{F} \{ v(x) \} \\
@@ -18,14 +18,14 @@ where ``v(x)`` and ``v'(x)`` denotes input and output function,
 Function ``g`` is a linear transform for lowering Fouier modes.
 
 ```@docs
-SpectralConv
+OperatorConv
 ```
 
 Reference: [Fourier Neural Operator for Parametric Partial Differential Equations](https://arxiv.org/abs/2010.08895)
 
 ---
 
-### Fourier operator layer
+### Operator kernel layer
 
 ```math
 v_{t+1}(x) = \sigma(W v_t(x) + \mathcal{K} \{ v_t(x) \} )
@@ -35,7 +35,7 @@ where ``v_t(x)`` is the input function for ``t``-th layer and ``\mathcal{K} \{ \
 Activation function ``\sigma`` can be arbitrary non-linear function.
 
 ```@docs
-FourierOperator
+OperatorKernel
 ```
 
 Reference: [Fourier Neural Operator for Parametric Partial Differential Equations](https://arxiv.org/abs/2010.08895)

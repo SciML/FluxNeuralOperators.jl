@@ -21,12 +21,13 @@ function train()
     modes = (16, )
     ch = 64 => 64
     σ = gelu
+    Transform = FourierTransform
     m = Chain(
         Dense(2, 64),
-        FourierOperator(ch, modes, σ),
-        FourierOperator(ch, modes, σ),
-        FourierOperator(ch, modes, σ),
-        FourierOperator(ch, modes),
+        OperatorKernel(ch, modes, Transform, σ),
+        OperatorKernel(ch, modes, Transform, σ),
+        OperatorKernel(ch, modes, Transform, σ),
+        OperatorKernel(ch, modes, Transform),
         Dense(64, 128, σ),
         Dense(128, 1),
         flatten

@@ -24,10 +24,10 @@ function train()
 
     m = Chain(
         Dense(1, 64),
-        FourierOperator(64=>64, (24, 24), gelu),
-        FourierOperator(64=>64, (24, 24), gelu),
-        FourierOperator(64=>64, (24, 24), gelu),
-        FourierOperator(64=>64, (24, 24), gelu),
+        OperatorKernel(64=>64, (24, 24), FourierTransform, gelu),
+        OperatorKernel(64=>64, (24, 24), FourierTransform, gelu),
+        OperatorKernel(64=>64, (24, 24), FourierTransform, gelu),
+        OperatorKernel(64=>64, (24, 24), FourierTransform, gelu),
         Dense(64, 1),
     ) |> device
 

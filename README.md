@@ -36,9 +36,11 @@ It performs Fourier transformation across infinite-dimensional function spaces a
 With only one time step information of learning, it can predict the following few steps with low loss
 by linking the operators into a Markov chain.
 
-**DeepONet operator** (Deep Operator Network)learns a neural operator with the help of two sub-neural net structures described as the branch and the trunk network. The branch network is fed the initial conditions data, whereas the trunk is fed with the locations where the target(output) is evaluated from the corresponding initial conditions. It is important that the output size of the branch and trunk subnets is same so that a dot product can be performed between them.
+**DeepONet operator** (Deep Operator Network) learns a neural operator with the help of two sub-neural net structures described as the branch and the trunk network.
+The branch network is fed the initial conditions data, whereas the trunk is fed with the locations where the target(output) is evaluated from the corresponding initial conditions.
+It is important that the output size of the branch and trunk subnets is same so that a dot product can be performed between them.
 
-Currently, the `FourierOperator` layer is provided in this work.
+Currently, the `OperatorKernel` layer is provided in this work.
 As for model, there are `FourierNeuralOperator` and `MarkovNeuralOperator` provided. Please take a glance at them [here](src/model.jl).
 
 ## Usage
@@ -51,10 +53,10 @@ model = Chain(
     # here, d == 1 and n == 64
     Dense(2, 64),
     # map each hidden representation to the next by integral kernel operator
-    FourierOperator(64=>64, (16, ), gelu),
-    FourierOperator(64=>64, (16, ), gelu),
-    FourierOperator(64=>64, (16, ), gelu),
-    FourierOperator(64=>64, (16, )),
+    OperatorKernel(64=>64, (16, ), FourierTransform, gelu),
+    OperatorKernel(64=>64, (16, ), FourierTransform, gelu),
+    OperatorKernel(64=>64, (16, ), FourierTransform, gelu),
+    OperatorKernel(64=>64, (16, ), FourierTransform),
     # project back to the scalar field of interest space
     Dense(64, 128, gelu),
     Dense(128, 1),
@@ -83,27 +85,28 @@ Flux.@epochs 50 Flux.train!(loss, params(model), data, opt)
 ### DeepONet
 
 ```julia
-#tuple of Ints for branch net architecture and then for trunk net, followed by activations for branch and trunk respectively
-model = DeepONet((32,64,72), (24,64,72), σ, tanh)
+# tuple of Ints for branch net architecture and then for trunk net,
+# followed by activations for branch and trunk respectively
+model = DeepONet((32, 64, 72), (24, 64, 72), σ, tanh)
 ```
 Or specify branch and trunk as separate `Chain` from Flux and pass to `DeepONet`
 
 ```julia
-branch = Chain(Dense(32,64,σ), Dense(64,72,σ))
-trunk = Chain(Dense(24,64,tanh), Dense(64,72,tanh))
-model = DeepONet(branch,trunk)
+branch = Chain(Dense(32, 64, σ), Dense(64, 72, σ))
+trunk = Chain(Dense(24, 64, tanh), Dense(64, 72, tanh))
+model = DeepONet(branch, trunk)
 ```
 
 You can again specify loss, optimization and training parameters just as you would for a simple neural network with Flux.
 
 ```julia
-loss(xtrain,ytrain,sensor) = Flux.Losses.mse(model(xtrain,sensor),ytrain)
-evalcb() = @show(loss(xval,yval,grid))
+loss(xtrain, ytrain, sensor) = Flux.Losses.mse(model(xtrain, sensor), ytrain)
+evalcb() = @show(loss(xval, yval, grid))
 
 learning_rate = 0.001
 opt = ADAM(learning_rate)
 parameters = params(model)
-Flux.@epochs 400 Flux.train!(loss, parameters, [(xtrain,ytrain,grid)], opt, cb = evalcb)
+Flux.@epochs 400 Flux.train!(loss, parameters, [(xtrain, ytrain, grid)], opt, cb=evalcb)
 ```
 
 ## Examples
@@ -129,16 +132,6 @@ PDE training examples are provided in `example` folder.
 ### Super Resolution with MNO
 
 [Super resolution on time dependent Navier-Stokes equation](example/SuperResolution)
-
-## Roadmap
-
-- [x] `FourierOperator` layer
-- [x] One-dimensional Burgers' equation example
-- [x] Two-dimensional with time Navier-Stokes equations example
-- [x] `MarkovNeuralOperator` model
-- [x] Flow over a circle prediction example
-- [ ] `NeuralOperator` layer
-- [ ] Poisson equation example
 
 ## References
 

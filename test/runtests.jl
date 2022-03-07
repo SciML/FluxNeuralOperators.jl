@@ -3,7 +3,8 @@ using Test
 using Flux
 
 @testset "NeuralOperators.jl" begin
-    include("fourier.jl")
+    include("Transform/Transform.jl")
+    include("operator_kernel.jl")
     include("model.jl")
     include("deeponet.jl")
 end
