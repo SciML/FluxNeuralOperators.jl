@@ -4,7 +4,7 @@ using Flux
 
 @testset "NeuralOperators.jl" begin
     include("Transform/Transform.jl")
-    include("fourier.jl")
+    include("operator_kernel.jl")
     include("model.jl")
     include("deeponet.jl")
 end
