@@ -5,7 +5,7 @@
 
 ## Layers
 
-### Spectral convolutional layer
+### Operator convolutional layer
 
 ```math
 F(s) = \mathcal{F} \{ v(x) \} \\
@@ -25,7 +25,7 @@ Reference: [Fourier Neural Operator for Parametric Partial Differential Equation
 
 ---
 
-### Fourier operator layer
+### Operator kernel layer
 
 ```math
 v_{t+1}(x) = \sigma(W v_t(x) + \mathcal{K} \{ v_t(x) \} )
