@@ -131,15 +131,15 @@ end
 
 ```jldoctest
 julia> OperatorKernel(2=>5, (16, ), FourierTransform)
-OperatorKernel(2 => 5, (16,), σ=identity, permuted=false)
+OperatorKernel(2 => 5, (16,), FourierTransform, σ=identity, permuted=false)
 
 julia> using Flux
 
 julia> OperatorKernel(2=>5, (16, ), FourierTransform, relu)
-OperatorKernel(2 => 5, (16,), σ=relu, permuted=false)
+OperatorKernel(2 => 5, (16,), FourierTransform, σ=relu, permuted=false)
 
 julia> OperatorKernel(2=>5, (16, ), FourierTransform, relu, permuted=true)
-OperatorKernel(2 => 5, (16,), σ=relu, permuted=true)
+OperatorKernel(2 => 5, (16,), FourierTransform, σ=relu, permuted=true)
 ```
 """
 function OperatorKernel(
@@ -163,6 +163,7 @@ function Base.show(io::IO, l::OperatorKernel)
         "OperatorKernel(" *
             "$(l.conv.in_channel) => $(l.conv.out_channel), " *
             "$(l.conv.modes), " *
+            "$(nameof(typeof(l.conv.transform))), " *
             "σ=$(string(l.σ)), " *
             "permuted=$(ispermuted(l.conv))" *
         ")"
@@ -185,9 +186,9 @@ einsum(𝐱₁, 𝐱₂) = @tullio 𝐲[m, o, b] := 𝐱₁[m, i, b] * 𝐱₂[m
 function apply_pattern(𝐱_truncated, 𝐰)
     x_size = size(𝐱_truncated) # [m.modes..., in_chs, batch]
 
-    𝐱_flattened = reshape(𝐱_truncated, :, x_size[end-1:end]...) # [prod(m.modes), out_chs, batch], only 3-dims
+    𝐱_flattened = reshape(𝐱_truncated, :, x_size[end-1:end]...) # [prod(m.modes), in_chs, batch], only 3-dims
     𝐱_weighted = einsum(𝐱_flattened, 𝐰) # [prod(m.modes), out_chs, batch], only 3-dims
-    𝐱_shaped = reshape(𝐱_weighted, x_size[1:end-2]..., size(𝐱_weighted, 2), size(𝐱_weighted, 3)) # [m.modes..., out_chs, batch]
+    𝐱_shaped = reshape(𝐱_weighted, x_size[1:end-2]..., size(𝐱_weighted)[2:3]...) # [m.modes..., out_chs, batch]
 
     return 𝐱_shaped
 end
