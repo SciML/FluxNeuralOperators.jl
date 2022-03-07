@@ -7,7 +7,7 @@
         OperatorConv(ch, modes, FourierTransform)
     )
     @test ndims(OperatorConv(ch, modes, FourierTransform)) == 1
-    @test repr(OperatorConv(ch, modes, FourierTransform)) == "OperatorConv(64 => 128, (16,), permuted=false)"
+    @test repr(OperatorConv(ch, modes, FourierTransform)) == "OperatorConv(64 => 128, (16,), FourierTransform, permuted=false)"
 
     𝐱 = rand(Float32, 2, 1024, 5)
     @test size(m(𝐱)) == (128, 1024, 5)
@@ -26,7 +26,7 @@ end
         OperatorConv(ch, modes, FourierTransform, permuted=true)
     )
     @test ndims(OperatorConv(ch, modes, FourierTransform, permuted=true)) == 1
-    @test repr(OperatorConv(ch, modes, FourierTransform, permuted=true)) == "OperatorConv(64 => 128, (16,), permuted=true)"
+    @test repr(OperatorConv(ch, modes, FourierTransform, permuted=true)) == "OperatorConv(64 => 128, (16,), FourierTransform, permuted=true)"
 
     𝐱 = rand(Float32, 2, 1024, 5)
     𝐱 = permutedims(𝐱, (2, 1, 3))

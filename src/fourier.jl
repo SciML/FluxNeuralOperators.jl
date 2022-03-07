@@ -3,11 +3,10 @@ export
     SpectralConv,
     OperatorKernel
 
-struct OperatorConv{P, N, T, S, TT}
+struct OperatorConv{P, T, S, TT}
     weight::T
     in_channel::S
     out_channel::S
-    modes::NTuple{N, S}
     transform::TT
 end
 
@@ -15,10 +14,9 @@ function OperatorConv{P}(
     weight::T,
     in_channel::S,
     out_channel::S,
-    modes::NTuple{N, S},
     transform::TT
-) where {P, N, T, S, TT<:AbstractTransform}
-    return OperatorConv{P, N, T, S, TT}(weight, in_channel, out_channel, modes, transform)
+) where {P, T, S, TT<:AbstractTransform}
+    return OperatorConv{P, T, S, TT}(weight, in_channel, out_channel, transform)
 end
 
 """
@@ -58,7 +56,7 @@ function OperatorConv(
     weights = scale * init(prod(modes), in_chs, out_chs)
     transform = Transform(modes)
 
-    return OperatorConv{permuted}(weights, in_chs, out_chs, modes, transform)
+    return OperatorConv{permuted}(weights, in_chs, out_chs, transform)
 end
 
 function SpectralConv(
@@ -74,17 +72,15 @@ end
 Flux.@functor OperatorConv{true}
 Flux.@functor OperatorConv{false}
 
-Base.ndims(::OperatorConv{P, N}) where {P, N} = N
+Base.ndims(oc::OperatorConv) = ndims(oc.transform)
 
 ispermuted(::OperatorConv{P}) where {P} = P
 
 function Base.show(io::IO, l::OperatorConv{P}) where {P}
-    print(io, "OperatorConv($(l.in_channel) => $(l.out_channel), $(l.modes), permuted=$P)")
+    print(io, "OperatorConv($(l.in_channel) => $(l.out_channel), $(l.transform.modes), $(nameof(typeof(l.transform))), permuted=$P)")
 end
 
 function operator_conv(m::OperatorConv, 𝐱::AbstractArray)
-    # ft = FourierTransform(m.modes)
-
     𝐱_transformed = transform(m.transform, 𝐱) # [size(x)..., in_chs, batch]
     𝐱_truncated = truncate_modes(m.transform, 𝐱_transformed) # [modes..., in_chs, batch]
     𝐱_applied_pattern = apply_pattern(𝐱_truncated, m.weight) # [modes..., out_chs, batch]
@@ -162,7 +158,7 @@ function Base.show(io::IO, l::OperatorKernel)
         io,
         "OperatorKernel(" *
             "$(l.conv.in_channel) => $(l.conv.out_channel), " *
-            "$(l.conv.modes), " *
+            "$(l.conv.transform.modes), " *
             "$(nameof(typeof(l.conv.transform))), " *
             "σ=$(string(l.σ)), " *
             "permuted=$(ispermuted(l.conv))" *
