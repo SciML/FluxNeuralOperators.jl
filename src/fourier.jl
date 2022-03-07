@@ -37,10 +37,10 @@ end
 
 ```jldoctest
 julia> OperatorConv(2=>5, (16, ), FourierTransform)
-OperatorConv(2 => 5, (16,), permuted=false)
+OperatorConv(2 => 5, (16,), FourierTransform, permuted=false)
 
 julia> OperatorConv(2=>5, (16, ), FourierTransform, permuted=true)
-OperatorConv(2 => 5, (16,), permuted=true)
+OperatorConv(2 => 5, (16,), FourierTransform, permuted=true)
 ```
 """
 function OperatorConv(
