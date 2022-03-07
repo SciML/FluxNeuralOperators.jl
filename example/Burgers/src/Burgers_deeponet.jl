@@ -1,15 +1,15 @@
 function train_don()
-    if has_cuda()
-        @info "CUDA is on"
-        device = gpu
-        CUDA.allowscalar(false)
-    else
+    # if has_cuda()
+    #     @info "CUDA is on"
+    #     device = gpu
+    #     CUDA.allowscalar(false)
+    # else
         device = cpu
-    end
+    # end
 
     x, y = get_data_don(n=300)
     xtrain = x[1:280, :]' |> device
-    xval = x[end-19:end, :]' |device
+    xval = x[end-19:end, :]' |> device
 
     ytrain = y[1:280, :] |> device
     yval = y[end-19:end, :] |> device
@@ -20,7 +20,7 @@ function train_don()
     opt = ADAM(learning_rate)
 
     m = DeepONet((1024,1024,1024),(1,1024,1024),gelu,gelu)
-    loss(xtrain,ytrain,sensor) = Flux.Losses.mse(model(xtrain,sensor),ytrain)
+    loss(xtrain,ytrain,sensor) = Flux.Losses.mse(m(xtrain,sensor),ytrain)
     evalcb() = @show(loss(xval,yval,grid))
 
     Flux.@epochs 400 Flux.train!(loss, params(m), [(xtrain,ytrain,grid)], opt, cb = evalcb)
