@@ -1,3 +1,5 @@
+include("data.jl")
+
 function train_don()
     # if has_cuda()
     #     @info "CUDA is on"
