@@ -1,12 +1,31 @@
 using NeuralOperators
 using Test
 using Flux
+using CUDA
+
+CUDA.allowscalar(false)
+
+cuda_tests = [
+    "cuda",
+]
+
+tests = [
+    "Transform/Transform",
+    "operator_kernel",
+    "model",
+    "deeponet",
+]
+
+if CUDA.functional()
+    append!(tests, cuda_tests)
+else
+    @warn "CUDA unavailable, not testing GPU support"
+end
 
 @testset "NeuralOperators.jl" begin
-    include("Transform/Transform.jl")
-    include("operator_kernel.jl")
-    include("model.jl")
-    include("deeponet.jl")
+    for t in tests
+        include("$(t).jl")
+    end
 end
 
 #=
