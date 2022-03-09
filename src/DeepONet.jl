@@ -116,7 +116,7 @@ function (a::DeepONet)(x::AbstractArray, y::AbstractVecOrMat)
     However, we perform the transformations by the NNs always in the first dim
     so we need to adjust (i.e. transpose) one of the inputs,
     which we do on the branch input here =#
-    return Array(branch(x)') * trunk(y)
+    return branch(x)' * trunk(y)
 end
 
 # Sensors stay the same and shouldn't be batched
