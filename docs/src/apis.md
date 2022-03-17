@@ -40,6 +40,21 @@ OperatorKernel
 
 Reference: [Fourier Neural Operator for Parametric Partial Differential Equations](https://arxiv.org/abs/2010.08895)
 
+### Graph kernel layer
+
+```math
+v_{t+1}(x_i) = \sigma(W v_t(x_i) + \frac{1}{|\mathcal{N}(x_i)|} \sum_{x_j \in \mathcal{N}(x_i)} \kappa \{ v_t(x_i), v_t(x_j) \} )
+```
+
+where ``v_t(x_i)`` is the input function for ``t``-th layer, ``x_i`` is the node feature for ``i``-th node and ``\mathcal{N}(x_i)`` represents the neighbors for ``x_i``.
+Activation function ``\sigma`` can be arbitrary non-linear function.
+
+```@docs
+GraphKernel
+```
+
+Reference: [Neural Operator: Graph Kernel Network for Partial Differential Equations](https://arxiv.org/abs/2003.03485)
+
 ## Models
 
 ### Fourier neural operator

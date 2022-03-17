@@ -7,6 +7,8 @@ module NeuralOperators
     using KernelAbstractions
     using Zygote
     using ChainRulesCore
+    using GeometricFlux
+    using Statistics
 
     export DeepONet
 

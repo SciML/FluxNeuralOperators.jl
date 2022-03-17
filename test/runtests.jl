@@ -1,7 +1,10 @@
 using NeuralOperators
-using Test
-using Flux
 using CUDA
+using Flux
+using GeometricFlux
+using Graphs
+using Zygote
+using Test
 
 CUDA.allowscalar(false)
 
