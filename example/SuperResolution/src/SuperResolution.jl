@@ -4,8 +4,11 @@ using NeuralOperators
 using Flux
 using Flux.Losses: mse
 using Flux.Data: DataLoader
+using GeometricFlux
+using Graphs
 using CUDA
 using JLD2
+using ProgressMeter: Progress, next!
 
 include("data.jl")
 include("models.jl")
