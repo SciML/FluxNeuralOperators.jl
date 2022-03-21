@@ -1,7 +1,4 @@
-## Index
-
-```@index
-```
+# APIs
 
 ## Layers
 
@@ -40,6 +37,8 @@ OperatorKernel
 
 Reference: [Fourier Neural Operator for Parametric Partial Differential Equations](https://arxiv.org/abs/2010.08895)
 
+---
+
 ### Graph kernel layer
 
 ```math
@@ -54,6 +53,8 @@ GraphKernel
 ```
 
 Reference: [Neural Operator: Graph Kernel Network for Partial Differential Equations](https://arxiv.org/abs/2003.03485)
+
+---
 
 ## Models
 
