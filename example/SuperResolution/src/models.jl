@@ -60,7 +60,7 @@ function train_mno(; cuda=true, η=1f-3, λ=1f-4, epochs=50)
     return m
 end
 
-function train_gno(; channel=64, cuda=true, η=1f-3, λ=1f-4, epochs=50)
+function train_gno(; channel=64, cuda=true, η=1f-3, λ=1f-4, epochs=50, batchsize=64)
     # GPU config
     if cuda && CUDA.has_cuda()
         device = gpu
@@ -72,10 +72,10 @@ function train_gno(; channel=64, cuda=true, η=1f-3, λ=1f-4, epochs=50)
     end
 
     @info "gen data... "
-    @time loader_train, loader_test = get_dataloader()
+    @time loader_train, loader_test = get_same_resolution(batchsize=batchsize)
 
     # build model
-    g = grid([12, 8])
+    g = grid([96, 64])
     fg = FeaturedGraph(g)
 
     m = Chain(

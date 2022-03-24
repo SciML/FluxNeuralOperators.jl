@@ -41,3 +41,19 @@ function get_dataloader(; ts::AbstractRange=LinRange(100, 11000, 10000), ratio::
 
     return loader_train, loader_test
 end
+
+function get_same_resolution(; ts::AbstractRange=LinRange(100, 11000, 10000), ratio::Real=0.95, batchsize=100)
+    data = gen_data(ts)
+
+    n_train, n_test = floor(Int, length(ts)*ratio), floor(Int, length(ts)*(1-ratio))
+
+    𝐱_train, 𝐲_train = data[:, 1:2:end, 1:2:end, 1:(n_train-1)], data[:, 1:2:end, 1:2:end, 2:n_train]
+    𝐱_train, 𝐲_train = reshape(𝐱_train, 1, :, n_train-1), reshape(𝐲_train, 1, :, n_train-1)
+    loader_train = Flux.DataLoader((𝐱_train, 𝐲_train), batchsize=batchsize, shuffle=true)
+
+    𝐱_test, 𝐲_test = data[:, 1:2:end, 1:2:end, (end-n_test+1):(end-1)], data[:, 1:2:end, 1:2:end, (end-n_test+2):end]
+    𝐱_test, 𝐲_test = reshape(𝐱_test, 1, :, n_test-1), reshape(𝐲_test, 1, :, n_test-1)
+    loader_test = Flux.DataLoader((𝐱_test, 𝐲_test), batchsize=batchsize, shuffle=false)
+
+    return loader_train, loader_test
+end
