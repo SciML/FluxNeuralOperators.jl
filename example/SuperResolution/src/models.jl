@@ -60,7 +60,7 @@ function train_mno(; cuda=true, η=1f-3, λ=1f-4, epochs=50)
     return m
 end
 
-function train_gno(; channel=64, cuda=true, η=1f-3, λ=1f-4, epochs=50, batchsize=64)
+function train_gno(; channel=16, cuda=true, η=1f-3, λ=1f-4, epochs=50, batchsize=16)
     # GPU config
     if cuda && CUDA.has_cuda()
         device = gpu
@@ -79,12 +79,12 @@ function train_gno(; channel=64, cuda=true, η=1f-3, λ=1f-4, epochs=50, batchsi
     fg = FeaturedGraph(g)
 
     m = Chain(
-        Dense(1, 64),
+        Dense(1, channel),
         WithGraph(fg, GraphKernel(Dense(2channel, channel, gelu), channel)),
         WithGraph(fg, GraphKernel(Dense(2channel, channel, gelu), channel)),
         WithGraph(fg, GraphKernel(Dense(2channel, channel, gelu), channel)),
         WithGraph(fg, GraphKernel(Dense(2channel, channel, gelu), channel)),
-        Dense(64, 1),
+        Dense(channel, 1),
     ) |> device
 
     # optimizer

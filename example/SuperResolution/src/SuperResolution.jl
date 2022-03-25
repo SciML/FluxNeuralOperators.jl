@@ -16,7 +16,7 @@ include("models.jl")
 function update_model!(model_file_path, model)
     model = cpu(model)
     jldsave(model_file_path; model)
-    @warn "model updated!"
+    @info "model updated!"
 end
 
 function get_model()
