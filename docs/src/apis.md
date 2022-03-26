@@ -18,7 +18,7 @@ Function ``g`` is a linear transform for lowering Fouier modes.
 OperatorConv
 ```
 
-Reference: [Fourier Neural Operator for Parametric Partial Differential Equations](https://arxiv.org/abs/2010.08895)
+Reference: [FNO2021](@cite)
 
 ---
 
@@ -35,7 +35,7 @@ Activation function ``\sigma`` can be arbitrary non-linear function.
 OperatorKernel
 ```
 
-Reference: [Fourier Neural Operator for Parametric Partial Differential Equations](https://arxiv.org/abs/2010.08895)
+Reference: [FNO2021](@cite)
 
 ---
 
@@ -52,7 +52,7 @@ Activation function ``\sigma`` can be arbitrary non-linear function.
 GraphKernel
 ```
 
-Reference: [Neural Operator: Graph Kernel Network for Partial Differential Equations](https://arxiv.org/abs/2003.03485)
+Reference: [NO2020](@cite)
 
 ---
 
@@ -64,7 +64,7 @@ Reference: [Neural Operator: Graph Kernel Network for Partial Differential Equat
 FourierNeuralOperator
 ```
 
-Reference: [Fourier Neural Operator for Parametric Partial Differential Equations](https://arxiv.org/abs/2010.08895)
+Reference: [FNO2021](@cite)
 
 ---
 
@@ -74,4 +74,4 @@ Reference: [Fourier Neural Operator for Parametric Partial Differential Equation
 MarkovNeuralOperator
 ```
 
-Reference: [Markov Neural Operators for Learning Chaotic Systems](https://arxiv.org/abs/2106.06898)
+Reference: [MNO2021](@cite)
