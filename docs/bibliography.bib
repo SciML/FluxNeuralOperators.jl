@@ -1,0 +1,46 @@
+@inproceedings{FNO2021,
+   abstract = {The classical development of neural networks has primarily focused on learning mappings between finite-dimensional Euclidean spaces. Recently, this has been generalized to neural operators that learn mappings between function spaces. For partial differential equations (PDEs), neural operators directly learn the mapping from any functional parametric dependence to the solution. Thus, they learn an entire family of PDEs, in contrast to classical methods which solve one instance of the equation. In this work, we formulate a new neural operator by parameterizing the integral kernel directly in Fourier space, allowing for an expressive and efficient architecture. We perform experiments on Burgers' equation, Darcy flow, and Navier-Stokes equation. The Fourier neural operator is the first ML-based method to successfully model turbulent flows with zero-shot super-resolution. It is up to three orders of magnitude faster compared to traditional PDE solvers. Additionally, it achieves superior accuracy compared to previous learning-based solvers under fixed resolution.},
+   author = {Zongyi Li and Nikola Kovachki and Kamyar Azizzadenesheli and Burigede Liu and Kaushik Bhattacharya and Andrew Stuart and Anima Anandkumar},
+   booktitle = {International Conference on Learning Representations},
+   month = {10},
+   title = {Fourier Neural Operator for Parametric Partial Differential Equations},
+   url = {https://iclr.cc/virtual/2021/poster/3281},
+   year = {2021},
+}
+
+@article{NO2020,
+   abstract = {The classical development of neural networks has been primarily for mappings between a finite-dimensional Euclidean space and a set of classes, or between two finite-dimensional Euclidean spaces. The purpose of this work is to generalize neural networks so that they can learn mappings between infinite-dimensional spaces (operators). The key innovation in our work is that a single set of network parameters, within a carefully designed network architecture, may be used to describe mappings between infinite-dimensional spaces and between different finite-dimensional approximations of those spaces. We formulate approximation of the infinite-dimensional mapping by composing nonlinear activation functions and a class of integral operators. The kernel integration is computed by message passing on graph networks. This approach has substantial practical consequences which we will illustrate in the context of mappings between input data to partial differential equations (PDEs) and their solutions. In this context, such learned networks can generalize among different approximation methods for the PDE (such as finite difference or finite element methods) and among approximations corresponding to different underlying levels of resolution and discretization. Experiments confirm that the proposed graph kernel network does have the desired properties and show competitive performance compared to the state of the art solvers.},
+   author = {Zongyi Li and Nikola Kovachki and Kamyar Azizzadenesheli and Burigede Liu and Kaushik Bhattacharya and Andrew Stuart and Anima Anandkumar},
+   journal = {ArXiv},
+   doi = {10.48550/arxiv.2003.03485},
+   month = {3},
+   title = {Neural Operator: Graph Kernel Network for Partial Differential Equations},
+   url = {http://arxiv.org/abs/2003.03485},
+   year = {2020},
+}
+
+@article{MNO2021,
+   abstract = {Chaotic systems are notoriously challenging to predict because of their
+instability. Small errors accumulate in the simulation of each time step,
+resulting in completely different trajectories. However, the trajectories of
+many prominent chaotic systems live in a low-dimensional subspace (attractor).
+If the system is Markovian, the attractor is uniquely determined by the Markov
+operator that maps the evolution of infinitesimal time steps. This makes it
+possible to predict the behavior of the chaotic system by learning the Markov
+operator even if we cannot predict the exact trajectory. Recently, a new
+framework for learning resolution-invariant solution operators for PDEs was
+proposed, known as neural operators. In this work, we train a Markov neural
+operator (MNO) with only the local one-step evolution information. We then
+compose the learned operator to obtain the global attractor and invariant
+measure. Such a Markov neural operator forms a discrete semigroup and we
+empirically observe that does not collapse or blow up. Experiments show neural
+operators are more accurate and stable compared to previous methods on chaotic
+systems such as the Kuramoto-Sivashinsky and Navier-Stokes equations.},
+   author = {Zongyi Li and Nikola Kovachki and Kamyar Azizzadenesheli and Burigede Liu and Kaushik Bhattacharya and Andrew Stuart and Anima Anandkumar},
+   journal = {ArXiv},
+   doi = {10.48550/arxiv.2106.06898},
+   month = {6},
+   title = {Markov Neural Operators for Learning Chaotic Systems},
+   url = {https://arxiv.org/abs/2106.06898},
+   year = {2021},
+}
