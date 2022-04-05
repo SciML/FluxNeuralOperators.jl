@@ -9,7 +9,7 @@ CurrentModule = NeuralOperators
 | **Ground Truth** | **Inferenced** |
 
 The demonstration shown above is Navier-Stokes equation learned by the `MarkovNeuralOperator` with only one time step information.
-Example can be found in [`example/FlowOverCircle`](https://github.com/foldfelis/NeuralOperators.jl/tree/master/example/FlowOverCircle).
+Example can be found in [`example/FlowOverCircle`](../../example/FlowOverCircle).
 
 ## Quick start
 
@@ -85,4 +85,4 @@ opt = ADAM(learning_rate)
 parameters = params(model)
 Flux.@epochs 400 Flux.train!(loss, parameters, [(xtrain, ytrain, grid)], opt, cb=evalcb)
 ```
-A more complete example using DeepONet architecture to solve Burgers' equation can be found in the [examples](https://github.com/foldfelis/NeuralOperators.jl/tree/master/example/Burgers/src/Burgers_deeponet.jl).
+A more complete example using DeepONet architecture to solve Burgers' equation can be found in the [examples](../../example/Burgers/src/Burgers_deeponet.jl).
