@@ -31,7 +31,7 @@ function train()
         Dense(64, 1),
     ) |> device
 
-    loss(𝐱, 𝐲) = sum(abs2, 𝐲 .- m(𝐱)) / size(𝐱)[end]
+    loss(𝐱, 𝐲) = l₂loss(m(𝐱), 𝐲)
 
     opt = Flux.Optimiser(WeightDecay(1f-4), Flux.ADAM(1f-3))
 
