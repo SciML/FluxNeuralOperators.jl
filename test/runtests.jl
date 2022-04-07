@@ -4,19 +4,21 @@ using Flux
 using GeometricFlux
 using Graphs
 using Zygote
+using Statistics
 using Test
 
 CUDA.allowscalar(false)
 
 cuda_tests = [
-    "cuda",
+    "cuda.jl",
 ]
 
 tests = [
-    "Transform/Transform",
-    "operator_kernel",
-    "model",
-    "deeponet",
+    "Transform/Transform.jl",
+    "operator_kernel.jl",
+    "loss.jl",
+    "model.jl",
+    "deeponet.jl",
 ]
 
 if CUDA.functional()
@@ -27,7 +29,7 @@ end
 
 @testset "NeuralOperators.jl" begin
     for t in tests
-        include("$(t).jl")
+        include(t)
     end
 end
 
