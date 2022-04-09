@@ -2,10 +2,8 @@ name = "FlowOverCircle"
 uuid = "1fc04e5d-1dd1-42ff-8d75-1d53504b2476"
 
 [deps]
-BSON = "fbb218c0-5317-5bc6-957e-2ee96dd4b1f0"
 CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
 Flux = "587475ba-b771-5e3f-ad9e-33799f191a9c"
-FluxTraining = "7bf95e4d-ca32-48da-9824-f0dc5310474f"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 MLUtils = "f1d291b0-491e-4a28-83b9-f70985020b54"
 NeuralOperators = "ea5c82af-86e5-48da-8ee1-382d6ad7af4b"

@@ -2,7 +2,7 @@ module FlowOverCircle
 
 using WaterLily, LinearAlgebra, ProgressMeter, MLUtils
 using NeuralOperators, Flux
-using CUDA, FluxTraining, BSON
+using CUDA
 
 function circle(n, m; Re=250) # copy from [WaterLily](https://github.com/weymouth/WaterLily.jl)
     # Set physical parameters
@@ -50,27 +50,26 @@ function train()
         device = cpu
     end
 
-    model = MarkovNeuralOperator(ch=(1, 64, 64, 64, 64, 64, 1), modes=(24, 24), σ=gelu)
-    data = get_dataloader()
+    model = MarkovNeuralOperator(ch=(1, 64, 64, 64, 64, 64, 1), modes=(24, 24), σ=gelu) |> device
+    loader_train, loader_test = get_dataloader()
+    data = [(𝐱, 𝐲) for (𝐱, 𝐲) in loader_train] |> device
     optimiser = Flux.Optimiser(WeightDecay(1f-4), Flux.ADAM(1f-3))
-    loss_func = l₂loss
+    loss_func(𝐱, 𝐲) = l₂loss(m(𝐱), 𝐲)
 
-    learner = Learner(
-        model, data, optimiser, loss_func,
-        ToDevice(device, device),
-        Checkpointer(joinpath(@__DIR__, "../model/"))
-    )
+    function validate()
+        validation_losses = [loss(device(𝐱), device(𝐲)) for (𝐱, 𝐲) in loader_test]
+        @info "loss: $(sum(validation_losses)/length(loader_test))"
+    end
 
-    fit!(learner, 50)
+    @time begin
+        for e in 1:50
+            @warn "epoch $e"
+            Flux.train!(loss_func, Flux.params(model), data, optimiser)
+            validate()
+        end
+    end
 
     return learner
-end
-
-function get_model()
-    model_path = joinpath(@__DIR__, "../model/")
-    model_file = readdir(model_path)[end]
-
-    return BSON.load(joinpath(model_path, model_file), @__MODULE__)[:model]
 end
 
 end # module
