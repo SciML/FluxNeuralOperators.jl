@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.16.0
+# v0.19.0
 
 using Markdown
 using InteractiveUtils
@@ -28,10 +28,7 @@ The data is provided by [IBM](https://developer.ibm.com/exchanges/data/all/doubl
 "
 
 # ╔═╡ 5268feee-bda2-4612-9d4c-a1db424a11c7
-data_x, data_y, _, _ = DoublePendulum.preprocess(
-	DoublePendulum.get_data(i=20),
-	ratio=1
-);
+data_x, data_y = DoublePendulum.preprocess(DoublePendulum.get_data(i=20));
 
 # ╔═╡ 4d0b08a4-8a54-41fd-997f-ad54d4c984cd
 m = DoublePendulum.get_model();
