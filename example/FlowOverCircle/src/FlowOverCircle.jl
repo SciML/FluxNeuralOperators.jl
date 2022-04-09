@@ -68,8 +68,6 @@ function train()
             validate()
         end
     end
-
-    return learner
 end
 
 end # module
