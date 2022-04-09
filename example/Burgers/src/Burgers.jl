@@ -32,14 +32,12 @@ function get_data(; n=2048, Δsamples=2^3, grid_size=div(2^13, Δsamples), T=Flo
     return x_loc_data, reshape(y_data, 1, :, n)
 end
 
-function get_dataloader(; n_train=1800, n_test=200, batchsize=100)
+function get_dataloader(; ratio::Float64=0.9, batchsize=100)
     𝐱, 𝐲 = get_data(n=2048)
+    data_train, data_test = splitobs((𝐱, 𝐲), at=ratio)
 
-    𝐱_train, 𝐲_train = 𝐱[:, :, 1:n_train], 𝐲[:, :, 1:n_train]
-    loader_train = Flux.DataLoader((𝐱_train, 𝐲_train), batchsize=batchsize, shuffle=true)
-
-    𝐱_test, 𝐲_test = 𝐱[:, :, end-n_test+1:end], 𝐲[:, :, end-n_test+1:end]
-    loader_test = Flux.DataLoader((𝐱_test, 𝐲_test), batchsize=batchsize, shuffle=false)
+    loader_train = DataLoader(data_train, batchsize=batchsize, shuffle=true)
+    loader_test = DataLoader(data_test, batchsize=batchsize, shuffle=false)
 
     return loader_train, loader_test
 end
