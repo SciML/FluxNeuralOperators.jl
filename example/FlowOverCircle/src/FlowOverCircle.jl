@@ -50,14 +50,7 @@ function train()
         device = cpu
     end
 
-    model = Chain(
-        Dense(1, 64),
-        OperatorKernel(64=>64, (24, 24), FourierTransform, gelu),
-        OperatorKernel(64=>64, (24, 24), FourierTransform, gelu),
-        OperatorKernel(64=>64, (24, 24), FourierTransform, gelu),
-        OperatorKernel(64=>64, (24, 24), FourierTransform, gelu),
-        Dense(64, 1),
-    )
+    model = MarkovNeuralOperator(ch=(1, 64, 64, 64, 64, 64, 1), modes=(24, 24), σ=gelu)
     data = get_dataloader()
     optimiser = Flux.Optimiser(WeightDecay(1f-4), Flux.ADAM(1f-3))
     loss_func = l₂loss
