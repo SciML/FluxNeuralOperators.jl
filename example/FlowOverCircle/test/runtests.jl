@@ -1,6 +1,7 @@
 using FlowOverCircle
+using FluxTraining
 using Test
 
 @testset "FlowOverCircle" begin
-    include("data.jl")
+    learner = FlowOverCircle.train(epochs=1)
 end

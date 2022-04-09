@@ -41,7 +41,7 @@ function get_dataloader(; ts::AbstractRange=LinRange(100, 11000, 10000), ratio::
     return loader_train, loader_test
 end
 
-function train()
+function train(; epochs=50)
     if has_cuda()
         @info "CUDA is on"
         device = gpu
@@ -61,7 +61,7 @@ function train()
         Checkpointer(joinpath(@__DIR__, "../model/"))
     )
 
-    fit!(learner, 50)
+    fit!(learner, epochs)
 
     return learner
 end
