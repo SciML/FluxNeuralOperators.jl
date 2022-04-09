@@ -1,3 +1,12 @@
+function get_data_don(; n=2048, Δsamples=2^3, grid_size=div(2^13, Δsamples))
+    file = matopen(joinpath(datadep"Burgers", "burgers_data_R10.mat"))
+    x_data = collect(read(file, "a")[1:n, 1:Δsamples:end])
+    y_data = collect(read(file, "u")[1:n, 1:Δsamples:end])
+    close(file)
+
+    return x_data, y_data
+end
+
 function train_don(; n=300, cuda=true, learning_rate=0.001, epochs=400)
     if cuda && has_cuda()
         @info "Training on GPU"
@@ -20,7 +29,7 @@ function train_don(; n=300, cuda=true, learning_rate=0.001, epochs=400)
     opt = ADAM(learning_rate)
 
     m = DeepONet((1024,1024,1024), (1,1024,1024), gelu, gelu) |> device
-    
+
     loss(X, y, sensor) = Flux.Losses.mse(m(X, sensor), y)
     evalcb() = @show(loss(xval, yval, grid))
 
