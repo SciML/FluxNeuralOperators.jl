@@ -44,7 +44,6 @@ function get_dataloader(; n_train=1800, n_test=200, batchsize=100)
     return loader_train, loader_test
 end
 
-
 __init__() = register_burgers()
 
 function train(; epochs=500)
