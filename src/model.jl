@@ -27,7 +27,7 @@ function FourierNeuralOperator(;
         OperatorKernel(ch[5]=>ch[6], modes, Transform),
         Dense(ch[6], ch[7], σ),
         Dense(ch[7], ch[8]),
-        flatten
+        Flux.flatten
     )
 end
 
@@ -48,7 +48,7 @@ function MarkovNeuralOperator(;
     σ=gelu
 )
     Transform = FourierTransform
-    
+
     return Chain(
         Dense(ch[1], ch[2]),
         OperatorKernel(ch[2]=>ch[3], modes, Transform, σ),
