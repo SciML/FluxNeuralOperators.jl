@@ -58,10 +58,9 @@ function train()
     learner = Learner(
         model, data, optimiser, loss_func,
         ToDevice(device, device),
-        Checkpointer(joinpath(@__DIR__, "../model/"))
     )
 
-    fit!(learner, 50)
+    @time fit!(learner, 50)
 
     return learner
 end
