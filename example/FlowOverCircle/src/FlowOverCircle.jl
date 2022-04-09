@@ -54,10 +54,10 @@ function train()
     loader_train, loader_test = get_dataloader()
     data = [(𝐱, 𝐲) for (𝐱, 𝐲) in loader_train] |> device
     optimiser = Flux.Optimiser(WeightDecay(1f-4), Flux.ADAM(1f-3))
-    loss_func(𝐱, 𝐲) = l₂loss(m(𝐱), 𝐲)
+    loss_func(𝐱, 𝐲) = l₂loss(model(𝐱), 𝐲)
 
     function validate()
-        validation_losses = [loss(device(𝐱), device(𝐲)) for (𝐱, 𝐲) in loader_test]
+        validation_losses = [loss_func(device(𝐱), device(𝐲)) for (𝐱, 𝐲) in loader_test]
         @info "loss: $(sum(validation_losses)/length(loader_test))"
     end
 
