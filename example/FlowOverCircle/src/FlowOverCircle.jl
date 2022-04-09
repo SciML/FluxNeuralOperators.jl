@@ -35,8 +35,8 @@ function get_dataloader(; ts::AbstractRange=LinRange(100, 11000, 10000), ratio::
     data = gen_data(ts)
     data_train, data_test = splitobs((𝐱=data[:, :, :, 1:end-1], 𝐲=data[:, :, :, 2:end]), at=ratio)
 
-    loader_train = Flux.DataLoader(data_train, batchsize=batchsize, shuffle=true)
-    loader_test = Flux.DataLoader(data_test, batchsize=batchsize, shuffle=false)
+    loader_train = DataLoader(data_train, batchsize=batchsize, shuffle=true)
+    loader_test = DataLoader(data_test, batchsize=batchsize, shuffle=false)
 
     return loader_train, loader_test
 end
