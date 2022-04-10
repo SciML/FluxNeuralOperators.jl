@@ -36,7 +36,7 @@ function get_dataloader(; ts::AbstractRange=LinRange(100, 11000, 10000), ratio::
     data_train, data_validate = splitobs(shuffleobs((𝐱=data[:, :, :, 1:end-1], 𝐲=data[:, :, :, 2:end])), at=ratio)
 
     data = gen_data(ts, resolution=2)
-    data_test = (𝐱=data[:, :, :, 1:end-1], 𝐲=data[:, :, :, 2:end])
+    _, data_test = splitobs(shuffleobs((𝐱=data[:, :, :, 1:end-1], 𝐲=data[:, :, :, 2:end])), at=ratio)
 
     loader_train = DataLoader(data_train, batchsize=batchsize, shuffle=true)
     loader_validate = DataLoader(data_validate, batchsize=batchsize, shuffle=false)
@@ -86,7 +86,7 @@ function train(; epochs=50)
     learner = Learner(
         model, data, optimiser, loss_func,
         ToDevice(device, device),
-        # Checkpointer(joinpath(@__DIR__, "../model/"))
+        Checkpointer(joinpath(@__DIR__, "../model/"))
     )
 
     fit!(learner, epochs)
