@@ -33,7 +33,7 @@ end
 
 function get_dataloader(; ts::AbstractRange=LinRange(100, 11000, 10000), ratio::Float64=0.95, batchsize=100)
     data = gen_data(ts)
-    data_train, data_test = splitobs((𝐱=data[:, :, :, 1:end-1], 𝐲=data[:, :, :, 2:end]), at=ratio)
+    data_train, data_test = splitobs(shuffleobs((𝐱=data[:, :, :, 1:end-1], 𝐲=data[:, :, :, 2:end])), at=ratio)
 
     loader_train = DataLoader(data_train, batchsize=batchsize, shuffle=true)
     loader_test = DataLoader(data_test, batchsize=batchsize, shuffle=false)
