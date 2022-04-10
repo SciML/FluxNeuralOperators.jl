@@ -1,7 +1,7 @@
 module FlowOverCircle
 
 using WaterLily, LinearAlgebra, ProgressMeter, MLUtils
-using NeuralOperators, Flux
+using NeuralOperators, Flux, GeometricFlux, Graphs
 using CUDA, FluxTraining, BSON
 
 function circle(n, m; Re=250) # copy from [WaterLily](https://github.com/weymouth/WaterLily.jl)
@@ -31,9 +31,16 @@ function gen_data(ts::AbstractRange)
     return 𝐩s
 end
 
-function get_dataloader(; ts::AbstractRange=LinRange(100, 11000, 10000), ratio::Float64=0.95, batchsize=100)
+function get_dataloader(; ts::AbstractRange=LinRange(100, 11000, 10000), ratio::Float64=0.95, batchsize=100, flatten=false)
     data = gen_data(ts)
-    data_train, data_test = splitobs(shuffleobs((𝐱=data[:, :, :, 1:end-1], 𝐲=data[:, :, :, 2:end])), at=ratio)
+    𝐱, 𝐲 = data[:, :, :, 1:end-1], data[:, :, :, 2:end]
+    n = length(ts) - 1
+
+    if flatten
+        𝐱, 𝐲 = reshape(𝐱, 1, :, n), reshape(𝐲, 1, :, n)
+    end
+
+    data_train, data_test = splitobs(shuffleobs((𝐱, 𝐲)), at=ratio)
 
     loader_train = DataLoader(data_train, batchsize=batchsize, shuffle=true)
     loader_test = DataLoader(data_test, batchsize=batchsize, shuffle=false)
@@ -52,6 +59,40 @@ function train(; epochs=50)
 
     model = MarkovNeuralOperator(ch=(1, 64, 64, 64, 64, 64, 1), modes=(24, 24), σ=gelu)
     data = get_dataloader()
+    optimiser = Flux.Optimiser(WeightDecay(1f-4), Flux.ADAM(1f-3))
+    loss_func = l₂loss
+
+    learner = Learner(
+        model, data, optimiser, loss_func,
+        ToDevice(device, device),
+        Checkpointer(joinpath(@__DIR__, "../model/"))
+    )
+
+    fit!(learner, epochs)
+
+    return learner
+end
+
+function train_gno(; epochs=50)
+    if has_cuda()
+        @info "CUDA is on"
+        device = gpu
+        CUDA.allowscalar(false)
+    else
+        device = cpu
+    end
+
+    featured_graph = FeaturedGraph(grid([96, 64]))
+
+    model = Chain(
+        Dense(1, 16),
+        WithGraph(featured_graph, GraphKernel(Dense(2*16, 16, gelu), 16)),
+        WithGraph(featured_graph, GraphKernel(Dense(2*16, 16, gelu), 16)),
+        WithGraph(featured_graph, GraphKernel(Dense(2*16, 16, gelu), 16)),
+        WithGraph(featured_graph, GraphKernel(Dense(2*16, 16, gelu), 16)),
+        Dense(16, 1),
+    )
+    data = get_dataloader(batchsize=16, flatten=true)
     optimiser = Flux.Optimiser(WeightDecay(1f-4), Flux.ADAM(1f-3))
     loss_func = l₂loss
 
