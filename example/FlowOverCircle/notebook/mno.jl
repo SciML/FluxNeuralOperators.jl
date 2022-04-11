@@ -35,10 +35,10 @@ end;
 # ╔═╡ 9b02b6a2-33c3-4ca6-bfba-0bd74b664830
 begin
 	anim = @animate for i in 1:size(data)[end]
-		heatmap(data[1, :, :, i]', color=:coolwarm, clim=(-1.5, 1.5))
+		heatmap(data[1, 2:end-1, 2:end-1, i]', color=:coolwarm, clim=(-1.5, 1.5))
 		scatter!(
-			[size(data, 3)÷2], [size(data, 3)÷2-1], 
-			markersize=45, color=:black, legend=false, ticks=false
+			[size(data, 3)÷2-2.5], [size(data, 3)÷2-2.25], 
+			markersize=40, color=:black, legend=false, ticks=false
 		)
 		annotate!(5, 5, text("i=$i", :left))
 	end
@@ -66,10 +66,10 @@ end
 # ╔═╡ a0b5e94c-a839-4cc0-a325-1a4ac39fafbc
 begin
 	anim_model = @animate for i in 1:size(states)[end]
-		heatmap(states[1, :, :, i]', color=:coolwarm, clim=(-1.5, 1.5))
+		heatmap(states[1, 2:end-1, 2:end-1, i]', color=:coolwarm, clim=(-1.5, 1.5))
 		scatter!(
-			[size(data, 3)÷2], [size(data, 3)÷2-1], 
-			markersize=45, color=:black, legend=false, ticks=false
+			[size(data, 3)÷2-2.5], [size(data, 3)÷2-2.25], 
+			markersize=40, color=:black, legend=false, ticks=false
 		)
 		annotate!(5, 5, text("i=$i", :left))
 	end
