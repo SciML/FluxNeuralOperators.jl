@@ -36,20 +36,20 @@ function get_dataloader(; ts::AbstractRange=LinRange(100, 11000, 10000), ratio::
     data_train, data_validate = splitobs(shuffleobs((𝐱=data[:, :, :, 1:end-1], 𝐲=data[:, :, :, 2:end])), at=ratio)
 
     data = gen_data(ts, resolution=2)
-    _, data_test = splitobs(shuffleobs((𝐱=data[:, :, :, 1:end-1], 𝐲=data[:, :, :, 2:end])), at=ratio)
+    _, data_super_res = splitobs(shuffleobs((𝐱=data[:, :, :, 1:end-1], 𝐲=data[:, :, :, 2:end])), at=ratio)
 
     loader_train = DataLoader(data_train, batchsize=batchsize, shuffle=true)
     loader_validate = DataLoader(data_validate, batchsize=batchsize, shuffle=false)
-    loader_test = DataLoader(data_test, batchsize=batchsize, shuffle=false)
+    loader_super_res = DataLoader(data_super_res, batchsize=batchsize, shuffle=false)
 
-    return (training=loader_train, validation=loader_validate, testing=loader_test)
+    return (training=loader_train, validation=loader_validate, super_res=loader_super_res)
 end
 
-struct TestPhase<:FluxTraining.AbstractValidationPhase end
+struct SuperResPhase<:FluxTraining.AbstractValidationPhase end
 
-FluxTraining.phasedataiter(::TestPhase) = :testing
+FluxTraining.phasedataiter(::SuperResPhase) = :super_res
 
-function FluxTraining.step!(learner, phase::TestPhase, batch)
+function FluxTraining.step!(learner, phase::SuperResPhase, batch)
     xs, ys = batch
     FluxTraining.runstep(learner, phase, (xs=xs, ys=ys)) do _, state
         state.ŷs = learner.model(state.xs)
@@ -57,16 +57,16 @@ function FluxTraining.step!(learner, phase::TestPhase, batch)
     end
 end
 
-function fit!(learner, nepochs::Int, (trainiter, validiter, testiter))
+function fit!(learner, nepochs::Int, (loader_train, loader_validate, loader_super_res))
     for i in 1:nepochs
-        epoch!(learner, TrainingPhase(), trainiter)
-        epoch!(learner, ValidationPhase(), validiter)
-        epoch!(learner, TestPhase(), testiter)
+        epoch!(learner, TrainingPhase(), loader_train)
+        epoch!(learner, ValidationPhase(), loader_validate)
+        epoch!(learner, SuperResPhase(), loader_super_res)
     end
 end
 
 function fit!(learner, nepochs::Int)
-    fit!(learner, nepochs, (learner.data.training, learner.data.validation, learner.data.testing))
+    fit!(learner, nepochs, (learner.data.training, learner.data.validation, learner.data.super_res))
 end
 
 function train(; cuda=true, η₀=1f-3, λ=1f-4, epochs=50)
