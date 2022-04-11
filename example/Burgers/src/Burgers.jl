@@ -44,18 +44,19 @@ end
 
 __init__() = register_burgers()
 
-function train(; epochs=500)
-    if has_cuda()
-        @info "CUDA is on"
+function train(; cuda=true, η₀=1f-3, λ=1f-4, epochs=500)
+    if cuda && CUDA.has_cuda()
         device = gpu
         CUDA.allowscalar(false)
+        @info "Training on GPU"
     else
         device = cpu
+        @info "Training on CPU"
     end
 
     model = FourierNeuralOperator(ch=(2, 64, 64, 64, 64, 64, 128, 1), modes=(16, ), σ=gelu)
     data = get_dataloader()
-    optimiser = Flux.Optimiser(WeightDecay(1f-4), Flux.ADAM(1f-3))
+    optimiser = Flux.Optimiser(WeightDecay(λ), Flux.ADAM(η₀))
     loss_func = l₂loss
 
     learner = Learner(

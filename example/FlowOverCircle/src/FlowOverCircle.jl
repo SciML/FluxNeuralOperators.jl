@@ -48,18 +48,19 @@ function get_dataloader(; ts::AbstractRange=LinRange(100, 11000, 10000), ratio::
     return loader_train, loader_test
 end
 
-function train(; epochs=50)
-    if has_cuda()
-        @info "CUDA is on"
+function train(; cuda=true, η₀=1f-3, λ=1f-4, epochs=50)
+    if cuda && CUDA.has_cuda()
         device = gpu
         CUDA.allowscalar(false)
+        @info "Training on GPU"
     else
         device = cpu
+        @info "Training on CPU"
     end
 
     model = MarkovNeuralOperator(ch=(1, 64, 64, 64, 64, 64, 1), modes=(24, 24), σ=gelu)
     data = get_dataloader()
-    optimiser = Flux.Optimiser(WeightDecay(1f-4), Flux.ADAM(1f-3))
+    optimiser = Flux.Optimiser(WeightDecay(λ), Flux.ADAM(η₀))
     loss_func = l₂loss
 
     learner = Learner(
@@ -73,17 +74,17 @@ function train(; epochs=50)
     return learner
 end
 
-function train_gno(; epochs=50)
-    if has_cuda()
-        @info "CUDA is on"
+function train_gno(; cuda=true, η₀=1f-3, λ=1f-4, epochs=50)
+    if cuda && CUDA.has_cuda()
         device = gpu
         CUDA.allowscalar(false)
+        @info "Training on GPU"
     else
         device = cpu
+        @info "Training on CPU"
     end
 
     featured_graph = FeaturedGraph(grid([96, 64]))
-
     model = Chain(
         Dense(1, 16),
         WithGraph(featured_graph, GraphKernel(Dense(2*16, 16, gelu), 16)),
@@ -93,7 +94,7 @@ function train_gno(; epochs=50)
         Dense(16, 1),
     )
     data = get_dataloader(batchsize=16, flatten=true)
-    optimiser = Flux.Optimiser(WeightDecay(1f-4), Flux.ADAM(1f-3))
+    optimiser = Flux.Optimiser(WeightDecay(λ), Flux.ADAM(η₀))
     loss_func = l₂loss
 
     learner = Learner(

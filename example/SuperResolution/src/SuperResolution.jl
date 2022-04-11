@@ -69,18 +69,19 @@ function fit!(learner, nepochs::Int)
     fit!(learner, nepochs, (learner.data.training, learner.data.validation, learner.data.testing))
 end
 
-function train(; epochs=50)
-    if has_cuda()
-        @info "CUDA is on"
+function train(; cuda=true, η₀=1f-3, λ=1f-4, epochs=50)
+    if cuda && CUDA.has_cuda()
         device = gpu
         CUDA.allowscalar(false)
+        @info "Training on GPU"
     else
         device = cpu
+        @info "Training on CPU"
     end
 
     model = MarkovNeuralOperator(ch=(1, 64, 64, 64, 64, 64, 1), modes=(24, 24), σ=gelu)
     data = get_dataloader()
-    optimiser = Flux.Optimiser(WeightDecay(1f-4), Flux.ADAM(1f-3))
+    optimiser = Flux.Optimiser(WeightDecay(λ), Flux.ADAM(η₀))
     loss_func = l₂loss
 
     learner = Learner(
@@ -100,35 +101,5 @@ function get_model()
 
     return BSON.load(joinpath(model_path, model_file), @__MODULE__)[:model]
 end
-
-# using NeuralOperators
-# using Flux
-# using Flux.Losses: mse
-# using Flux.Data: DataLoader
-# using GeometricFlux
-# using Graphs
-# using CUDA
-# using JLD2
-# using ProgressMeter: Progress, next!
-
-# include("data.jl")
-# include("models.jl")
-
-# function update_model!(model_file_path, model)
-#     model = cpu(model)
-#     jldsave(model_file_path; model)
-#     @info "model updated!"
-# end
-
-# function get_model()
-#     f = jldopen(joinpath(@__DIR__, "../model/model.jld2"))
-#     model = f["model"]
-#     close(f)
-
-#     return model
-# end
-
-# loss(m, 𝐱, 𝐲) = mse(m(𝐱), 𝐲)
-# loss(m, loader::DataLoader, device) = sum(loss(m, 𝐱 |> device, 𝐲 |> device) for (𝐱, 𝐲) in loader)/length(loader)
 
 end # module
