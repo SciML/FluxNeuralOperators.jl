@@ -29,19 +29,16 @@ from infinite-dimensional space (u, t) to infinite-dimensional space f(u, t).
 Neural operator learns a continuous function between two continuous function spaces.
 The kernel can be trained on different geometry, which is learned from a graph.
 
-**Fourier neural operator** learns a neural operator with Dirichlet kernel to form a Fourier transformation.
+**[Fourier neural operator](src/model.jl)** learns a neural operator with Dirichlet kernel to form a Fourier transformation.
 It performs Fourier transformation across infinite-dimensional function spaces and learns better than neural operator.
 
-**Markov neural operator** learns a neural operator with Fourier operators.
+**[Markov neural operator](src/model.jl)** learns a neural operator with Fourier operators.
 With only one time step information of learning, it can predict the following few steps with low loss
 by linking the operators into a Markov chain.
 
-**DeepONet operator** (Deep Operator Network) learns a neural operator with the help of two sub-neural net structures described as the branch and the trunk network.
+**[DeepONet operator](src/DeepONet.jl)** (Deep Operator Network) learns a neural operator with the help of two sub-neural net structures described as the branch and the trunk network.
 The branch network is fed the initial conditions data, whereas the trunk is fed with the locations where the target(output) is evaluated from the corresponding initial conditions.
 It is important that the output size of the branch and trunk subnets is same so that a dot product can be performed between them.
-
-Currently, the `OperatorKernel` layer is provided in this work.
-As for model, there are `FourierNeuralOperator` and `MarkovNeuralOperator` provided. Please take a glance at them [here](src/model.jl).
 
 ## Usage
 
@@ -77,7 +74,7 @@ model = FourierNeuralOperator(
 And then train as a Flux model.
 
 ```julia
-loss(𝐱, 𝐲) = sum(abs2, 𝐲 .- model(𝐱)) / size(𝐱)[end]
+loss(𝐱, 𝐲) = l₂loss(model(𝐱), 𝐲)
 opt = Flux.Optimiser(WeightDecay(1f-4), Flux.ADAM(1f-3))
 Flux.@epochs 50 Flux.train!(loss, params(model), data, opt)
 ```
