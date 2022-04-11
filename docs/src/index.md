@@ -9,7 +9,7 @@ CurrentModule = NeuralOperators
 | **Ground Truth** | **Inferenced** |
 
 The demonstration shown above is Navier-Stokes equation learned by the `MarkovNeuralOperator` with only one time step information.
-Example can be found in [`example/FlowOverCircle`](../../example/FlowOverCircle).
+Example can be found in [`example/FlowOverCircle`](https://github.com/SciML/NeuralOperators.jl/tree/master/example/FlowOverCircle).
 
 ## Quick start
 
@@ -36,7 +36,6 @@ model = Chain(
     # project back to the scalar field of interest space
     Dense(64, 128, gelu),
     Dense(128, 1),
-    flatten
 )
 ```
 
@@ -53,7 +52,7 @@ model = FourierNeuralOperator(
 And then train as a Flux model.
 
 ```julia
-loss(𝐱, 𝐲) = Flux.Losses.mse(model(𝐱), 𝐲)
+loss(𝐱, 𝐲) = l₂loss(model(𝐱), 𝐲)
 opt = Flux.Optimiser(WeightDecay(1f-4), Flux.ADAM(1f-3))
 Flux.@epochs 50 Flux.train!(loss, params(model), data, opt)
 ```
@@ -85,4 +84,4 @@ opt = ADAM(learning_rate)
 parameters = params(model)
 Flux.@epochs 400 Flux.train!(loss, parameters, [(xtrain, ytrain, grid)], opt, cb=evalcb)
 ```
-A more complete example using DeepONet architecture to solve Burgers' equation can be found in the [examples](../../example/Burgers/src/Burgers_deeponet.jl).
+A more complete example using DeepONet architecture to solve Burgers' equation can be found in the [examples](https://github.com/SciML/NeuralOperators.jl/blob/master/example/Burgers/src/Burgers_deeponet.jl).

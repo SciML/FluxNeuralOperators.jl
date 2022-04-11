@@ -57,7 +57,6 @@ model = Chain(
     # project back to the scalar field of interest space
     Dense(64, 128, gelu),
     Dense(128, 1),
-    flatten
 )
 ```
 
