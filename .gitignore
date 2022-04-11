@@ -25,4 +25,4 @@ docs/site/
 # environment.
 Manifest.toml
 
-*.jld2
+*.bson

@@ -4,7 +4,6 @@ using Flux
 using GeometricFlux
 using Graphs
 using Zygote
-using Statistics
 using Test
 
 CUDA.allowscalar(false)
