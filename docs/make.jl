@@ -6,6 +6,8 @@ bib = CitationBibliography(joinpath(@__DIR__, "bibliography.bib"), sorting=:nyt)
 
 DocMeta.setdocmeta!(NeuralOperators, :DocTestSetup, :(using NeuralOperators); recursive=true)
 
+include("pages.jl")
+
 makedocs(
     bib,
     modules=[NeuralOperators],
@@ -17,12 +19,7 @@ makedocs(
         canonical="http://neuraloperators.sciml.ai",
         assets=String[],
     ),
-    pages=[
-        "Home" => "index.md",
-        "Introduction" => "introduction.md",
-        "APIs" => "apis.md",
-        "References" => "references.md",
-    ],
+    pages=pages,
 )
 
 deploydocs(;
