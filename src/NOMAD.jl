@@ -3,11 +3,26 @@ struct NOMAD{T1, T2}
     decoder_net::T2
 end
 
+"""
+`NOMAD(architecture_approximator::Tuple, architecture_decoder::Tuple,
+        act_approximator = identity, act_decoder=true;
+        init_approximator = Flux.glorot_uniform,
+        init_decoder = Flux.glorot_uniform,
+        bias_approximator=true, bias_decoder=true)`
+`NOMAD(approximator_net::Flux.Chain, decoder_net::Flux.Chain)`
+
+Create a Nonlinear Manifold Decoders for Operator Learning (NOMAD) as proposed by Lu et al.
+arXiv:2206.03551
+
+The decoder is defined as follows:
+
+``\\tilde D (β, y) = f(β, y)``
+"""
 function NOMAD(architecture_approximator::Tuple, architecture_decoder::Tuple,
-                        act_approximator = identity, act_decoder=true;
-                        init_approximator = Flux.glorot_uniform,
-                        init_decoder = Flux.glorot_uniform,
-                        bias_approximator=true, bias_decoder=true)
+                act_approximator = identity, act_decoder=true;
+                init_approximator = Flux.glorot_uniform,
+                init_decoder = Flux.glorot_uniform,
+                bias_approximator=true, bias_decoder=true)
 
     approximator_net = construct_subnet(architecture_approximator, act_approximator;
                                     init=init_approximator, bias=bias_approximator)
