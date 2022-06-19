@@ -21,6 +21,7 @@ jobs:
           - '1'
           # - 'nightly'
         os:
+          - ubuntu-latest
           - windows-latest
         arch:
           - x64
