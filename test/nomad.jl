@@ -21,6 +21,8 @@
     model = NOMAD((length(a), 22, length(a)), (length(a) + length(sensors), length(sensors)), σ, tanh; init_approximator=Flux.glorot_normal, bias_decoder=false)
     y = model(a, sensors)
     @test size(y) == (1, 16)
+    # Check if model description is printed, when defined
+    @test repr(model) == "NOMAD with\nApproximator net: (Chain(Dense(16 => 22, σ), Dense(22 => 16, σ)))\nDecoder net: (Chain(Dense(32 => 16, tanh; bias=false)))\n"
 
     mgrad = Flux.Zygote.gradient(() -> sum(model(a, sensors)), Flux.params(model))
     @info mgrad.grads
