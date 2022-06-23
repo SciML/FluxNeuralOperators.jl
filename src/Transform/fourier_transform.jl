@@ -1,6 +1,6 @@
 export FourierTransform
 
-struct FourierTransform{N, S}<:AbstractTransform
+struct FourierTransform{N, S} <: AbstractTransform
     modes::NTuple{N, S} # N == ndims(x)
 end
 
@@ -11,7 +11,7 @@ function transform(ft::FourierTransform, 𝐱::AbstractArray)
 end
 
 function low_pass(ft::FourierTransform, 𝐱_fft::AbstractArray)
-    return view(𝐱_fft, map(d->1:d, ft.modes)..., :, :) # [ft.modes..., in_chs, batch]
+    return view(𝐱_fft, map(d -> 1:d, ft.modes)..., :, :) # [ft.modes..., in_chs, batch]
 end
 
 const truncate_modes = low_pass
