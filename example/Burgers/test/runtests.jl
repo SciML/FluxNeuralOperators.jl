@@ -15,6 +15,6 @@ using Test
 end
 
 @testset "Burger: NOMAD Training Accuracy" begin
-    ϵ = Burgers.train_nomad(; cuda=true, epochs=100)
+    ϵ = Burgers.train_nomad(; cuda = true, epochs = 100)
     @test ϵ < 0.4 # epoch=100 returns 0.233
 end

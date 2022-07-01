@@ -49,18 +49,18 @@ Approximator net: (Chain(Dense(2 => 128), Dense(128 => 64)))
 Decoder net: (Chain(Dense(72 => 24), Dense(24 => 12)))
 """
 function NOMAD(architecture_approximator::Tuple, architecture_decoder::Tuple,
-                act_approximator = identity, act_decoder=true;
-                init_approximator = Flux.glorot_uniform,
-                init_decoder = Flux.glorot_uniform,
-                bias_approximator=true, bias_decoder=true)
-
+               act_approximator = identity, act_decoder = true;
+               init_approximator = Flux.glorot_uniform,
+               init_decoder = Flux.glorot_uniform,
+               bias_approximator = true, bias_decoder = true)
     approximator_net = construct_subnet(architecture_approximator, act_approximator;
-                                    init=init_approximator, bias=bias_approximator)
+                                        init = init_approximator, bias = bias_approximator)
 
     decoder_net = construct_subnet(architecture_decoder, act_decoder;
-                                    init=init_decoder, bias=bias_decoder)
+                                   init = init_decoder, bias = bias_decoder)
 
-    return NOMAD{typeof(approximator_net), typeof(decoder_net)}(approximator_net, decoder_net)
+    return NOMAD{typeof(approximator_net), typeof(decoder_net)}(approximator_net,
+                                                                decoder_net)
 end
 
 Flux.@functor NOMAD
@@ -69,12 +69,12 @@ function (a::NOMAD)(x::AbstractArray, y::AbstractVecOrMat)
     # Assign the parameters
     approximator, decoder = a.approximator_net, a.decoder_net
 
-    return decoder(cat(approximator(x), y', dims=1))'
+    return decoder(cat(approximator(x), y', dims = 1))'
 end
 
 # Print nicely
 function Base.show(io::IO, l::NOMAD)
-    print(io, "NOMAD with\nApproximator net: (",l.approximator_net)
+    print(io, "NOMAD with\nApproximator net: (", l.approximator_net)
     print(io, ")\n")
     print(io, "Decoder net: (", l.decoder_net)
     print(io, ")\n")
