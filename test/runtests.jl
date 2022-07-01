@@ -18,6 +18,7 @@ tests = [
     "loss.jl",
     "model.jl",
     "deeponet.jl",
+    "nomad.jl",
 ]
 
 if CUDA.functional()
