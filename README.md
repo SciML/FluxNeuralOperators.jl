@@ -1,8 +1,8 @@
 # NeuralOperators
 
-| **Documentation** | **Build Status** |
-|:-----------------:|:----------------:|
-| [![doc stable badge]][doc stable link] | [![ci badge]][ci link] [![codecov badge]][codecov link] |
+| **Documentation** | **Build Status** | **Style** |
+|:-----------------:|:----------------:|:---------:|
+| [![doc stable badge]][doc stable link] | [![ci badge]][ci link] [![codecov badge]][codecov link] | [![style badge]][style link] |
 
 [doc stable badge]: https://img.shields.io/badge/docs-stable-blue.svg
 [doc stable link]: http://neuraloperators.sciml.ai/stable/
@@ -11,6 +11,8 @@
 [ci link]: https://github.com/SciML/NeuralOperators.jl/actions/workflows/CI.yml
 [codecov badge]: https://codecov.io/gh/SciML/NeuralOperators.jl/branch/master/graph/badge.svg
 [codecov link]: https://codecov.io/gh/SciML/NeuralOperators.jl
+[style badge]: https://img.shields.io/static/v1?label=code%20style&message=SciML&color=9558b2&labelColor=389826
+[style link]: https://github.com/SciML/SciMLStyle
 
 | **Ground Truth** | **Inferenced** |
 |:----------------:|:--------------:|
