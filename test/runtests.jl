@@ -27,11 +27,9 @@ else
     @warn "CUDA unavailable, not testing GPU support"
 end
 
-@testset "NeuralOperators.jl" begin
-    for t in tests
-        include(t)
-    end
-end
+@testset "NeuralOperators.jl" begin for t in tests
+    include(t)
+end end
 
 #=
     　 ／l、    meow?

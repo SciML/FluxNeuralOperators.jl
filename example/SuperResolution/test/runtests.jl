@@ -1,5 +1,4 @@
 using SuperResolution
 using Test
 
-@testset "SuperResolution" begin
-end
+@testset "SuperResolution" begin end

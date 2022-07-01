@@ -1,8 +1,8 @@
 export
-    AbstractTransform,
-    transform,
-    truncate_modes,
-    inverse
+       AbstractTransform,
+       transform,
+       truncate_modes,
+       inverse
 
 """
     AbstractTransform

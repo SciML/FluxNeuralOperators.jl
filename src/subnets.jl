@@ -24,16 +24,16 @@ julia> model([2,1])
 ```
 """
 function construct_subnet(architecture::Tuple, σ = identity;
-                          init=Flux.glorot_uniform, bias=true)
+                          init = Flux.glorot_uniform, bias = true)
     # First, create an array that contains all Dense layers independently
     # Given n-element architecture constructs n-1 layers
-    layers = Array{Flux.Dense}(undef, length(architecture)-1)
-    @inbounds for i ∈ 2:length(architecture)
-      layers[i-1] = Flux.Dense(architecture[i-1], architecture[i], σ;
-                                init=init, bias=bias)
+    layers = Array{Flux.Dense}(undef, length(architecture) - 1)
+    @inbounds for i in 2:length(architecture)
+        layers[i - 1] = Flux.Dense(architecture[i - 1], architecture[i], σ;
+                                   init = init, bias = bias)
     end
 
     # Concatenate the layers to a string, chain them and parse them into
     # the Flux Chain constructor syntax
-    return Meta.parse("Chain("*join(layers,",")*")") |> eval
+    return Meta.parse("Chain(" * join(layers, ",") * ")") |> eval
 end

@@ -84,22 +84,21 @@ end
 
 # Declare the function that assigns Weights and biases to the layer
 function DeepONet(architecture_branch::Tuple, architecture_trunk::Tuple,
-                        act_branch = identity, act_trunk = identity;
-                        init_branch = Flux.glorot_uniform,
-                        init_trunk = Flux.glorot_uniform,
-                        bias_branch=true, bias_trunk=true)
-
-    @assert architecture_branch[end] == architecture_trunk[end] "Branch and Trunk net must share the same amount of nodes in the last layer. Otherwise Σᵢ bᵢⱼ tᵢₖ won't work."
+                  act_branch = identity, act_trunk = identity;
+                  init_branch = Flux.glorot_uniform,
+                  init_trunk = Flux.glorot_uniform,
+                  bias_branch = true, bias_trunk = true)
+    @assert architecture_branch[end]==architecture_trunk[end] "Branch and Trunk net must share the same amount of nodes in the last layer. Otherwise Σᵢ bᵢⱼ tᵢₖ won't work."
 
     # To construct the subnets we use the helper function in subnets.jl
     # Initialize the branch net
     branch_net = construct_subnet(architecture_branch, act_branch;
-                                    init=init_branch, bias=bias_branch)
+                                  init = init_branch, bias = bias_branch)
     # Initialize the trunk net
     trunk_net = construct_subnet(architecture_trunk, act_trunk;
-                                    init=init_trunk, bias=bias_trunk)
+                                 init = init_trunk, bias = bias_trunk)
 
-    return DeepONet{typeof(branch_net),typeof(trunk_net)}(branch_net, trunk_net)
+    return DeepONet{typeof(branch_net), typeof(trunk_net)}(branch_net, trunk_net)
 end
 
 Flux.@functor DeepONet
@@ -120,12 +119,13 @@ function (a::DeepONet)(x::AbstractArray, y::AbstractVecOrMat)
 end
 
 # Sensors stay the same and shouldn't be batched
-(a::DeepONet)(x::AbstractArray, y::AbstractArray) =
-  throw(ArgumentError("Sensor locations fed to trunk net can't be batched."))
+function (a::DeepONet)(x::AbstractArray, y::AbstractArray)
+    throw(ArgumentError("Sensor locations fed to trunk net can't be batched."))
+end
 
 # Print nicely
 function Base.show(io::IO, l::DeepONet)
-    print(io, "DeepONet with\nbranch net: (",l.branch_net)
+    print(io, "DeepONet with\nbranch net: (", l.branch_net)
     print(io, ")\n")
     print(io, "Trunk net: (", l.trunk_net)
     print(io, ")\n")
