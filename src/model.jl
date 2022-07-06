@@ -99,8 +99,7 @@ end
     MarkovNeuralOperator(;
                          ch = (1, 64, 64, 64, 64, 64, 1),
                          modes = (24, 24),
-                         σ = gelu
-    )
+                         σ = gelu)
 
 Markov neural operator learns a neural operator with Fourier operators.
 With only one time step information of learning, it can predict the following few steps
@@ -142,33 +141,34 @@ The role of each channel size described as follow:
 julia> using NNlib
 
 julia> MarkovNeuralOperator(;
-                            ch = (2, 64, 64, 64, 64, 64, 128, 1),
-                            modes = (16,),
+                            ch = (1, 64, 64, 64, 64, 64, 1),
+                            modes = (24, 24),
                             σ = gelu)
 Chain(
-  Dense(2 => 64),                       # 192 parameters
+  Dense(1 => 64),                       # 128 parameters
   OperatorKernel(
     Dense(64 => 64),                    # 4_160 parameters
-    OperatorConv(64 => 64, (16,), FourierTransform, permuted=false),  # 65_536 parameters
+    OperatorConv(64 => 64, (24, 24), FourierTransform, permuted=false),  # 2_359_296 parameters
     NNlib.gelu,
   ),
   OperatorKernel(
     Dense(64 => 64),                    # 4_160 parameters
-    OperatorConv(64 => 64, (16,), FourierTransform, permuted=false),  # 65_536 parameters
+    OperatorConv(64 => 64, (24, 24), FourierTransform, permuted=false),  # 2_359_296 parameters
     NNlib.gelu,
   ),
   OperatorKernel(
     Dense(64 => 64),                    # 4_160 parameters
-    OperatorConv(64 => 64, (16,), FourierTransform, permuted=false),  # 65_536 parameters
+    OperatorConv(64 => 64, (24, 24), FourierTransform, permuted=false),  # 2_359_296 parameters
     NNlib.gelu,
   ),
   OperatorKernel(
     Dense(64 => 64),                    # 4_160 parameters
-    OperatorConv(64 => 64, (16,), FourierTransform, permuted=false),  # 65_536 parameters
+    OperatorConv(64 => 64, (24, 24), FourierTransform, permuted=false),  # 2_359_296 parameters
     NNlib.gelu,
   ),
-  Dense(64 => 128),                     # 8_320 parameters
-)                   # Total: 16 arrays, 287_296 parameters, 2.097 MiB.
+  Dense(64 => 1),                       # 65 parameters
+)                   # Total: 16 arrays, 9_454_017 parameters, 72.066 MiB.
+
 ```
 """
 function MarkovNeuralOperator(;
