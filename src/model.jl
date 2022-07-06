@@ -106,7 +106,7 @@ With only one time step information of learning, it can predict the following fe
 with low loss by linking the operators into a Markov chain.
 
 The model is comprised of
-a `Dense` layer to lift (d + 1)-dimensional vector field to n-dimensional vector field,
+a `Dense` layer to lift d-dimensional vector field to n-dimensional vector field,
 and an integral kernel operator which consists of four Fourier kernels,
 and a `Dense` layers to project data back to the scalar field of interest space.
 
