@@ -19,15 +19,14 @@ function OperatorConv{P}(weight::T,
 end
 
 """
-    OperatorConv(
-        ch, modes, transform;
-        init=c_glorot_uniform, permuted=false, T=ComplexF32
-    )
+    OperatorConv(ch, modes, transform;
+                 init=c_glorot_uniform, permuted=false, T=ComplexF32)
 
 ## Arguments
 
-* `ch`: Input and output channel size, e.g. `64=>64`.
-* `modes`: The modes to be preserved.
+* `ch`: A `Pair` of input and output channel size `ch_in=>ch_out`, e.g. `64=>64`.
+* `modes`: The modes to be preserved. A tuple of length `d`,
+    where `d` is the dimension of data.
 * `Transform`: The trafo to operate the transformation.
 * `permuted`: Whether the dim is permuted. If `permuted=true`, layer accepts
     data in the order of `(ch, ..., batch)`, otherwise the order is `(..., ch, batch)`.
@@ -74,7 +73,11 @@ ispermuted(::OperatorConv{P}) where {P} = P
 
 function Base.show(io::IO, l::OperatorConv{P}) where {P}
     print(io,
-          "OperatorConv($(l.in_channel) => $(l.out_channel), $(l.transform.modes), $(nameof(typeof(l.transform))), permuted=$P)")
+          "OperatorConv(" *
+          "$(l.in_channel) => $(l.out_channel), " *
+          "$(l.transform.modes), " *
+          "$(nameof(typeof(l.transform))), " *
+          "permuted=$P)")
 end
 
 function operator_conv(m::OperatorConv, 𝐱::AbstractArray)
@@ -116,8 +119,10 @@ end
 
 ## Arguments
 
-* `ch`: Input and output channel size for spectral convolution, e.g. `64=>64`.
-* `modes`: The Fourier modes to be preserved for spectral convolution.
+* `ch`: A `Pair` of input and output channel size for spectral convolution `in_ch=>out_ch`,
+    e.g. `64=>64`.
+* `modes`: The modes to be preserved for spectral convolution. A tuple of length `d`,
+    where `d` is the dimension of data.
 * `σ`: Activation function.
 * `permuted`: Whether the dim is permuted. If `permuted=true`, layer accepts
     data in the order of `(ch, ..., batch)`, otherwise the order is `(..., ch, batch)`.
