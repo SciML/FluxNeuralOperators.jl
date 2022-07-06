@@ -37,7 +37,7 @@ The role of each channel size described as follow:
 [8] projected channel number
 ```
 
-## Arguments
+## Keyword Arguments
 
 * `ch`: A `Tuple` or `Vector` of the 8 channel size.
 * `modes`: The modes to be preserved. A tuple of length `d`,
