@@ -28,8 +28,13 @@ end
 * `modes`: The modes to be preserved. A tuple of length `d`,
     where `d` is the dimension of data.
 * `Transform`: The trafo to operate the transformation.
+
+## Keyword Arguments
+
+* `init`: Initial function to initialize parameters.
 * `permuted`: Whether the dim is permuted. If `permuted=true`, layer accepts
     data in the order of `(ch, ..., batch)`, otherwise the order is `(..., ch, batch)`.
+* `T`: Data type of parameters.
 
 ## Example
 
@@ -124,6 +129,9 @@ end
 * `modes`: The modes to be preserved for spectral convolution. A tuple of length `d`,
     where `d` is the dimension of data.
 * `σ`: Activation function.
+
+## Keyword Arguments
+
 * `permuted`: Whether the dim is permuted. If `permuted=true`, layer accepts
     data in the order of `(ch, ..., batch)`, otherwise the order is `(..., ch, batch)`.
 
@@ -181,6 +189,10 @@ Graph kernel layer.
 * `κ`: A neural network layer for approximation, e.g. a `Dense` layer or a MLP.
 * `ch`: Channel size for linear transform, e.g. `32`.
 * `σ`: Activation function.
+
+## Keyword Arguments
+
+* `init`: Initial function to initialize parameters.
 """
 struct GraphKernel{A, B, F} <: MessagePassing
     linear::A
