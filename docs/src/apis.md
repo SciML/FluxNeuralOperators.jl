@@ -1,5 +1,11 @@
 # APIs
 
+## Transforms
+
+```@docs
+AbstractTransform
+```
+
 ## Layers
 
 ### Operator convolutional layer
@@ -75,3 +81,20 @@ MarkovNeuralOperator
 ```
 
 Reference: [MNO2021](@cite)
+
+---
+
+### DeepONet
+
+```@docs
+DeepONet
+NeuralOperators.construct_subnet
+```
+
+### NOMAD
+
+Nonlinear manifold decoders for operator learning
+
+```@docs
+NOMAD
+```
