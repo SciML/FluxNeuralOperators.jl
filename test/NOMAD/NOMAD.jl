@@ -28,6 +28,5 @@
           "NOMAD with\nApproximator net: (Chain(Dense(16 => 22, σ), Dense(22 => 16, σ)))\nDecoder net: (Chain(Dense(32 => 16, tanh; bias=false)))\n"
 
     mgrad = Flux.Zygote.gradient(() -> sum(model(a, sensors)), Flux.params(model))
-    # @info mgrad.grads
     @test length(mgrad.grads) == 5
 end

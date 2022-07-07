@@ -1,4 +1,5 @@
 using DoublePendulum
+using FluxTraining
 using Test
 
 @testset "DoublePendulum" begin
