@@ -33,3 +33,9 @@
     @test_throws AssertionError DeepONet((32, 64, 70), (24, 48, 72), σ, tanh)
     @test_throws DimensionMismatch m(a, sensors)
 end
+
+if CUDA.functional()
+    include("cuda.jl")
+else
+    @warn "CUDA unavailable, not testing GPU support"
+end
