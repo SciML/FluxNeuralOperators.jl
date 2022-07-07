@@ -26,7 +26,7 @@ function train_don(; n = 300, cuda = true, learning_rate = 0.001, epochs = 400)
 
     grid = collect(range(0, 1, length = 1024)') |> device
 
-    opt = ADAM(learning_rate)
+    opt = Adam(learning_rate)
 
     m = DeepONet((1024, 1024, 1024), (1, 1024, 1024), gelu, gelu) |> device
 

@@ -62,7 +62,7 @@ function train(; cuda = true, η₀ = 1.0f-3, λ = 1.0f-4, epochs = 50)
     model = MarkovNeuralOperator(ch = (1, 64, 64, 64, 64, 64, 1), modes = (24, 24),
                                  σ = gelu)
     data = get_dataloader()
-    optimiser = Flux.Optimiser(WeightDecay(λ), Flux.ADAM(η₀))
+    optimiser = Flux.Optimiser(WeightDecay(λ), Flux.Adam(η₀))
     loss_func = l₂loss
 
     learner = Learner(model, data, optimiser, loss_func,
@@ -92,7 +92,7 @@ function train_gno(; cuda = true, η₀ = 1.0f-3, λ = 1.0f-4, epochs = 50)
                   WithGraph(featured_graph, GraphKernel(Dense(2 * 16, 16, gelu), 16)),
                   Dense(16, 1))
     data = get_dataloader(batchsize = 16, flatten = true)
-    optimiser = Flux.Optimiser(WeightDecay(λ), Flux.ADAM(η₀))
+    optimiser = Flux.Optimiser(WeightDecay(λ), Flux.Adam(η₀))
     loss_func = l₂loss
 
     learner = Learner(model, data, optimiser, loss_func,

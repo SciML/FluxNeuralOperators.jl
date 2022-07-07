@@ -76,7 +76,7 @@ And then train as a Flux model.
 
 ```julia
 loss(𝐱, 𝐲) = l₂loss(model(𝐱), 𝐲)
-opt = Flux.Optimiser(WeightDecay(1f-4), Flux.ADAM(1f-3))
+opt = Flux.Optimiser(WeightDecay(1f-4), Flux.Adam(1f-3))
 Flux.@epochs 50 Flux.train!(loss, params(model), data, opt)
 ```
 
@@ -102,7 +102,7 @@ loss(xtrain, ytrain, sensor) = Flux.Losses.mse(model(xtrain, sensor), ytrain)
 evalcb() = @show(loss(xval, yval, grid))
 
 learning_rate = 0.001
-opt = ADAM(learning_rate)
+opt = Adam(learning_rate)
 parameters = params(model)
 Flux.@epochs 400 Flux.train!(loss, parameters, [(xtrain, ytrain, grid)], opt, cb=evalcb)
 ```

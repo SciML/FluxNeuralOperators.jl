@@ -6,7 +6,7 @@
 
     loss(𝐱, 𝐲) = sum(abs2, 𝐲 .- m(𝐱)) / size(𝐱)[end]
     data = [(𝐱, 𝐲)]
-    Flux.train!(loss, Flux.params(m), data, Flux.ADAM())
+    Flux.train!(loss, Flux.params(m), data, Flux.Adam())
 end
 
 @testset "MarkovNeuralOperator" begin
@@ -17,5 +17,5 @@ end
 
     loss(𝐱, 𝐲) = sum(abs2, 𝐲 .- m(𝐱)) / size(𝐱)[end]
     data = [(𝐱, 𝐲)]
-    Flux.train!(loss, Flux.params(m), data, Flux.ADAM())
+    Flux.train!(loss, Flux.params(m), data, Flux.Adam())
 end
