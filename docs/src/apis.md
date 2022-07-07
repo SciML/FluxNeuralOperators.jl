@@ -1,5 +1,11 @@
 # APIs
 
+## Transforms
+
+```@docs
+AbstractTransform
+```
+
 ## Layers
 
 ### Operator convolutional layer
@@ -11,8 +17,9 @@ v'(x) = \mathcal{F}^{-1} \{ F'(s) \}
 ```
 
 where ``v(x)`` and ``v'(x)`` denotes input and output function,
-``\mathcal{F} \{ \cdot \}``, ``\mathcal{F}^{-1} \{ \cdot \}`` are Fourier transform, inverse Fourier transform, respectively.
-Function ``g`` is a linear transform for lowering Fouier modes.
+``\mathcal{F} \{ \cdot \}``, ``\mathcal{F}^{-1} \{ \cdot \}`` are transform,
+inverse transform, respectively.
+Function ``g`` is a linear transform for lowering spectrum modes.
 
 ```@docs
 OperatorConv
@@ -28,7 +35,8 @@ Reference: [FNO2021](@cite)
 v_{t+1}(x) = \sigma(W v_t(x) + \mathcal{K} \{ v_t(x) \} )
 ```
 
-where ``v_t(x)`` is the input function for ``t``-th layer and ``\mathcal{K} \{ \cdot \}`` denotes spectral convolutional layer.
+where ``v_t(x)`` is the input function for ``t``-th layer and
+``\mathcal{K} \{ \cdot \}`` denotes spectral convolutional layer.
 Activation function ``\sigma`` can be arbitrary non-linear function.
 
 ```@docs
@@ -45,7 +53,9 @@ Reference: [FNO2021](@cite)
 v_{t+1}(x_i) = \sigma(W v_t(x_i) + \frac{1}{|\mathcal{N}(x_i)|} \sum_{x_j \in \mathcal{N}(x_i)} \kappa \{ v_t(x_i), v_t(x_j) \} )
 ```
 
-where ``v_t(x_i)`` is the input function for ``t``-th layer, ``x_i`` is the node feature for ``i``-th node and ``\mathcal{N}(x_i)`` represents the neighbors for ``x_i``.
+where ``v_t(x_i)`` is the input function for ``t``-th layer,
+``x_i`` is the node feature for ``i``-th node and
+``\mathcal{N}(x_i)`` represents the neighbors for ``x_i``.
 Activation function ``\sigma`` can be arbitrary non-linear function.
 
 ```@docs
@@ -75,3 +85,22 @@ MarkovNeuralOperator
 ```
 
 Reference: [MNO2021](@cite)
+
+---
+
+### DeepONet
+
+```@docs
+DeepONet
+NeuralOperators.construct_subnet
+```
+
+---
+
+### NOMAD
+
+Nonlinear manifold decoders for operator learning
+
+```@docs
+NOMAD
+```

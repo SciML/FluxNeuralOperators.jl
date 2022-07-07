@@ -14,7 +14,7 @@ function low_pass(ft::FourierTransform, 𝐱_fft::AbstractArray)
     return view(𝐱_fft, map(d -> 1:d, ft.modes)..., :, :) # [ft.modes..., in_chs, batch]
 end
 
-const truncate_modes = low_pass
+truncate_modes(args...) = low_pass(args...)
 
 function inverse(ft::FourierTransform, 𝐱_fft::AbstractArray)
     return real(ifft(𝐱_fft, 1:ndims(ft))) # [size(x_fft)..., out_chs, batch]

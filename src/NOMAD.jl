@@ -4,12 +4,12 @@ struct NOMAD{T1, T2}
 end
 
 """
-`NOMAD(architecture_approximator::Tuple, architecture_decoder::Tuple,
-        act_approximator = identity, act_decoder=true;
-        init_approximator = Flux.glorot_uniform,
-        init_decoder = Flux.glorot_uniform,
-        bias_approximator=true, bias_decoder=true)`
-`NOMAD(approximator_net::Flux.Chain, decoder_net::Flux.Chain)`
+    NOMAD(architecture_approximator::Tuple, architecture_decoder::Tuple,
+          act_approximator = identity, act_decoder=true;
+          init_approximator = Flux.glorot_uniform,
+          init_decoder = Flux.glorot_uniform,
+          bias_approximator=true, bias_decoder=true)
+    NOMAD(approximator_net::Flux.Chain, decoder_net::Flux.Chain)
 
 Create a Nonlinear Manifold Decoders for Operator Learning (NOMAD) as proposed by Lu et al.
 arXiv:2206.03551
@@ -47,6 +47,7 @@ julia> model = NOMAD(approximator, decoder)
 NOMAD with
 Approximator net: (Chain(Dense(2 => 128), Dense(128 => 64)))
 Decoder net: (Chain(Dense(72 => 24), Dense(24 => 12)))
+```
 """
 function NOMAD(architecture_approximator::Tuple, architecture_decoder::Tuple,
                act_approximator = identity, act_decoder = true;
