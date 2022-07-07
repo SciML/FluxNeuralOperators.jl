@@ -4,12 +4,12 @@ CurrentModule = NeuralOperators
 
 # NeuralOperators
 
-| ![](https://github.com/foldfelis/NeuralOperators.jl/blob/master/example/FlowOverCircle/gallery/ans.gif?raw=true) | ![](https://github.com/foldfelis/NeuralOperators.jl/blob/master/example/FlowOverCircle/gallery/inferenced.gif?raw=true) |
+| ![](https://github.com/foldfelis/NeuralOperators.jl/blob/main/example/FlowOverCircle/gallery/ans.gif?raw=true) | ![](https://github.com/foldfelis/NeuralOperators.jl/blob/main/example/FlowOverCircle/gallery/inferenced.gif?raw=true) |
 |:----------------:|:--------------:|
 | **Ground Truth** | **Inferenced** |
 
 The demonstration shown above is Navier-Stokes equation learned by the `MarkovNeuralOperator` with only one time step information.
-Example can be found in [`example/FlowOverCircle`](https://github.com/SciML/NeuralOperators.jl/tree/master/example/FlowOverCircle).
+Example can be found in [`example/FlowOverCircle`](https://github.com/SciML/NeuralOperators.jl/tree/main/example/FlowOverCircle).
 
 ## Quick start
 
@@ -84,4 +84,4 @@ opt = Adam(learning_rate)
 parameters = params(model)
 Flux.@epochs 400 Flux.train!(loss, parameters, [(xtrain, ytrain, grid)], opt, cb=evalcb)
 ```
-A more complete example using DeepONet architecture to solve Burgers' equation can be found in the [examples](https://github.com/SciML/NeuralOperators.jl/blob/master/example/Burgers/src/Burgers_deeponet.jl).
+A more complete example using DeepONet architecture to solve Burgers' equation can be found in the [examples](https://github.com/SciML/NeuralOperators.jl/blob/main/example/Burgers/src/Burgers_deeponet.jl).
