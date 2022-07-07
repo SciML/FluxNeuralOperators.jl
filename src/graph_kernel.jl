@@ -28,17 +28,22 @@ end
 
 Flux.@functor GraphKernel
 
-function GeometricFlux.message(l::GraphKernel, x_i::AbstractArray, x_j::AbstractArray, e_ij)
-    return l.κ(vcat(x_i, x_j))
+function GeometricFlux.message(l::GraphKernel, x_i, x_j::AbstractArray, e_ij::AbstractArray)
+    N = size(x_j, 1)
+    K = l.κ(e_ij)
+    dims = size(K)[2:end]
+    m_ij = GeometricFlux._matmul(reshape(K, N, N, :), reshape(x_j, N, 1, :))
+    return reshape(m_ij, N, dims...)
 end
 
 function GeometricFlux.update(l::GraphKernel, m::AbstractArray, x::AbstractArray)
     return l.σ.(GeometricFlux._matmul(l.linear, x) + m)
 end
 
-function (l::GraphKernel)(el::NamedTuple, X::AbstractArray)
+function (l::GraphKernel)(el::NamedTuple, X::AbstractArray, E::AbstractArray)
     GraphSignals.check_num_nodes(el.N, X)
-    _, V, _ = GeometricFlux.propagate(l, el, nothing, X, nothing, mean, nothing, nothing)
+    GraphSignals.check_num_nodes(el.E, E)
+    _, V, _ = GeometricFlux.propagate(l, el, E, X, nothing, mean, nothing, nothing)
     return V
 end
 
