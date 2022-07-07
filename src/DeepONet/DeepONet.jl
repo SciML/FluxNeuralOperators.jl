@@ -1,3 +1,7 @@
+export DeepONet
+
+include("subnets.jl")
+
 """
 `DeepONet(architecture_branch::Tuple, architecture_trunk::Tuple,
                         act_branch = identity, act_trunk = identity;

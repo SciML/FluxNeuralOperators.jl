@@ -1,3 +1,5 @@
+export NOMAD
+
 struct NOMAD{T1, T2}
     approximator_net::T1
     decoder_net::T2
