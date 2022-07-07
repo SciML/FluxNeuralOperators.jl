@@ -13,7 +13,7 @@
 
     loss(x, y) = Flux.mse(m(x), y)
     data = [(𝐱, rand(Float32, 128, 1024, 5))]
-    Flux.train!(loss, Flux.params(m), data, Flux.ADAM())
+    Flux.train!(loss, Flux.params(m), data, Flux.Adam())
 end
 
 @testset "permuted 1D OperatorConv" begin
@@ -32,7 +32,7 @@ end
 
     loss(x, y) = Flux.mse(m(x), y)
     data = [(𝐱, rand(Float32, 1024, 128, 5))]
-    Flux.train!(loss, Flux.params(m), data, Flux.ADAM())
+    Flux.train!(loss, Flux.params(m), data, Flux.Adam())
 end
 
 @testset "1D OperatorKernel" begin
@@ -49,7 +49,7 @@ end
 
     loss(x, y) = Flux.mse(m(x), y)
     data = [(𝐱, rand(Float32, 128, 1024, 5))]
-    Flux.train!(loss, Flux.params(m), data, Flux.ADAM())
+    Flux.train!(loss, Flux.params(m), data, Flux.Adam())
 end
 
 @testset "permuted 1D OperatorKernel" begin
@@ -67,7 +67,7 @@ end
 
     loss(x, y) = Flux.mse(m(x), y)
     data = [(𝐱, rand(Float32, 1024, 128, 5))]
-    Flux.train!(loss, Flux.params(m), data, Flux.ADAM())
+    Flux.train!(loss, Flux.params(m), data, Flux.Adam())
 end
 
 @testset "2D OperatorConv" begin
@@ -83,7 +83,7 @@ end
 
     loss(x, y) = Flux.mse(m(x), y)
     data = [(𝐱, rand(Float32, 64, 22, 22, 5))]
-    Flux.train!(loss, Flux.params(m), data, Flux.ADAM())
+    Flux.train!(loss, Flux.params(m), data, Flux.Adam())
 end
 
 @testset "permuted 2D OperatorConv" begin
@@ -100,7 +100,7 @@ end
 
     loss(x, y) = Flux.mse(m(x), y)
     data = [(𝐱, rand(Float32, 22, 22, 64, 5))]
-    Flux.train!(loss, Flux.params(m), data, Flux.ADAM())
+    Flux.train!(loss, Flux.params(m), data, Flux.Adam())
 end
 
 @testset "2D OperatorKernel" begin
@@ -115,7 +115,7 @@ end
 
     loss(x, y) = Flux.mse(m(x), y)
     data = [(𝐱, rand(Float32, 64, 22, 22, 5))]
-    Flux.train!(loss, Flux.params(m), data, Flux.ADAM())
+    Flux.train!(loss, Flux.params(m), data, Flux.Adam())
 end
 
 @testset "permuted 2D OperatorKernel" begin
@@ -131,7 +131,7 @@ end
 
     loss(x, y) = Flux.mse(m(x), y)
     data = [(𝐱, rand(Float32, 22, 22, 64, 5))]
-    Flux.train!(loss, Flux.params(m), data, Flux.ADAM())
+    Flux.train!(loss, Flux.params(m), data, Flux.Adam())
 end
 
 @testset "SpectralConv" begin
@@ -141,21 +141,4 @@ end
 
     @test SpectralConv(ch, modes) isa OperatorConv
     @test SpectralConv(ch, modes).transform isa FourierTransform
-end
-
-@testset "GraphKernel" begin
-    batch_size = 5
-    channel = 32
-    N = 10 * 10
-
-    κ = Dense(2 * channel, channel, relu)
-
-    graph = grid([10, 10])
-    𝐱 = rand(Float32, channel, N, batch_size)
-    l = WithGraph(FeaturedGraph(graph), GraphKernel(κ, channel))
-    @test repr(l.layer) == "GraphKernel(Dense(64 => 32, relu), channel=32)"
-    @test size(l(𝐱)) == (channel, N, batch_size)
-
-    g = Zygote.gradient(() -> sum(l(𝐱)), Flux.params(l))
-    @test length(g.grads) == 3
 end

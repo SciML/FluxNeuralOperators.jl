@@ -1,4 +1,4 @@
-@testset "CUDA" begin @testset "DeepONet" begin
+@testset "DeepONet CUDA" begin
     batch_size = 2
     a = [0.83541104, 0.83479851, 0.83404712, 0.83315711, 0.83212979, 0.83096755,
         0.82967374, 0.82825263, 0.82670928, 0.82504949, 0.82327962, 0.82140651,
@@ -13,4 +13,4 @@
 
     mgrad = Flux.Zygote.gradient(() -> sum(model(a, sensors)), Flux.params(model))
     @test length(mgrad.grads) == 9
-end end
+end

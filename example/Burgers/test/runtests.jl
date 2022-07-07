@@ -1,4 +1,5 @@
 using Burgers
+using FluxTraining
 using Test
 
 @testset "Burgers" begin

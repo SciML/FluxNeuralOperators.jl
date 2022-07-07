@@ -56,7 +56,7 @@ function train(; cuda = true, η₀ = 1.0f-3, λ = 1.0f-4, epochs = 500)
     model = FourierNeuralOperator(ch = (2, 64, 64, 64, 64, 64, 128, 1), modes = (16,),
                                   σ = gelu)
     data = get_dataloader()
-    optimiser = Flux.Optimiser(WeightDecay(λ), Flux.ADAM(η₀))
+    optimiser = Flux.Optimiser(WeightDecay(λ), Flux.Adam(η₀))
     loss_func = l₂loss
 
     learner = Learner(model, data, optimiser, loss_func,
@@ -88,7 +88,7 @@ function train_nomad(; n = 300, cuda = true, learning_rate = 0.001, epochs = 400
     grid = rand(collect(0:0.001:1), (280, 1024)) |> device
     gridval = rand(collect(0:0.001:1), (20, 1024)) |> device
 
-    opt = ADAM(learning_rate)
+    opt = Adam(learning_rate)
 
     m = NOMAD((1024, 1024), (2048, 1024), gelu, gelu) |> device
 

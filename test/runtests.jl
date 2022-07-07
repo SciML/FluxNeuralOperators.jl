@@ -8,28 +8,18 @@ using Test
 
 CUDA.allowscalar(false)
 
-cuda_tests = [
-    "cuda.jl",
-]
+@testset "NeuralOperators.jl" begin
+    # kernels
+    include("Transform/Transform.jl")
+    include("operator_kernel.jl")
+    include("graph_kernel.jl")
+    include("loss.jl")
 
-tests = [
-    "Transform/Transform.jl",
-    "operator_kernel.jl",
-    "loss.jl",
-    "model.jl",
-    "deeponet.jl",
-    "nomad.jl",
-]
-
-if CUDA.functional()
-    append!(tests, cuda_tests)
-else
-    @warn "CUDA unavailable, not testing GPU support"
+    # models
+    include("FNO/FNO.jl")
+    include("DeepONet/DeepONet.jl")
+    include("NOMAD/NOMAD.jl")
 end
-
-@testset "NeuralOperators.jl" begin for t in tests
-    include(t)
-end end
 
 #=
     　 ／l、    meow?

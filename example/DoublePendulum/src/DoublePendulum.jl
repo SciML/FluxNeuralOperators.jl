@@ -93,7 +93,7 @@ function train(; cuda = true, Δt = 1, η₀ = 1.0f-3, λ = 1.0f-4, epochs = 20)
     model = FourierNeuralOperator(ch = (2, 64, 64, 64, 64, 64, 128, 2), modes = (4, 16),
                                   σ = gelu)
     data = get_dataloader(Δt = Δt)
-    optimiser = Flux.Optimiser(WeightDecay(λ), Flux.ADAM(η₀))
+    optimiser = Flux.Optimiser(WeightDecay(λ), Flux.Adam(η₀))
     loss_func = l₂loss
 
     learner = Learner(model, data, optimiser, loss_func,
