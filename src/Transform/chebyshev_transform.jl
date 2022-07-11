@@ -1,6 +1,6 @@
 export ChebyshevTransform
 
-struct ChebyshevTransform{N, S}<:AbstractTransform
+struct ChebyshevTransform{N, S} <: AbstractTransform
     modes::NTuple{N, S} # N == ndims(x)
 end
 
@@ -11,7 +11,7 @@ function transform(t::ChebyshevTransform{N}, 𝐱::AbstractArray) where {N}
 end
 
 function truncate_modes(t::ChebyshevTransform, 𝐱̂::AbstractArray)
-    return view(𝐱̂, map(d->1:d, t.modes)..., :, :) # [t.modes..., in_chs, batch]
+    return view(𝐱̂, map(d -> 1:d, t.modes)..., :, :) # [t.modes..., in_chs, batch]
 end
 
 function inverse(t::ChebyshevTransform{N}, 𝐱̂::AbstractArray) where {N}
@@ -21,31 +21,30 @@ end
 
 function ChainRulesCore.rrule(::typeof(FFTW.r2r), x::AbstractArray, kind, dims)
     y = FFTW.r2r(x, kind, dims)
-    (M,) = size(x)[dims]
-    r2r_pullback(Δ) = (NoTangent(), ∇r2r(unthunk(Δ), kind, dims, M), NoTangent(), NoTangent())
+    r2r_pullback(Δ) = (NoTangent(), ∇r2r(unthunk(Δ), kind, dims), NoTangent(), NoTangent())
     return y, r2r_pullback
 end
 
-function ∇r2r(Δ::AbstractArray, kind, dims, M)
-    # derivative of r2r turns out to be r2r + a rank 4 correction
+function ∇r2r(Δ::AbstractArray{T}, kind, dims) where {T}
+    # derivative of r2r turns out to be r2r
     Δx = FFTW.r2r(Δ, kind, dims)
-    
-    # a1 = fill!(similar(A, M), one(T))
+
+    # rank 4 correction: needs @bischtob to elaborate the reason using this. 
+    # (M,) = size(Δ)[dims]
+    # a1 = fill!(similar(Δ, M), one(T))
     # CUDA.@allowscalar a1[1] = a1[end] = zero(T)
 
-    # a2 = fill!(similar(A, M), one(T))
+    # a2 = fill!(similar(Δ, M), one(T))
     # a2[1:2:end] .= -one(T)
     # CUDA.@allowscalar a2[1] = a2[end] = zero(T)
 
-    # e1 = fill!(similar(A, M), zero(T))
+    # e1 = fill!(similar(Δ, M), zero(T))
     # CUDA.@allowscalar e1[1] = one(T)
 
-    # eN = fill!(similar(A, M), zero(T))
+    # eN = fill!(similar(Δ, M), zero(T))
     # CUDA.@allowscalar eN[end] = one(T)
 
-    # @tullio Δx[s, i, b] +=
-    #     a1[i] * e1[k] * Δ[s, k, b] - a2[i] * eN[k] * Δ[s, k, b]
-    # @tullio Δx[s, i, b] +=
-    #     eN[i] * a2[k] * Δ[s, k, b] - e1[i] * a1[k] * Δ[s, k, b]
+    # Δx .+= @. a1' * sum(e1' .* Δ, dims=2) - a2' * sum(eN' .* Δ, dims=2)
+    # Δx .+= @. eN' * sum(a2' .* Δ, dims=2) - e1' * sum(a1' .* Δ, dims=2)
     return Δx
 end
