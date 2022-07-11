@@ -17,8 +17,8 @@ end
         mwt = MWT_CZ1d()
 
         # base functions
-        wavelet_transform(mwt, )
-        even_odd(mwt, )
+        wavelet_transform(mwt)
+        even_odd(mwt)
 
         # forward
         Y = mwt(X)
@@ -26,5 +26,4 @@ end
         # backward
         g = gradient()
     end
-
 end
