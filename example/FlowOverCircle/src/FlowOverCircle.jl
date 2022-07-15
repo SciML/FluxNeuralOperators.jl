@@ -3,6 +3,7 @@ module FlowOverCircle
 using WaterLily, LinearAlgebra, ProgressMeter, MLUtils
 using NeuralOperators, Flux, GeometricFlux, Graphs
 using CUDA, FluxTraining, BSON
+using GeometricFlux.GraphSignals: generate_coordinates
 
 function circle(n, m; Re = 250) # copy from [WaterLily](https://github.com/weymouth/WaterLily.jl)
     # Set physical parameters
@@ -36,16 +37,16 @@ function get_dataloader(; ts::AbstractRange = LinRange(100, 11000, 10000),
     data = gen_data(ts)
     𝐱, 𝐲 = data[:, :, :, 1:(end - 1)], data[:, :, :, 2:end]
     n = length(ts) - 1
-    coord = generate_coordinates(𝐱[1, :, :, 1])
-    coord = repeat(coord, outer = (1, 1, 1, n))
+    grid = generate_coordinates(𝐱[1, :, :, 1])
+    grid = repeat(grid, outer = (1, 1, 1, n))
+    x_with_grid = vcat(𝐱, grid)
 
     if flatten
         𝐱, 𝐲 = reshape(𝐱, 1, :, n), reshape(𝐲, 1, :, n)
-        coord = reshape(coord, size(coord, 1), :, n)
+        x_with_grid = reshape(x_with_grid, size(x_with_grid, 1), :, n)
     end
 
-    coord = vcat(𝐱, coord)
-    data_train, data_test = splitobs(shuffleobs((𝐱, 𝐲, coord)), at = ratio)
+    data_train, data_test = splitobs(shuffleobs((𝐱, 𝐲, x_with_grid)), at = ratio)
 
     loader_train = DataLoader(data_train, batchsize = batchsize, shuffle = true)
     loader_test = DataLoader(data_test, batchsize = batchsize, shuffle = false)
@@ -53,16 +54,21 @@ function get_dataloader(; ts::AbstractRange = LinRange(100, 11000, 10000),
     return loader_train, loader_test
 end
 
-function generate_coordinates(A::AbstractArray)
-    dims = size(A)
-    N = length(dims)
-    colons = ntuple(i -> Colon(), N)
-    coord = similar(A, N, dims...)
-    for i in 1:N
-        ones = ntuple(x -> 1, i - 1)
-        coord[i, colons...] .= reshape(1:dims[i], ones..., :)
+function FluxTraining.step!(learner, phase::FluxTraining.TrainingPhase, batch)
+    xs, ys, position = batch
+    FluxTraining.runstep(learner, phase, (; xs=xs, ys=ys, pos=position)) do handle, state
+
+        state.grads = FluxTraining._gradient(learner.optimizer, learner.model, learner.params) do model
+            state.ŷs = model(state.pos, state.xs, nothing)
+            handle(LossBegin())
+            state.loss = learner.lossfn(state.ŷs, state.ys)
+            handle(BackwardBegin())
+            return state.loss
+        end
+        handle(BackwardEnd())
+        learner.params, learner.model = FluxTraining._update!(
+            learner.optimizer, learner.params, learner.model, state.grads)
     end
-    return coord
 end
 
 function train(; cuda = true, η₀ = 1.0f-3, λ = 1.0f-4, epochs = 50)
@@ -113,10 +119,10 @@ function train_gno(; cuda = true, η₀ = 1.0f-3, λ = 1.0f-4, epochs = 50)
                   WithGraph(featured_graph,
                             GraphKernel(Dense(edge_dim, abs2(16), gelu), 16)),
                   Dense(16, 1))
-    data = get_dataloader(batchsize = 16, flatten = true)
+
     optimiser = Flux.Optimiser(WeightDecay(λ), Flux.Adam(η₀))
     loss_func = l₂loss
-
+    data = get_dataloader(batchsize = 8, flatten = true)
     learner = Learner(model, data, optimiser, loss_func,
                       ToDevice(device, device),
                       Checkpointer(joinpath(@__DIR__, "../model/")))

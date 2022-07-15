@@ -42,9 +42,18 @@ end
 
 function (l::GraphKernel)(el::NamedTuple, X::AbstractArray, E::AbstractArray)
     GraphSignals.check_num_nodes(el.N, X)
-    GraphSignals.check_num_nodes(el.E, E)
+    # GraphSignals.check_num_edges(el.E, E)
     _, V, _ = GeometricFlux.propagate(l, el, E, X, nothing, mean, nothing, nothing)
     return V
+end
+
+(wg::WithGraph{<:GraphKernel})(X::AbstractArray) = wg(wg.position, X, nothing)
+
+function (wg::WithGraph{<:GraphKernel})(P::AbstractArray, X::AbstractArray, ::Nothing)
+    el = wg.graph
+    # node features + positional features as edge features
+    E = vcat(GeometricFlux._gather(P, el.xs), GeometricFlux._gather(P, el.nbrs))
+    return wg.layer(el, X, E)
 end
 
 function Base.show(io::IO, l::GraphKernel)
