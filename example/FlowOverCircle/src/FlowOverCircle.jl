@@ -42,11 +42,11 @@ function get_dataloader(; ts::AbstractRange = LinRange(100, 11000, 10000),
     x_with_grid = vcat(𝐱, grid)
 
     if flatten
-        𝐱, 𝐲 = reshape(𝐱, 1, :, n), reshape(𝐲, 1, :, n)
         x_with_grid = reshape(x_with_grid, size(x_with_grid, 1), :, n)
+        𝐲 = reshape(𝐲, 1, :, n)
     end
 
-    data_train, data_test = splitobs(shuffleobs((𝐱, 𝐲, x_with_grid)), at = ratio)
+    data_train, data_test = splitobs(shuffleobs((x_with_grid, 𝐲)), at = ratio)
 
     loader_train = DataLoader(data_train, batchsize = batchsize, shuffle = true)
     loader_test = DataLoader(data_test, batchsize = batchsize, shuffle = false)
@@ -55,17 +55,18 @@ function get_dataloader(; ts::AbstractRange = LinRange(100, 11000, 10000),
 end
 
 function FluxTraining.step!(learner, phase::FluxTraining.TrainingPhase, batch)
-    xs, ys, position = batch
-    FluxTraining.runstep(learner, phase, (; xs=xs, ys=ys, pos=position)) do handle, state
-
+    xs, ys = batch
+    FluxTraining.runstep(learner, phase, (; xs = xs, ys = ys)) do handle, state
         state.grads = FluxTraining._gradient(learner.optimizer, learner.model, learner.params) do model
-            state.ŷs = model(state.pos, state.xs, nothing)
-            handle(LossBegin())
+            state.ŷs = model(state.xs)
+            handle(FluxTraining.LossBegin())
             state.loss = learner.lossfn(state.ŷs, state.ys)
-            handle(BackwardBegin())
+            handle(FluxTraining.BackwardBegin())
+
             return state.loss
         end
-        handle(BackwardEnd())
+
+        handle(FluxTraining.BackwardEnd())
         learner.params, learner.model = FluxTraining._update!(
             learner.optimizer, learner.params, learner.model, state.grads)
     end
@@ -106,10 +107,11 @@ function train_gno(; cuda = true, η₀ = 1.0f-3, λ = 1.0f-4, epochs = 50)
         @info "Training on CPU"
     end
 
-    coord_dim = 2
-    edge_dim = 2(coord_dim + 1)
+    grid_dim = 2
+    edge_dim = 2(grid_dim + 1)
     featured_graph = FeaturedGraph(grid([96, 64]))
-    model = Chain(Dense(1, 16),
+    model = Chain(Flux.SkipConnection(Dense(grid_dim + 1, 16), vcat),
+                 # size(x) = (19, 6144, 8)
                   WithGraph(featured_graph,
                             GraphKernel(Dense(edge_dim, abs2(16), gelu), 16)),
                   WithGraph(featured_graph,
@@ -118,6 +120,7 @@ function train_gno(; cuda = true, η₀ = 1.0f-3, λ = 1.0f-4, epochs = 50)
                             GraphKernel(Dense(edge_dim, abs2(16), gelu), 16)),
                   WithGraph(featured_graph,
                             GraphKernel(Dense(edge_dim, abs2(16), gelu), 16)),
+                  x -> x[1:end-3, :, :],
                   Dense(16, 1))
 
     optimiser = Flux.Optimiser(WeightDecay(λ), Flux.Adam(η₀))
