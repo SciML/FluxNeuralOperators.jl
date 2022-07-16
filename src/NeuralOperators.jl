@@ -11,6 +11,8 @@ using ChainRulesCore
 using GeometricFlux
 using Statistics
 
+include("abstracttypes.jl")
+
 # kernels
 include("Transform/Transform.jl")
 include("operator_kernel.jl")

@@ -113,7 +113,7 @@ end
 # operator #
 ############
 
-struct OperatorKernel{L, C, F}
+struct OperatorKernel{L, C, F} <: AbstractOperatorKernel
     linear::L
     conv::C
     σ::F
