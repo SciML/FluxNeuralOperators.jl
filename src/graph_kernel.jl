@@ -44,23 +44,25 @@ end
 
 function (l::GraphKernel)(el::NamedTuple, X::AbstractArray, E::AbstractArray)
     GraphSignals.check_num_nodes(el.N, X)
-    # GraphSignals.check_num_edges(el.E, E)
+    GraphSignals.check_num_edges(el.E, E)
     _, V, _ = GeometricFlux.propagate(l, el, E, X, nothing, mean, nothing, nothing)
 
     return V
 end
 
-# (wg::WithGraph{<:GraphKernel})(Vt::AbstractArray, E::AbstractArray) = wg(nothing, Vt, E), E
-
-function (wg::WithGraph{<:GraphKernel})(input::AbstractArray)
-    el = wg.graph
-    Vt, X_with_grid = input[1:end-3, :, :], input[end-2:end, :, :]
+# For variable graph
+function (l::GraphKernel)(fg::AbstractFeaturedGraph)
+    nf = node_feature(fg)
+    pf = positional_feature(fg)
+    GraphSignals.check_num_nodes(fg, nf)
+    GraphSignals.check_num_nodes(fg, pf)
+    el = GeometricFlux.GraphSignals.to_namedtuple(fg)
 
     # node features + positional features as edge features
-    E = vcat(GeometricFlux._gather(X_with_grid, el.xs),
-             GeometricFlux._gather(X_with_grid, el.nbrs))
+    ef = vcat(GeometricFlux._gather(pf, el.xs), GeometricFlux._gather(pf, el.nbrs))
+    _, V, _ = GeometricFlux.propagate(l, el, ef, nf, nothing, mean, nothing, nothing)
 
-    return vcat(wg.layer(el, Vt, E), X_with_grid)
+    return ConcreteFeaturedGraph(fg, nf = V)
 end
 
 function Base.show(io::IO, l::GraphKernel)
