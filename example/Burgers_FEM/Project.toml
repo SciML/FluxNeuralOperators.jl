@@ -1,0 +1,17 @@
+name = "Burgers_FEM"
+uuid = "e5170f7b-8a26-429b-971b-688deff48327"
+authors = ["Yueh-Hua Tu"]
+version = "0.1.0"
+
+[deps]
+FEniCS = "186dfeec-b415-5c13-8e76-5fbf19f56f9b"
+OrdinaryDiffEq = "1dea7af3-3e70-54e6-95c3-0bf5283fa5ed"
+
+[compat]
+julia = "1.6"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
