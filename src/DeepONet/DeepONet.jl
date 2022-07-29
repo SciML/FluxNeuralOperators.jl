@@ -81,7 +81,7 @@ branch net: (Chain(Dense(2, 128), Dense(128, 64), Dense(64, 72)))
 Trunk net: (Chain(Dense(1, 24), Dense(24, 72)))
 ```
 """
-struct DeepONet{T1, T2}
+struct DeepONet{T1, T2} <: AbstractOperatorModel
     branch_net::T1
     trunk_net::T2
 end

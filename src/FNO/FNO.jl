@@ -2,6 +2,14 @@ export
        FourierNeuralOperator,
        MarkovNeuralOperator
 
+struct FourierNeuralOperator{L, K, P} <: AbstractOperatorModel
+    lifting_net::L
+    integral_kernel_net::K
+    project_net::P
+end
+
+Flux.@functor FourierNeuralOperator
+
 """
     FourierNeuralOperator(;
                           ch = (2, 64, 64, 64, 64, 64, 128, 1),
@@ -85,15 +93,30 @@ function FourierNeuralOperator(;
                                modes = (16,),
                                σ = gelu)
     Transform = FourierTransform
+    lifting = Dense(ch[1], ch[2])
+    mapping = Chain(OperatorKernel(ch[2] => ch[3], modes, Transform, σ),
+                    OperatorKernel(ch[3] => ch[4], modes, Transform, σ),
+                    OperatorKernel(ch[4] => ch[5], modes, Transform, σ),
+                    OperatorKernel(ch[5] => ch[6], modes, Transform))
+    project = Chain(Dense(ch[6], ch[7], σ),
+                    Dense(ch[7], ch[8]))
 
-    return Chain(Dense(ch[1], ch[2]),
-                 OperatorKernel(ch[2] => ch[3], modes, Transform, σ),
-                 OperatorKernel(ch[3] => ch[4], modes, Transform, σ),
-                 OperatorKernel(ch[4] => ch[5], modes, Transform, σ),
-                 OperatorKernel(ch[5] => ch[6], modes, Transform),
-                 Dense(ch[6], ch[7], σ),
-                 Dense(ch[7], ch[8]))
+    return FourierNeuralOperator(lifting, mapping, project)
 end
+
+function (fno::FourierNeuralOperator)(𝐱::AbstractArray)
+    lifted = fno.lifting_net(𝐱)
+    mapped = fno.integral_kernel_net(lifted)
+    𝐲 = fno.project_net(mapped)
+
+    return 𝐲
+end
+
+struct MarkovNeuralOperator{F} <: AbstractOperatorModel
+    fno::F
+end
+
+Flux.@functor MarkovNeuralOperator
 
 """
     MarkovNeuralOperator(;
@@ -176,11 +199,15 @@ function MarkovNeuralOperator(;
                               modes = (24, 24),
                               σ = gelu)
     Transform = FourierTransform
+    lifting = Dense(ch[1], ch[2])
+    mapping = Chain(OperatorKernel(ch[2] => ch[3], modes, Transform, σ),
+                    OperatorKernel(ch[3] => ch[4], modes, Transform, σ),
+                    OperatorKernel(ch[4] => ch[5], modes, Transform, σ),
+                    OperatorKernel(ch[5] => ch[6], modes, Transform, σ))
+    project = Dense(ch[6], ch[7])
+    fno = FourierNeuralOperator(lifting, mapping, project)
 
-    return Chain(Dense(ch[1], ch[2]),
-                 OperatorKernel(ch[2] => ch[3], modes, Transform, σ),
-                 OperatorKernel(ch[3] => ch[4], modes, Transform, σ),
-                 OperatorKernel(ch[4] => ch[5], modes, Transform, σ),
-                 OperatorKernel(ch[5] => ch[6], modes, Transform, σ),
-                 Dense(ch[6], ch[7]))
+    return MarkovNeuralOperator(fno)
 end
+
+(mno::MarkovNeuralOperator)(𝐱::AbstractArray) = mno.fno(𝐱)
