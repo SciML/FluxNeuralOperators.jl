@@ -71,29 +71,6 @@ function train_mno(; cuda = true, η₀ = 1.0f-3, λ = 1.0f-4, epochs = 50)
     return learner
 end
 
-function batch_featured_graph(data, graph, batchsize)
-    tot_len = size(data)[end]
-    bch_data = FeaturedGraph[]
-    for i in 1:batchsize:tot_len
-        bch_rng = (i + batchsize >= tot_len) ? (i:tot_len) : (i:(i + batchsize - 1))
-        fg = FeaturedGraph(graph, nf = data[:, :, bch_rng], pf = data[:, :, bch_rng])
-        push!(bch_data, fg)
-    end
-
-    return bch_data
-end
-
-function batch_data(data, batchsize)
-    tot_len = size(data)[end]
-    bch_data = Array{Float32, 3}[]
-    for i in 1:batchsize:tot_len
-        bch_rng = (i + batchsize >= tot_len) ? (i:tot_len) : (i:(i + batchsize - 1))
-        push!(bch_data, data[:, :, bch_rng])
-    end
-
-    return bch_data
-end
-
 function get_gno_dataloader(; ts::AbstractRange = LinRange(100, 11000, 10000),
                             ratio::Float64 = 0.95, batchsize = 8)
     data = gen_data(ts)
@@ -111,17 +88,11 @@ function get_gno_dataloader(; ts::AbstractRange = LinRange(100, 11000, 10000),
     # flatten
     𝐱, 𝐲 = reshape(𝐱, size(𝐱, 1), :, n), reshape(𝐲, 1, :, n)
 
-    data_train, data_test = splitobs(shuffleobs((𝐱, 𝐲)), at = ratio)
+    fg = FeaturedGraph(graph, nf = 𝐱, pf = 𝐱)
+    data_train, data_test = splitobs(shuffleobs((fg, 𝐲)), at = ratio)
 
-    batched_train_X = batch_featured_graph(data_train[1], graph, batchsize)
-    batched_test_X = batch_featured_graph(data_test[1], graph, batchsize)
-    batched_train_y = batch_data(data_train[2], batchsize)
-    batched_test_y = batch_data(data_test[2], batchsize)
-
-    loader_train = DataLoader((batched_train_X, batched_train_y), batchsize = -1,
-                              shuffle = true)
-    loader_test = DataLoader((batched_test_X, batched_test_y), batchsize = -1,
-                             shuffle = false)
+    loader_train = DataLoader(data_train, batchsize = batchsize, shuffle = true)
+    loader_test = DataLoader(data_test, batchsize = batchsize, shuffle = false)
 
     return loader_train, loader_test
 end

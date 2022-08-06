@@ -66,7 +66,7 @@ function (l::GraphKernel)(fg::AbstractFeaturedGraph)
 end
 
 function Base.show(io::IO, l::GraphKernel)
-    channel, _ = size(l.linear)
+    channel = size(l.linear, 1)
     print(io, "GraphKernel(", l.κ, ", channel=", channel)
     l.σ == identity || print(io, ", ", l.σ)
     print(io, ")")
