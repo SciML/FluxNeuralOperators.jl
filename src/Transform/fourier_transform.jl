@@ -5,6 +5,7 @@ struct FourierTransform{N, S} <: AbstractTransform
 end
 
 Base.ndims(::FourierTransform{N}) where {N} = N
+Base.eltype(::Type{FourierTransform}) = ComplexF32
 
 function transform(ft::FourierTransform, 𝐱::AbstractArray)
     return fft(Zygote.hook(real, 𝐱), 1:ndims(ft)) # [size(x)..., in_chs, batch]

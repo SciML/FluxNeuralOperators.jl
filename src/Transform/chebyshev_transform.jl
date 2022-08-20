@@ -5,6 +5,7 @@ struct ChebyshevTransform{N, S} <: AbstractTransform
 end
 
 Base.ndims(::ChebyshevTransform{N}) where {N} = N
+Base.eltype(::Type{ChebyshevTransform}) = Float32
 
 function transform(t::ChebyshevTransform{N}, 𝐱::AbstractArray) where {N}
     return FFTW.r2r(𝐱, FFTW.REDFT10, 1:N) # [size(x)..., in_chs, batch]
