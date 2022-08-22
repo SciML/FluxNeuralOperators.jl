@@ -92,7 +92,7 @@ function operator_conv(m::OperatorConv, 𝐱::AbstractArray)
     𝐱_padded = pad_modes(𝐱_applied_pattern,
                          (size(𝐱_transformed)[1:(end - 2)]...,
                           size(𝐱_applied_pattern)[(end - 1):end]...)) # [size(x)..., out_chs, batch] <- [modes..., out_chs, batch]
-    𝐱_inversed = inverse(m.transform, 𝐱_padded)
+    𝐱_inversed = inverse(m.transform, 𝐱_padded, size(𝐱))
 
     return 𝐱_inversed
 end
