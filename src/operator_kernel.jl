@@ -19,7 +19,7 @@ end
 
 """
     OperatorConv(ch, modes, transform;
-                 init=c_glorot_uniform, permuted=false, T=ComplexF32)
+                 init=glorot_uniform, permuted=false, T=ComplexF32)
 
 ## Arguments
 
@@ -49,9 +49,9 @@ OperatorConv(2 => 5, (16,), FourierTransform, permuted=true)
 function OperatorConv(ch::Pair{S, S},
                       modes::NTuple{N, S},
                       Transform::Type{<:AbstractTransform};
-                      init = c_glorot_uniform,
+                      init = (dims...) -> Flux.glorot_uniform(eltype(Transform), dims...),
                       permuted = false,
-                      T::DataType = ComplexF32) where {S <: Integer, N}
+                      T::DataType = eltype(Transform)) where {S <: Integer, N}
     in_chs, out_chs = ch
     scale = one(T) / (in_chs * out_chs)
     weights = scale * init(prod(modes), in_chs, out_chs)
@@ -185,6 +185,8 @@ end
 #########
 
 c_glorot_uniform(dims...) = Flux.glorot_uniform(dims...) + Flux.glorot_uniform(dims...) * im
+Flux.glorot_uniform(::Type{<:Real}, dims...) = Flux.glorot_uniform(dims...)
+Flux.glorot_uniform(::Type{<:Complex}, dims...) = c_glorot_uniform(dims...)
 
 # [prod(modes), out_chs, batch] <- [prod(modes), in_chs, batch] * [out_chs, in_chs, prod(modes)]
 einsum(𝐱₁, 𝐱₂) = @tullio 𝐲[m, o, b] := 𝐱₁[m, i, b] * 𝐱₂[m, i, o]
