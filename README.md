@@ -1,18 +1,15 @@
 # NeuralOperators
 
-| **Documentation** | **Build Status** | **Style** |
-|:-----------------:|:----------------:|:---------:|
-| [![doc stable badge]][doc stable link] | [![ci badge]][ci link] [![codecov badge]][codecov link] | [![style badge]][style link] |
+[![Join the chat at https://julialang.zulipchat.com #sciml-bridged](https://img.shields.io/static/v1?label=Zulip&message=chat&color=9558b2&labelColor=389826)](https://julialang.zulipchat.com/#narrow/stream/279055-sciml-bridged)
+[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](http://neuraloperators.sciml.ai/stable/)
+[![Global Docs](https://img.shields.io/badge/docs-SciML-blue.svg)](https://docs.sciml.ai/dev/modules/NeuralOperators/)
 
-[doc stable badge]: https://img.shields.io/badge/docs-stable-blue.svg
-[doc stable link]: http://neuraloperators.sciml.ai/stable/
+[![codecov](https://codecov.io/gh/SciML/NeuralOperators.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/SciML/NeuralOperators.jl)
+[![Build Status](https://github.com/SciML/NeuralOperators.jl/workflows/CI/badge.svg)](https://github.com/SciML/NeuralOperators.jl/actions?query=workflow%3ACI)
+[![Build status](https://badge.buildkite.com/be853055db9e309317157b7e2983e752b60705502e622a139e.svg)](https://buildkite.com/julialang/neuraloperators-dot-jl)
 
-[ci badge]: https://github.com/SciML/NeuralOperators.jl/actions/workflows/CI.yml/badge.svg
-[ci link]: https://github.com/SciML/NeuralOperators.jl/actions/workflows/CI.yml
-[codecov badge]: https://codecov.io/gh/SciML/NeuralOperators.jl/branch/master/graph/badge.svg
-[codecov link]: https://codecov.io/gh/SciML/NeuralOperators.jl
-[style badge]: https://img.shields.io/static/v1?label=code%20style&message=SciML&color=9558b2&labelColor=389826
-[style link]: https://github.com/SciML/SciMLStyle
+[![ColPrac: Contributor's Guide on Collaborative Practices for Community Packages](https://img.shields.io/badge/ColPrac-Contributor's%20Guide-blueviolet)](https://github.com/SciML/ColPrac)
+[![SciML Code Style](https://img.shields.io/static/v1?label=code%20style&message=SciML&color=9558b2&labelColor=389826)](https://github.com/SciML/SciMLStyle)
 
 | **Ground Truth** | **Inferenced** |
 |:----------------:|:--------------:|
