@@ -8,7 +8,7 @@ using Test
     @test size(xs) == (2, 1024, 1000)
     @test size(ys) == (1, 1024, 1000)
 
-    learner = Burgers.train(epochs = 10)
+    learner = Burgers.train(epochs = 100)
     loss = learner.cbstate.metricsepoch[ValidationPhase()][:Loss].values[end]
     @test loss < 0.1
 
