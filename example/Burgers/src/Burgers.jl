@@ -19,9 +19,7 @@ function register_burgers()
 
                      * `a`: initial conditions u(x,0)
                      * `u`: solutions u(x,t_end)
-                     """,
-
-                     "http://www.med.cgu.edu.tw/NeuralOperators/Burgers_R10.zip",
+                     """, "http://www.med.cgu.edu.tw/NeuralOperators/Burgers_R10.zip",
                      "9cbbe5070556c777b1ba3bacd49da5c36ea8ed138ba51b6ee76a24b971066ecd",
                      post_fetch_method = unpack))
 end
@@ -113,7 +111,6 @@ function train_nomad(; n = 300, cuda = true, learning_rate = 0.001, epochs = 400
     mean_diff = sum(diffvec) / length(diffvec)
     return mean_diff
 end
-
 
 function get_model()
     model_path = joinpath(@__DIR__, "../model/")
