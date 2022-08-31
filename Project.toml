@@ -1,7 +1,7 @@
 name = "NeuralOperators"
 uuid = "ea5c82af-86e5-48da-8ee1-382d6ad7af4b"
 authors = ["JingYu Ning <foldfelis@gmail.com> and contributors"]
-version = "0.4.2"
+version = "0.4.3"
 
 [deps]
 CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
