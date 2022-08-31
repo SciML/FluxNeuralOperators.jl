@@ -4,6 +4,7 @@ using DataDeps, MAT, MLUtils
 using NeuralOperators, Flux
 using CUDA, FluxTraining, BSON
 import Flux: params
+using BSON: @save, @load
 
 include("Burgers_deeponet.jl")
 
@@ -12,7 +13,14 @@ function register_burgers()
                      """
                      Burgers' equation dataset from
                      [fourier_neural_operator](https://github.com/zongyi-li/fourier_neural_operator)
+
+                     mapping between initial conditions to the solutions at the last point of time evolition in some function space. 
+                     u(x,0) -> u(x, time_end):
+
+                     * `a`: initial conditions u(x,0)
+                     * `u`: solutions u(x,t_end)
                      """,
+
                      "http://www.med.cgu.edu.tw/NeuralOperators/Burgers_R10.zip",
                      "9cbbe5070556c777b1ba3bacd49da5c36ea8ed138ba51b6ee76a24b971066ecd",
                      post_fetch_method = unpack))
@@ -63,6 +71,8 @@ function train(; cuda = true, η₀ = 1.0f-3, λ = 1.0f-4, epochs = 500)
                       ToDevice(device, device))
 
     fit!(learner, epochs)
+    model = learner.model |> cpu
+    @save "model/model_burger.bson" model
 
     return learner
 end
@@ -102,6 +112,14 @@ function train_nomad(; n = 300, cuda = true, learning_rate = 0.001, epochs = 400
     diffvec = vec(abs.(cpu(yval) .- cpu(ỹ)))
     mean_diff = sum(diffvec) / length(diffvec)
     return mean_diff
+end
+
+
+function get_model()
+    model_path = joinpath(@__DIR__, "../model/")
+    model_file = readdir(model_path)[end]
+
+    return BSON.load(joinpath(model_path, model_file), @__MODULE__)[:model]
 end
 
 end
