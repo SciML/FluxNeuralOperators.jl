@@ -16,7 +16,7 @@ makedocs(bib,
          sitename = "NeuralOperators.jl",
          format = Documenter.HTML(;
                                   prettyurls = get(ENV, "CI", "false") == "true",
-                                  canonical = "http://neuraloperators.sciml.ai",
+                                  canonical = "https://docs.sciml.ai/NeuralOperators/stable/",
                                   assets = String[]),
          pages = pages)
 
