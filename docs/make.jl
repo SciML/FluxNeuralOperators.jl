@@ -17,7 +17,7 @@ makedocs(bib,
          format = Documenter.HTML(;
                                   prettyurls = get(ENV, "CI", "false") == "true",
                                   canonical = "https://docs.sciml.ai/NeuralOperators/stable/",
-                                  assets = String[]),
+                                  assets = ["assets/favicon.ico"]),
          pages = pages)
 
 deploydocs(;
