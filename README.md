@@ -5,7 +5,7 @@
 
 [![codecov](https://codecov.io/gh/SciML/NeuralOperators.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/SciML/NeuralOperators.jl)
 [![Build Status](https://github.com/SciML/NeuralOperators.jl/workflows/CI/badge.svg)](https://github.com/SciML/NeuralOperators.jl/actions?query=workflow%3ACI)
-[![Build status](https://badge.buildkite.com/be853055db9e309317157b7e2983e752b60705502e622a139e.svg)](https://buildkite.com/julialang/neuraloperators-dot-jl)
+[![Build status](https://badge.buildkite.com/be853055db9e309317157b7e2983e752b60705502e622a139e.svg?branch=main)](https://buildkite.com/julialang/neuraloperators-dot-jl)
 
 [![ColPrac: Contributor's Guide on Collaborative Practices for Community Packages](https://img.shields.io/badge/ColPrac-Contributor's%20Guide-blueviolet)](https://github.com/SciML/ColPrac)
 [![SciML Code Style](https://img.shields.io/static/v1?label=code%20style&message=SciML&color=9558b2&labelColor=389826)](https://github.com/SciML/SciMLStyle)
