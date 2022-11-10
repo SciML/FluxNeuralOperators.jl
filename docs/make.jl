@@ -2,6 +2,9 @@ using NeuralOperators
 using Documenter
 using DocumenterCitations
 
+cp("./docs/Manifest.toml", "./docs/src/assets/Manifest.toml", force = true)
+cp("./docs/Project.toml", "./docs/src/assets/Project.toml", force = true)
+
 bib = CitationBibliography(joinpath(@__DIR__, "bibliography.bib"), sorting = :nyt)
 
 DocMeta.setdocmeta!(NeuralOperators, :DocTestSetup, :(using NeuralOperators);
