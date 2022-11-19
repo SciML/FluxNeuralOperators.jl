@@ -11,6 +11,16 @@ MAT = "23992714-dd62-5051-b70f-ba57cb901cac"
 MLUtils = "f1d291b0-491e-4a28-83b9-f70985020b54"
 NeuralOperators = "ea5c82af-86e5-48da-8ee1-382d6ad7af4b"
 
+[compat]
+BSON = "0.3"
+CUDA = "3.12"
+DataDeps = "0.7"
+Flux = "0.13"
+FluxTraining = "0.3"
+MAT = "0.10"
+MLUtils = "0.3"
+NeuralOperators = "0.4"
+
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 

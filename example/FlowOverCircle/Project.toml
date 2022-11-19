@@ -16,6 +16,20 @@ Pluto = "c3e4b0f8-55cb-11ea-2926-15256bba5781"
 ProgressMeter = "92933f4c-e287-5a05-a399-4b506db050ca"
 WaterLily = "ed894a53-35f9-47f1-b17f-85db9237eebd"
 
+[compat]
+BSON = "0.3"
+CUDA = "3.12"
+Flux = "0.13"
+FluxTraining = "0.3"
+GeometricFlux = "0.13"
+Graphs = "1.7"
+MLUtils = "0.3"
+NeuralOperators = "0.4"
+Plots = "1.36"
+Pluto = "0.19"
+ProgressMeter = "1.7"
+WaterLily = "0.2"
+
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
