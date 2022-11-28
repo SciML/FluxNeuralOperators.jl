@@ -16,6 +16,6 @@ end
 
 truncate_modes(ft::FourierTransform, 𝐱_fft::AbstractArray) = low_pass(ft, 𝐱_fft)
 
-function inverse(ft::FourierTransform, 𝐱_fft::AbstractArray, M)
+function inverse(ft::FourierTransform{N}, 𝐱_fft::AbstractArray, M::NTuple{N, Int64}) where {N}
     return real(irfft(𝐱_fft, M[1], 1:ndims(ft))) # [size(x_fft)..., out_chs, batch]
 end

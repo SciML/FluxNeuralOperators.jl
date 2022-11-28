@@ -14,7 +14,7 @@ function truncate_modes(t::ChebyshevTransform, 𝐱̂::AbstractArray)
     return view(𝐱̂, map(d -> 1:d, t.modes)..., :, :) # [t.modes..., in_chs, batch]
 end
 
-function inverse(t::ChebyshevTransform{N}, 𝐱̂::AbstractArray, M) where {N}
+function inverse(t::ChebyshevTransform{N}, 𝐱̂::AbstractArray, M::NTuple{N, Int64}) where {N}
     normalized_𝐱̂ = 𝐱̂ ./ (prod(2 .* (size(𝐱̂)[1:N] .- 1)))
     return FFTW.r2r(normalized_𝐱̂, FFTW.REDFT01, 1:N) # [size(x)..., in_chs, batch]
 end
