@@ -71,7 +71,7 @@ end
 end
 
 @testset "2D OperatorConv" begin
-    modes = (16, 16)
+    modes = (10, 10)
     ch = 64 => 64
 
     m = Chain(Dense(1, 64),
@@ -87,7 +87,7 @@ end
 end
 
 @testset "permuted 2D OperatorConv" begin
-    modes = (16, 16)
+    modes = (10, 10)
     ch = 64 => 64
 
     m = Chain(Conv((1, 1), 1 => 64),
@@ -104,7 +104,7 @@ end
 end
 
 @testset "2D OperatorKernel" begin
-    modes = (16, 16)
+    modes = (10, 10)
     ch = 64 => 64
 
     m = Chain(Dense(1, 64),
@@ -119,7 +119,7 @@ end
 end
 
 @testset "permuted 2D OperatorKernel" begin
-    modes = (16, 16)
+    modes = (10, 10)
     ch = 64 => 64
 
     m = Chain(Conv((1, 1), 1 => 64),
