@@ -799,7 +799,7 @@ version = "1.2.0"
 deps = ["CUDA", "CUDAKernels", "ChainRulesCore", "FFTW", "Flux", "GeometricFlux", "KernelAbstractions", "Statistics", "Tullio", "Zygote"]
 path = "/home/runner/work/NeuralOperators.jl/NeuralOperators.jl"
 uuid = "ea5c82af-86e5-48da-8ee1-382d6ad7af4b"
-version = "0.4.4"
+version = "0.4.5"
 
 [[deps.OffsetArrays]]
 deps = ["Adapt"]
