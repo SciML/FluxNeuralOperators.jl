@@ -18,7 +18,7 @@ DataDeps = "0.7"
 Flux = "0.13"
 FluxTraining = "0.3"
 MAT = "0.10"
-MLUtils = "0.3"
+MLUtils = "0.3, 0.4"
 NeuralOperators = "0.4"
 
 [extras]
