@@ -22,7 +22,7 @@ x --- branch --
 y --- trunk ---
 
 Where `x` represents the input function, discretely evaluated at its respective sensors.
-So the ipnut is of shape [m] for one instance or [m x b] for a training set.
+So, the input is of shape [m] for one instance or [m x b] for a training set.
 `y` are the probing locations for the operator to be trained. It has shape [N x n] for
 N different variables in the PDE (i.e. spatial and temporal coordinates) with each n distinct evaluation points.
 `u` is the solution of the queried instance of the PDE, given by the specific choice of parameters.
@@ -38,16 +38,16 @@ You can set up this architecture in two ways:
 flexibility and e.g. use an RNN or CNN instead of simple `Dense` layers.
 
 Strictly speaking, DeepONet does not imply either of the branch or trunk net to be a simple
- DNN. Usually though, this is the case which is why it's treated as the default case here.
+ DNN. Usually this is the case, which is why it's treated as the default case here.
 
 # Example
 
 Consider a transient 1D advection problem ∂ₜu + u ⋅ ∇u = 0, with an IC u(x,0) = g(x).
-We are given several (b = 200) instances of the IC, discretized at 50 points each and want
+We are given several (b = 200) instances of the IC, discretized at 50 points each, and want
  to query the solution for 100 different locations and times [0;1].
 
-That makes the branch input of shape [50 x 200] and the trunk input of shape [2 x 100]. So the
- input for the branch net is 50 and 100 for the trunk net.
+That makes the branch input of shape [50 x 200] and the trunk input of shape [2 x 100]. So, the
+input for the branch net is 50 and 100 for the trunk net.
 
 # Usage
 

@@ -2,7 +2,7 @@
 Construct a Chain of `Dense` layers from a given tuple of integers.
 
 Input:
-A tuple (m,n,o,p) of integer type numbers that each describe the width of the i-th Dense layer to Construct
+A tuple (m,n,o,p) of integer type numbers that each describe the width of the i'th Dense layer to Construct
 
 Output:
 A `Flux` Chain with length of the input tuple and individual width given by the tuple elements
