@@ -31,10 +31,10 @@ end
 ## Keyword Arguments
 
 * `init`: Initial function to initialize parameters.
-* `permuted`: Whether the dim is permuted. If `permuted=true`, layer accepts
-    data in the order of `(ch, x_1, ... , x_d , batch)`,
-    otherwise the order is `(x_1, ... , x_d, ch, batch)`.
-* `T`: Data type of parameters.
+* `permuted`: Whether the dim is permuted. If `permuted=true`, the layer accepts
+    data in the order of `(ch, x_1, ... , x_d , batch)`.
+    Otherwise the order is `(x_1, ... , x_d, ch, batch)`.
+* `T`: Datatype of parameters.
 
 ## Example
 
@@ -132,7 +132,7 @@ end
 
 ## Keyword Arguments
 
-* `permuted`: Whether the dim is permuted. If `permuted=true`, layer accepts
+* `permuted`: Whether the dim is permuted. If `permuted=true`, the layer accepts
     data in the order of `(ch, x_1, ... , x_d , batch)`,
     otherwise the order is `(x_1, ... , x_d, ch, batch)`.
 

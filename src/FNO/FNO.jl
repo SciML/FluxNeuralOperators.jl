@@ -18,14 +18,14 @@ Flux.@functor FourierNeuralOperator
 
 Fourier neural operator is a operator learning model that uses Fourier kernel to perform
 spectral convolutions.
-It is a promissing way for surrogate methods, and can be regarded as a physics operator.
+It is a promising way for surrogate methods, and can be regarded as a physics operator.
 
 The model is comprised of
 a `Dense` layer to lift (d + 1)-dimensional vector field to n-dimensional vector field,
 and an integral kernel operator which consists of four Fourier kernels,
 and two `Dense` layers to project data back to the scalar field of interest space.
 
-The role of each channel size described as follow:
+The role of each channel size described as follows:
 
 ```
 [1] input channel number
@@ -133,7 +133,7 @@ a `Dense` layer to lift d-dimensional vector field to n-dimensional vector field
 and an integral kernel operator which consists of four Fourier kernels,
 and a `Dense` layers to project data back to the scalar field of interest space.
 
-The role of each channel size described as follow:
+The role of each channel size described as follows:
 
 ```
 [1] input channel number

@@ -6,10 +6,10 @@ CurrentModule = NeuralOperators
 
 | ![](https://github.com/foldfelis/NeuralOperators.jl/blob/main/example/FlowOverCircle/gallery/ans.gif?raw=true) | ![](https://github.com/foldfelis/NeuralOperators.jl/blob/main/example/FlowOverCircle/gallery/inferenced.gif?raw=true) |
 |:----------------:|:--------------:|
-| **Ground Truth** | **Inferenced** |
+| **Ground Truth** | **Inferred** |
 
-The demonstration shown above is Navier-Stokes equation learned by the `MarkovNeuralOperator` with only one time step information.
-Example can be found in [`example/FlowOverCircle`](https://github.com/SciML/NeuralOperators.jl/tree/main/example/FlowOverCircle).
+The demonstration shown above is the Navier-Stokes equation learned by the `MarkovNeuralOperator` with only one time step information.
+The example can be found in [`example/FlowOverCircle`](https://github.com/SciML/NeuralOperators.jl/tree/main/example/FlowOverCircle).
 
 ## Quick start
 
@@ -73,7 +73,7 @@ trunk = Chain(Dense(24, 64, tanh), Dense(64, 72, tanh))
 model = DeepONet(branch, trunk)
 ```
 
-You can again specify loss, optimization and training parameters just as you would for a simple neural network with Flux.
+You can again specify loss, optimization, and training parameters just as you would for a simple neural network with Flux.
 
 ```julia
 loss(xtrain, ytrain, sensor) = Flux.Losses.mse(model(xtrain, sensor), ytrain)
