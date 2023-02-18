@@ -27,7 +27,7 @@ OperatorConv
 
 Reference: [FNO2021](@cite)
 
----
+* * *
 
 ### Operator kernel layer
 
@@ -45,7 +45,7 @@ OperatorKernel
 
 Reference: [FNO2021](@cite)
 
----
+* * *
 
 ### Graph kernel layer
 
@@ -64,7 +64,7 @@ GraphKernel
 
 Reference: [NO2020](@cite)
 
----
+* * *
 
 ## Models
 
@@ -76,7 +76,7 @@ FourierNeuralOperator
 
 Reference: [FNO2021](@cite)
 
----
+* * *
 
 ### Markov neural operator
 
@@ -86,7 +86,7 @@ MarkovNeuralOperator
 
 Reference: [MNO2021](@cite)
 
----
+* * *
 
 ### DeepONet
 
@@ -95,7 +95,7 @@ DeepONet
 NeuralOperators.construct_subnet
 ```
 
----
+* * *
 
 ### NOMAD
 

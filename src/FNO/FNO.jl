@@ -47,10 +47,10 @@ The role of each channel size described as follows:
 
 ## Keyword Arguments
 
-* `ch`: A `Tuple` or `Vector` of the 8 channel size.
-* `modes`: The modes to be preserved. A tuple of length `d`,
+  - `ch`: A `Tuple` or `Vector` of the 8 channel size.
+  - `modes`: The modes to be preserved. A tuple of length `d`,
     where `d` is the dimension of data.
-* `σ`: Activation function for all layers in the model.
+  - `σ`: Activation function for all layers in the model.
 
 ## Example
 
@@ -153,10 +153,10 @@ The role of each channel size described as follows:
 
 ## Keyword Arguments
 
-* `ch`: A `Tuple` or `Vector` of the 7 channel size.
-* `modes`: The modes to be preserved. A tuple of length `d`,
+  - `ch`: A `Tuple` or `Vector` of the 7 channel size.
+  - `modes`: The modes to be preserved. A tuple of length `d`,
     where `d` is the dimension of data.
-* `σ`: Activation function for all layers in the model.
+  - `σ`: Activation function for all layers in the model.
 
 ## Example
 
@@ -191,7 +191,6 @@ Chain(
   ),
   Dense(64 => 1),                       # 65 parameters
 )                   # Total: 16 arrays, 9_454_017 parameters, 72.066 MiB.
-
 ```
 """
 function MarkovNeuralOperator(;

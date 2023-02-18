@@ -14,7 +14,7 @@ By inference the result recurrently, we can generate up to 150 steps with the fi
 Change directory to `example/DoublePendulum` and use following commend to train model:
 
 ```julia
+julia> using DoublePendulum;
+       DoublePendulum.train();
 $ julia --proj
-
-julia> using DoublePendulum; DoublePendulum.train()
 ```
