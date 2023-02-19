@@ -23,26 +23,26 @@ end
 
 ## Arguments
 
-* `ch`: A `Pair` of input and output channel size `ch_in=>ch_out`, e.g. `64=>64`.
-* `modes`: The modes to be preserved. A tuple of length `d`,
+  - `ch`: A `Pair` of input and output channel size `ch_in=>ch_out`, e.g. `64=>64`.
+  - `modes`: The modes to be preserved. A tuple of length `d`,
     where `d` is the dimension of data.
-* `Transform`: The trafo to operate the transformation.
+  - `Transform`: The trafo to operate the transformation.
 
 ## Keyword Arguments
 
-* `init`: Initial function to initialize parameters.
-* `permuted`: Whether the dim is permuted. If `permuted=true`, the layer accepts
+  - `init`: Initial function to initialize parameters.
+  - `permuted`: Whether the dim is permuted. If `permuted=true`, the layer accepts
     data in the order of `(ch, x_1, ... , x_d , batch)`.
     Otherwise the order is `(x_1, ... , x_d, ch, batch)`.
-* `T`: Datatype of parameters.
+  - `T`: Datatype of parameters.
 
 ## Example
 
 ```jldoctest
-julia> OperatorConv(2=>5, (16, ), FourierTransform)
+julia> OperatorConv(2 => 5, (16,), FourierTransform)
 OperatorConv(2 => 5, (16,), FourierTransform, permuted=false)
 
-julia> OperatorConv(2=>5, (16, ), FourierTransform, permuted=true)
+julia> OperatorConv(2 => 5, (16,), FourierTransform, permuted = true)
 OperatorConv(2 => 5, (16,), FourierTransform, permuted=true)
 ```
 """
@@ -124,30 +124,30 @@ end
 
 ## Arguments
 
-* `ch`: A `Pair` of input and output channel size for spectral convolution `in_ch=>out_ch`,
+  - `ch`: A `Pair` of input and output channel size for spectral convolution `in_ch=>out_ch`,
     e.g. `64=>64`.
-* `modes`: The modes to be preserved for spectral convolution. A tuple of length `d`,
+  - `modes`: The modes to be preserved for spectral convolution. A tuple of length `d`,
     where `d` is the dimension of data.
-* `σ`: Activation function.
+  - `σ`: Activation function.
 
 ## Keyword Arguments
 
-* `permuted`: Whether the dim is permuted. If `permuted=true`, the layer accepts
+  - `permuted`: Whether the dim is permuted. If `permuted=true`, the layer accepts
     data in the order of `(ch, x_1, ... , x_d , batch)`,
     otherwise the order is `(x_1, ... , x_d, ch, batch)`.
 
 ## Example
 
 ```jldoctest
-julia> OperatorKernel(2=>5, (16, ), FourierTransform)
+julia> OperatorKernel(2 => 5, (16,), FourierTransform)
 OperatorKernel(2 => 5, (16,), FourierTransform, σ=identity, permuted=false)
 
 julia> using Flux
 
-julia> OperatorKernel(2=>5, (16, ), FourierTransform, relu)
+julia> OperatorKernel(2 => 5, (16,), FourierTransform, relu)
 OperatorKernel(2 => 5, (16,), FourierTransform, σ=relu, permuted=false)
 
-julia> OperatorKernel(2=>5, (16, ), FourierTransform, relu, permuted=true)
+julia> OperatorKernel(2 => 5, (16,), FourierTransform, relu, permuted = true)
 OperatorKernel(2 => 5, (16,), FourierTransform, σ=relu, permuted=true)
 ```
 """

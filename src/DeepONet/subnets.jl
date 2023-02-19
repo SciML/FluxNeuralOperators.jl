@@ -10,7 +10,7 @@ A `Flux` Chain with length of the input tuple and individual width given by the 
 # Example
 
 ```julia
-julia> model = NeuralOperators.construct_subnet((2,128,64,32,1))
+julia> model = NeuralOperators.construct_subnet((2, 128, 64, 32, 1))
 Chain(
   Dense(2, 128),                        # 384 parameters
   Dense(128, 64),                       # 8_256 parameters
@@ -18,7 +18,7 @@ Chain(
   Dense(32, 1),                         # 33 parameters
 )                   # Total: 8 arrays, 10_753 parameters, 42.504 KiB.
 
-julia> model([2,1])
+julia> model([2, 1])
 1-element Vector{Float32}:
  -0.7630446
 ```

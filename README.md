@@ -7,11 +7,11 @@
 [![Build Status](https://github.com/SciML/NeuralOperators.jl/workflows/CI/badge.svg)](https://github.com/SciML/NeuralOperators.jl/actions?query=workflow%3ACI)
 [![Build status](https://badge.buildkite.com/be853055db9e309317157b7e2983e752b60705502e622a139e.svg?branch=main)](https://buildkite.com/julialang/neuraloperators-dot-jl)
 
-[![ColPrac: Contributor's Guide on Collaborative Practices for Community Packages](https://img.shields.io/badge/ColPrac-Contributor's%20Guide-blueviolet)](https://github.com/SciML/ColPrac)
+[![ColPrac: Contributor's Guide on Collaborative Practices for Community Packages](https://img.shields.io/badge/ColPrac-Contributor%27s%20Guide-blueviolet)](https://github.com/SciML/ColPrac)
 [![SciML Code Style](https://img.shields.io/static/v1?label=code%20style&message=SciML&color=9558b2&labelColor=389826)](https://github.com/SciML/SciMLStyle)
 
-| **Ground Truth** | **Inferenced** |
-|:----------------:|:--------------:|
+| **Ground Truth**                            | **Inferenced**                                     |
+|:-------------------------------------------:|:--------------------------------------------------:|
 | ![](example/FlowOverCircle/gallery/ans.gif) | ![](example/FlowOverCircle/gallery/inferenced.gif) |
 
 The demonstration showing above is Navier-Stokes equation learned by the `MarkovNeuralOperator` with only one time step information.
@@ -44,35 +44,32 @@ It is important that the output size of the branch and trunk subnets is same so 
 
 ```julia
 model = Chain(
-    # lift (d + 1)-dimensional vector field to n-dimensional vector field
-    # here, d == 1 and n == 64
-    Dense(2, 64),
-    # map each hidden representation to the next by integral kernel operator
-    OperatorKernel(64=>64, (16, ), FourierTransform, gelu),
-    OperatorKernel(64=>64, (16, ), FourierTransform, gelu),
-    OperatorKernel(64=>64, (16, ), FourierTransform, gelu),
-    OperatorKernel(64=>64, (16, ), FourierTransform),
-    # project back to the scalar field of interest space
-    Dense(64, 128, gelu),
-    Dense(128, 1),
-)
+              # lift (d + 1)-dimensional vector field to n-dimensional vector field
+              # here, d == 1 and n == 64
+              Dense(2, 64),
+              # map each hidden representation to the next by integral kernel operator
+              OperatorKernel(64 => 64, (16,), FourierTransform, gelu),
+              OperatorKernel(64 => 64, (16,), FourierTransform, gelu),
+              OperatorKernel(64 => 64, (16,), FourierTransform, gelu),
+              OperatorKernel(64 => 64, (16,), FourierTransform),
+              # project back to the scalar field of interest space
+              Dense(64, 128, gelu),
+              Dense(128, 1))
 ```
 
 Or one can just call:
 
 ```julia
-model = FourierNeuralOperator(
-    ch=(2, 64, 64, 64, 64, 64, 128, 1),
-    modes=(16, ),
-    σ=gelu
-)
+model = FourierNeuralOperator(ch = (2, 64, 64, 64, 64, 64, 128, 1),
+                              modes = (16,),
+                              σ = gelu)
 ```
 
 And then train as a Flux model.
 
 ```julia
 loss(𝐱, 𝐲) = l₂loss(model(𝐱), 𝐲)
-opt = Flux.Optimiser(WeightDecay(1f-4), Flux.Adam(1f-3))
+opt = Flux.Optimiser(WeightDecay(1.0f-4), Flux.Adam(1.0f-3))
 Flux.@epochs 50 Flux.train!(loss, params(model), data, opt)
 ```
 
@@ -83,6 +80,7 @@ Flux.@epochs 50 Flux.train!(loss, params(model), data, opt)
 # followed by activations for branch and trunk respectively
 model = DeepONet((32, 64, 72), (24, 64, 72), σ, tanh)
 ```
+
 Or specify branch and trunk as separate `Chain` from Flux and pass to `DeepONet`
 
 ```julia
@@ -100,7 +98,7 @@ evalcb() = @show(loss(xval, yval, grid))
 learning_rate = 0.001
 opt = Adam(learning_rate)
 parameters = params(model)
-Flux.@epochs 400 Flux.train!(loss, parameters, [(xtrain, ytrain, grid)], opt, cb=evalcb)
+Flux.@epochs 400 Flux.train!(loss, parameters, [(xtrain, ytrain, grid)], opt, cb = evalcb)
 ```
 
 ## Examples
@@ -129,9 +127,12 @@ PDE training examples are provided in `example` folder.
 
 ## References
 
-- [Fourier Neural Operator for Parametric Partial Differential Equations](https://arxiv.org/abs/2010.08895)
-  - [zongyi-li/fourier_neural_operator](https://github.com/zongyi-li/fourier_neural_operator)
-- [Neural Operator: Graph Kernel Network for Partial Differential Equations](https://arxiv.org/abs/2003.03485)
-  - [zongyi-li/graph-pde](https://github.com/zongyi-li/graph-pde)
-- [Markov Neural Operators for Learning Chaotic Systems](https://arxiv.org/abs/2106.06898)
-- [DeepONet: Learning nonlinear operators for identifying  differential equations based on the universal approximation theorem of operators](https://arxiv.org/abs/1910.03193)
+  - [Fourier Neural Operator for Parametric Partial Differential Equations](https://arxiv.org/abs/2010.08895)
+    
+      + [zongyi-li/fourier_neural_operator](https://github.com/zongyi-li/fourier_neural_operator)
+
+  - [Neural Operator: Graph Kernel Network for Partial Differential Equations](https://arxiv.org/abs/2003.03485)
+    
+      + [zongyi-li/graph-pde](https://github.com/zongyi-li/graph-pde)
+  - [Markov Neural Operators for Learning Chaotic Systems](https://arxiv.org/abs/2106.06898)
+  - [DeepONet: Learning nonlinear operators for identifying  differential equations based on the universal approximation theorem of operators](https://arxiv.org/abs/1910.03193)

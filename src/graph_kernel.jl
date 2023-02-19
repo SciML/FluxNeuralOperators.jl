@@ -7,13 +7,13 @@ Graph kernel layer.
 
 ## Arguments
 
-* `κ`: A neural network layer for approximation, e.g. a `Dense` layer or a MLP.
-* `ch`: Channel size for linear transform, e.g. `32`.
-* `σ`: Activation function.
+  - `κ`: A neural network layer for approximation, e.g. a `Dense` layer or a MLP.
+  - `ch`: Channel size for linear transform, e.g. `32`.
+  - `σ`: Activation function.
 
 ## Keyword Arguments
 
-* `init`: Initial function to initialize parameters.
+  - `init`: Initial function to initialize parameters.
 """
 struct GraphKernel{A, B, F} <: MessagePassing
     linear::A
