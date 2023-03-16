@@ -77,7 +77,6 @@ function truncate_modes(ft::FourierTransform, 𝐱_fft::AbstractArray)
         end
     end 
     s = floor.(Int,size(𝐱_fft)[1:end-2]./2)
-    @show box(floor.(Int,ft.modes./2),s)
     view(𝐱_fft,box(floor.(Int,ft.modes./2),s)...,:,:)
 end 
 
