@@ -20,8 +20,6 @@ using Pkg
 Pkg.add("NeuralOperators")
 ```
 
-```
-
 ## Usage
 
 ### Fourier Neural Operator
