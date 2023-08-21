@@ -13,7 +13,7 @@ NeuralOperators = "ea5c82af-86e5-48da-8ee1-382d6ad7af4b"
 
 [compat]
 BSON = "0.3"
-CUDA = "3.12"
+CUDA = "3.12, 4"
 DataDeps = "0.7"
 Flux = "0.13"
 FluxTraining = "0.3"

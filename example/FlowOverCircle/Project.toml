@@ -18,7 +18,7 @@ WaterLily = "ed894a53-35f9-47f1-b17f-85db9237eebd"
 
 [compat]
 BSON = "0.3"
-CUDA = "3.12"
+CUDA = "3.12, 4"
 Flux = "0.13"
 FluxTraining = "0.3"
 GeometricFlux = "0.13"

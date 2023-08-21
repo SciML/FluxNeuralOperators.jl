@@ -32,13 +32,13 @@ The role of each channel size described as follows:
  ↓ Dense
 [2] lifted channel number
  ↓ OperatorKernel
-[3] mapped cahnnel number
+[3] mapped channel number
  ↓ OperatorKernel
-[4] mapped cahnnel number
+[4] mapped channel number
  ↓ OperatorKernel
-[5] mapped cahnnel number
+[5] mapped channel number
  ↓ OperatorKernel
-[6] mapped cahnnel number
+[6] mapped channel number
  ↓ Dense
 [7] projected channel number
  ↓ Dense
@@ -140,13 +140,13 @@ The role of each channel size described as follows:
  ↓ Dense
 [2] lifted channel number
  ↓ OperatorKernel
-[3] mapped cahnnel number
+[3] mapped channel number
  ↓ OperatorKernel
-[4] mapped cahnnel number
+[4] mapped channel number
  ↓ OperatorKernel
-[5] mapped cahnnel number
+[5] mapped channel number
  ↓ OperatorKernel
-[6] mapped cahnnel number
+[6] mapped channel number
  ↓ Dense
 [7] projected channel number
 ```
