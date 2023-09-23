@@ -5,7 +5,7 @@ Flux = "587475ba-b771-5e3f-ad9e-33799f191a9c"
 NeuralOperators = "ea5c82af-86e5-48da-8ee1-382d6ad7af4b"
 
 [compat]
-Documenter = "0.27"
+Documenter = "0.27, 1"
 DocumenterCitations = "0.2"
 Flux = "0.13"
 NeuralOperators = "0.4"
