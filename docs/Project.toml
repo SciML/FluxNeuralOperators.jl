@@ -7,5 +7,5 @@ NeuralOperators = "ea5c82af-86e5-48da-8ee1-382d6ad7af4b"
 [compat]
 Documenter = "0.27"
 DocumenterCitations = "0.2"
-Flux = "0.13"
+Flux = "0.13, 0.14"
 NeuralOperators = "0.4"
