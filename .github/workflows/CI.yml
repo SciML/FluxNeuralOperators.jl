@@ -4,8 +4,12 @@ env:
 on:
   push:
     branches: '*'
+    paths-ignore:
+      - 'docs/**'
     tags: '*'
   pull_request:
+    paths-ignore:
+      - 'docs/**'
 concurrency:
   # Skip intermediate builds: always.
   # Cancel intermediate builds: only if it is a pull request build.
