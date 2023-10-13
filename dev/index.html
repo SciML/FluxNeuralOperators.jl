@@ -27,20 +27,20 @@ learning_rate = 0.001
 opt = Adam(learning_rate)
 parameters = params(model)
 Flux.@epochs 400 Flux.train!(loss, parameters, [(xtrain, ytrain, grid)], opt, cb = evalcb)</code></pre><p>A more complete example using DeepONet architecture to solve Burgers&#39; equation can be found in the <a href="https://github.com/SciML/NeuralOperators.jl/blob/main/example/Burgers/src/Burgers_deeponet.jl">examples</a>.</p><h2 id="Contributing"><a class="docs-heading-anchor" href="#Contributing">Contributing</a><a id="Contributing-1"></a><a class="docs-heading-anchor-permalink" href="#Contributing" title="Permalink"></a></h2><ul><li><p>Please refer to the <a href="https://github.com/SciML/ColPrac/blob/master/README.md">SciML ColPrac: Contributor&#39;s Guide on Collaborative Practices for Community Packages</a> for guidance on PRs, issues, and other matters relating to contributing to SciML.</p></li><li><p>See the <a href="https://github.com/SciML/SciMLStyle">SciML Style Guide</a> for common coding practices and other style decisions.</p></li><li><p>There are a few community forums:</p><ul><li>The #diffeq-bridged and #sciml-bridged channels in the <a href="https://julialang.org/slack/">Julia Slack</a></li><li>The #diffeq-bridged and #sciml-bridged channels in the <a href="https://julialang.zulipchat.com/#narrow/stream/279055-sciml-bridged">Julia Zulip</a></li><li>On the <a href="https://discourse.julialang.org">Julia Discourse forums</a></li><li>See also <a href="https://sciml.ai/community/">SciML Community page</a></li></ul></li></ul><h2 id="Reproducibility"><a class="docs-heading-anchor" href="#Reproducibility">Reproducibility</a><a id="Reproducibility-1"></a><a class="docs-heading-anchor-permalink" href="#Reproducibility" title="Permalink"></a></h2><details><summary>The documentation of this SciML package was built using these direct dependencies,</summary><pre class="documenter-example-output"><code class="nohighlight hljs ansi"><span class="sgr32"><span class="sgr1">Status</span></span> `~/work/NeuralOperators.jl/NeuralOperators.jl/docs/Project.toml`
-  <span class="sgr90">[e30172f5] </span>Documenter v1.0.1
+  <span class="sgr90">[e30172f5] </span>Documenter v1.1.1
   <span class="sgr90">[daee34ce] </span>DocumenterCitations v1.2.1
 <span class="sgr33">⌅</span> <span class="sgr90">[587475ba] </span>Flux v0.13.17
-  <span class="sgr90">[ea5c82af] </span>NeuralOperators v0.4.6 `~/work/NeuralOperators.jl/NeuralOperators.jl`
+  <span class="sgr90">[ea5c82af] </span>NeuralOperators v0.4.7 `~/work/NeuralOperators.jl/NeuralOperators.jl`
 <span class="sgr36"><span class="sgr1">Info</span></span> Packages marked with <span class="sgr33">⌅</span> have new versions available but compatibility constraints restrict them from upgrading. To see why use `status --outdated`</code></pre></details><details><summary>and using this machine and Julia version.</summary><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Julia Version 1.9.3
 Commit bed2cd540a1 (2023-08-24 14:43 UTC)
 Build Info:
   Official https://julialang.org/ release
 Platform Info:
   OS: Linux (x86_64-linux-gnu)
-  CPU: 2 × Intel(R) Xeon(R) Platinum 8272CL CPU @ 2.60GHz
+  CPU: 2 × Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz
   WORD_SIZE: 64
   LIBM: libopenlibm
-  LLVM: libLLVM-14.0.6 (ORCJIT, skylake-avx512)
+  LLVM: libLLVM-14.0.6 (ORCJIT, icelake-server)
   Threads: 1 on 2 virtual cores
 Environment:
   JULIA_PKG_SERVER_REGISTRY_PREFERENCE = eager</code></pre></details><details><summary>A more complete overview of all dependencies and their versions is also provided.</summary><pre class="documenter-example-output"><code class="nohighlight hljs ansi"><span class="sgr32"><span class="sgr1">Status</span></span> `~/work/NeuralOperators.jl/NeuralOperators.jl/docs/Manifest.toml`
@@ -60,12 +60,12 @@ Environment:
   <span class="sgr90">[f1be7e48] </span>Bibliography v0.2.19
   <span class="sgr90">[d1d4a3ce] </span>BitFlags v0.1.7
   <span class="sgr90">[e1450e63] </span>BufferedStreams v1.2.1
-  <span class="sgr90">[fa961155] </span>CEnum v0.4.2
+<span class="sgr33">⌅</span> <span class="sgr90">[fa961155] </span>CEnum v0.4.2
   <span class="sgr90">[336ed68f] </span>CSV v0.10.11
 <span class="sgr33">⌅</span> <span class="sgr90">[052768ef] </span>CUDA v4.0.1
   <span class="sgr90">[72cfdca4] </span>CUDAKernels v0.4.7
 <span class="sgr33">⌅</span> <span class="sgr90">[1af6417a] </span>CUDA_Runtime_Discovery v0.1.2
-  <span class="sgr90">[082447d4] </span>ChainRules v1.54.0
+  <span class="sgr90">[082447d4] </span>ChainRules v1.55.0
   <span class="sgr90">[d360d2e6] </span>ChainRulesCore v1.16.0
   <span class="sgr90">[46823bd8] </span>Chemfiles v0.10.41
   <span class="sgr90">[944b1d66] </span>CodecZlib v0.7.2
@@ -74,7 +74,7 @@ Environment:
   <span class="sgr90">[c3611d14] </span>ColorVectorSpace v0.10.0
   <span class="sgr90">[5ae59095] </span>Colors v0.12.10
   <span class="sgr90">[bbf7d656] </span>CommonSubexpressions v0.3.0
-  <span class="sgr90">[34da2185] </span>Compat v4.9.0
+  <span class="sgr90">[34da2185] </span>Compat v4.10.0
   <span class="sgr90">[a33af91c] </span>CompositionsBase v0.1.2
   <span class="sgr90">[f0e56b4a] </span>ConcurrentUtilities v2.2.1
   <span class="sgr90">[187b0558] </span>ConstructionBase v1.5.4
@@ -89,9 +89,9 @@ Environment:
   <span class="sgr90">[8bb1440f] </span>DelimitedFiles v1.9.1
   <span class="sgr90">[163ba53b] </span>DiffResults v1.1.0
   <span class="sgr90">[b552c78f] </span>DiffRules v1.15.1
-  <span class="sgr90">[b4f34e82] </span>Distances v0.10.9
+  <span class="sgr90">[b4f34e82] </span>Distances v0.10.10
   <span class="sgr90">[ffbed154] </span>DocStringExtensions v0.9.3
-  <span class="sgr90">[e30172f5] </span>Documenter v1.0.1
+  <span class="sgr90">[e30172f5] </span>Documenter v1.1.1
   <span class="sgr90">[daee34ce] </span>DocumenterCitations v1.2.1
   <span class="sgr90">[460bff9d] </span>ExceptionUnwrapping v0.1.9
   <span class="sgr90">[e2ba6199] </span>ExprTools v0.1.10
@@ -99,7 +99,7 @@ Environment:
   <span class="sgr90">[cc61a311] </span>FLoops v0.2.1
   <span class="sgr90">[b9860ae5] </span>FLoopsBase v0.1.1
   <span class="sgr90">[5789e2e9] </span>FileIO v1.16.1
-  <span class="sgr90">[48062228] </span>FilePathsBase v0.9.20
+  <span class="sgr90">[48062228] </span>FilePathsBase v0.9.21
   <span class="sgr90">[1a297f60] </span>FillArrays v1.6.1
   <span class="sgr90">[53c48c17] </span>FixedPointNumbers v0.8.4
 <span class="sgr33">⌅</span> <span class="sgr90">[587475ba] </span>Flux v0.13.17
@@ -109,18 +109,18 @@ Environment:
   <span class="sgr90">[46192b85] </span>GPUArraysCore v0.1.5
 <span class="sgr33">⌅</span> <span class="sgr90">[61eb1bfa] </span>GPUCompiler v0.17.3
   <span class="sgr90">[92fee26a] </span>GZip v0.6.1
-<span class="sgr33">⌅</span> <span class="sgr90">[7e08b658] </span>GeometricFlux v0.13.10
+<span class="sgr32">⌃</span> <span class="sgr90">[7e08b658] </span>GeometricFlux v0.13.10
   <span class="sgr90">[c27321d9] </span>Glob v1.3.1
 <span class="sgr33">⌅</span> <span class="sgr90">[3ebe565e] </span>GraphSignals v0.8.6
-  <span class="sgr90">[86223c79] </span>Graphs v1.8.0
-  <span class="sgr90">[f67ccb44] </span>HDF5 v0.17.0
+  <span class="sgr90">[86223c79] </span>Graphs v1.9.0
+  <span class="sgr90">[f67ccb44] </span>HDF5 v0.17.1
   <span class="sgr90">[cd3eb016] </span>HTTP v1.10.0
   <span class="sgr90">[b5f81e59] </span>IOCapture v0.2.3
   <span class="sgr90">[7869d1d1] </span>IRTools v0.4.10
   <span class="sgr90">[c817782e] </span>ImageBase v0.1.7
   <span class="sgr90">[a09fc81d] </span>ImageCore v0.10.1
   <span class="sgr90">[4e3cecfd] </span>ImageShow v0.3.8
-  <span class="sgr90">[d25df0c9] </span>Inflate v0.1.3
+  <span class="sgr90">[d25df0c9] </span>Inflate v0.1.4
   <span class="sgr90">[22cec73e] </span>InitialValues v0.3.1
   <span class="sgr90">[842dd82b] </span>InlineStrings v1.4.0
   <span class="sgr90">[7d512f48] </span>InternedStrings v0.7.0
@@ -139,15 +139,15 @@ Environment:
   <span class="sgr90">[0e77f7df] </span>LazilyInitializedFields v1.2.1
   <span class="sgr90">[8cdb02fc] </span>LazyModules v0.3.1
   <span class="sgr90">[2ab3a3ac] </span>LogExpFunctions v0.3.26
-  <span class="sgr90">[e6f89c97] </span>LoggingExtras v1.0.2
+  <span class="sgr90">[e6f89c97] </span>LoggingExtras v1.0.3
   <span class="sgr90">[23992714] </span>MAT v0.10.6
-  <span class="sgr90">[eb30cadb] </span>MLDatasets v0.7.13
+  <span class="sgr90">[eb30cadb] </span>MLDatasets v0.7.14
   <span class="sgr90">[d8e11817] </span>MLStyle v0.4.17
   <span class="sgr90">[f1d291b0] </span>MLUtils v0.4.3
   <span class="sgr90">[3da0fdf6] </span>MPIPreferences v0.1.9
   <span class="sgr90">[1914dd2f] </span>MacroTools v0.5.11
   <span class="sgr90">[dbb5928d] </span>MappedArrays v0.4.2
-  <span class="sgr90">[d0879d2d] </span>MarkdownAST v0.1.1
+  <span class="sgr90">[d0879d2d] </span>MarkdownAST v0.1.2
   <span class="sgr90">[739be429] </span>MbedTLS v1.1.7
   <span class="sgr90">[128add7d] </span>MicroCollections v0.1.4
   <span class="sgr90">[e1d29d7a] </span>Missings v1.1.0
@@ -158,7 +158,7 @@ Environment:
   <span class="sgr90">[77ba4419] </span>NaNMath v1.0.2
   <span class="sgr90">[71a1bf82] </span>NameResolution v0.1.5
   <span class="sgr90">[b8a86587] </span>NearestNeighbors v0.4.13
-  <span class="sgr90">[ea5c82af] </span>NeuralOperators v0.4.6 `~/work/NeuralOperators.jl/NeuralOperators.jl`
+  <span class="sgr90">[ea5c82af] </span>NeuralOperators v0.4.7 `~/work/NeuralOperators.jl/NeuralOperators.jl`
   <span class="sgr90">[6fe1bfb0] </span>OffsetArrays v1.12.10
   <span class="sgr90">[0b1bfda6] </span>OneHotArrays v0.2.4
   <span class="sgr90">[4d8831e6] </span>OpenSSL v1.4.1
@@ -191,10 +191,10 @@ Environment:
   <span class="sgr90">[276daf66] </span>SpecialFunctions v2.3.1
   <span class="sgr90">[171d559e] </span>SplittablesBase v0.1.15
   <span class="sgr90">[cae243ae] </span>StackViews v0.1.1
-  <span class="sgr90">[90137ffa] </span>StaticArrays v1.6.4
+  <span class="sgr90">[90137ffa] </span>StaticArrays v1.6.5
   <span class="sgr90">[1e83bf80] </span>StaticArraysCore v1.4.2
   <span class="sgr90">[82ae8749] </span>StatsAPI v1.7.0
-  <span class="sgr90">[2913bbd2] </span>StatsBase v0.34.0
+  <span class="sgr90">[2913bbd2] </span>StatsBase v0.34.2
 <span class="sgr33">⌅</span> <span class="sgr90">[5e0ebb24] </span>Strided v1.2.3
   <span class="sgr90">[69024149] </span>StringEncodings v0.3.7
   <span class="sgr90">[892a3eda] </span>StringManipulation v0.3.4
@@ -218,7 +218,7 @@ Environment:
   <span class="sgr90">[76eceee3] </span>WorkerUtilities v1.6.1
   <span class="sgr90">[ddb6d928] </span>YAML v0.4.9
   <span class="sgr90">[a5390f91] </span>ZipFile v0.10.1
-  <span class="sgr90">[e88e6eb3] </span>Zygote v0.6.64
+  <span class="sgr90">[e88e6eb3] </span>Zygote v0.6.65
   <span class="sgr90">[700de1a5] </span>ZygoteRules v0.2.3
 <span class="sgr32">⌃</span> <span class="sgr90">[02a925ec] </span>cuDNN v1.0.3
 <span class="sgr33">⌅</span> <span class="sgr90">[4ee394cb] </span>CUDA_Driver_jll v0.2.0+0
@@ -234,8 +234,8 @@ Environment:
   <span class="sgr90">[856f044c] </span>MKL_jll v2023.2.0+0
   <span class="sgr90">[7cb0a576] </span>MPICH_jll v4.1.2+0
   <span class="sgr90">[f1f71cc9] </span>MPItrampoline_jll v5.3.1+0
-  <span class="sgr90">[9237b28f] </span>MicrosoftMPI_jll v10.1.3+4
-  <span class="sgr90">[fe0851c0] </span>OpenMPI_jll v4.1.5+0
+  <span class="sgr90">[9237b28f] </span>MicrosoftMPI_jll v10.1.4+0
+  <span class="sgr90">[fe0851c0] </span>OpenMPI_jll v4.1.6+0
   <span class="sgr90">[458c3c95] </span>OpenSSL_jll v3.0.11+0
   <span class="sgr90">[efe28fd5] </span>OpenSpecFun_jll v0.5.5+0
   <span class="sgr90">[9fbe4022] </span>Word2Vec_jll v0.1.0+0
@@ -286,4 +286,4 @@ Environment:
   <span class="sgr90">[8e850b90] </span>libblastrampoline_jll v5.8.0+0
   <span class="sgr90">[8e850ede] </span>nghttp2_jll v1.48.0+0
   <span class="sgr90">[3f19e933] </span>p7zip_jll v17.4.0+0
-<span class="sgr36"><span class="sgr1">Info</span></span> Packages marked with <span class="sgr32">⌃</span> and <span class="sgr33">⌅</span> have new versions available, but those with <span class="sgr33">⌅</span> are restricted by compatibility constraints from upgrading. To see why use `status --outdated -m`</code></pre></details><p>You can also download the <a href="https://github.com/SciML/NeuralOperators.jl/tree/gh-pages/v0.4.6/assets/Manifest.toml">manifest</a> file and the <a href="https://github.com/SciML/NeuralOperators.jl/tree/gh-pages/v0.4.6/assets/Project.toml">project</a> file.</p></article><nav class="docs-footer"><a class="docs-footer-nextpage" href="introduction/">Introduction »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="auto">Automatic (OS)</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.0.1 on <span class="colophon-date" title="Monday 25 September 2023 03:13">Monday 25 September 2023</span>. Using Julia version 1.9.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+<span class="sgr36"><span class="sgr1">Info</span></span> Packages marked with <span class="sgr32">⌃</span> and <span class="sgr33">⌅</span> have new versions available, but those with <span class="sgr33">⌅</span> are restricted by compatibility constraints from upgrading. To see why use `status --outdated -m`</code></pre></details><p>You can also download the <a href="https://github.com/SciML/NeuralOperators.jl/tree/gh-pages/v0.4.7/assets/Manifest.toml">manifest</a> file and the <a href="https://github.com/SciML/NeuralOperators.jl/tree/gh-pages/v0.4.7/assets/Project.toml">project</a> file.</p></article><nav class="docs-footer"><a class="docs-footer-nextpage" href="introduction/">Introduction »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="auto">Automatic (OS)</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.1.1 on <span class="colophon-date" title="Friday 13 October 2023 04:49">Friday 13 October 2023</span>. Using Julia version 1.9.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
