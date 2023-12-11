@@ -3,7 +3,7 @@ module LuxNeuralOperators
 import PrecompileTools: @recompile_invalidations
 
 @recompile_invalidations begin
-    using FFTW, Lux, Random, TensorCast, TransmuteDims
+    using ArrayInterface, FFTW, Lux, Random, TransmuteDims
 
     import ChainRulesCore as CRC
     import Lux.Experimental: @compact

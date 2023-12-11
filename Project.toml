@@ -4,21 +4,20 @@ authors = ["Avik Pal <avikpal@mit.edu>"]
 version = "0.1.0"
 
 [deps]
+ArrayInterface = "4fba245c-0d91-5ea0-9b3e-6abc04ee57a9"
 ChainRulesCore = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
 FFTW = "7a1cc6ca-52ef-59f5-83cd-3a7055c09341"
 Lux = "b2108857-7c20-44ae-9111-449ecde12c47"
 LuxCore = "bb33d45b-7691-41d6-9220-0943567d0623"
 PrecompileTools = "aea7be01-6a6a-4083-8856-8a6e6704d82a"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
-TensorCast = "02d47bb6-7ce6-556a-be16-bb1710789e2b"
 TransmuteDims = "24ddb15e-299a-5cc3-8414-dbddc482d9ca"
 
 [compat]
-ChainRulesCore = "1.18.0"
-FFTW = "1.7.1"
-Lux = "0.5.10"
-LuxCore = "0.1.6"
-PrecompileTools = "1.2.0"
+ChainRulesCore = "1"
+FFTW = "1"
+Lux = "0.5.7"
+LuxCore = "0.1"
+PrecompileTools = "1"
 Random = "<0.0.1, 1"
-TensorCast = "0.4.6"
-TransmuteDims = "0.1.15"
+TransmuteDims = "0.1"
