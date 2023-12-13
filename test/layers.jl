@@ -13,8 +13,6 @@ include("test_utils.jl")
         (; m=(10, 10), permuted=Val(true), x_size=(22, 22, 1, 5), y_size=(22, 22, 64, 5))
     ]
 
-    loss(m, ps, x, y) = sum(abs2, m(x, ps) .- y)
-
     @testset "$(length(setup.m))D $(op): permuted = $(setup.permuted)" for setup in setups,
         op in opconv
 
@@ -32,7 +30,7 @@ include("test_utils.jl")
         @inferred m(x, ps, st)
 
         data = [(x, rand(rng, Float32, setup.y_size...))]
-        l2, l1 = train!(loss, m, ps, st, data; epochs=10)
+        l2, l1 = train!(m, ps, st, data; epochs=10)
         @test l2 < l1
     end
 end

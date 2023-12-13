@@ -1,4 +1,4 @@
-using Random, StableRNGs, Test
+using Random, StableRNGs, Statistics, Test
 using Lux, LuxCUDA, Zygote, Optimisers
 using LuxTestUtils: @jet, @test_gradients
 
@@ -7,7 +7,7 @@ CUDA.allowscalar(false)
 const GROUP = get(ENV, "GROUP", "All")
 
 cpu_testing() = GROUP == "All" || GROUP == "CPU"
-cuda_testing() = GROUP == "All" || GROUP == "CUDA"
+cuda_testing() = LuxCUDA.functional() && (GROUP == "All" || GROUP == "CUDA")
 
 if !@isdefined(MODES)
     const MODES = begin
@@ -34,6 +34,10 @@ function get_default_rng(mode::String)
 end
 
 get_stable_rng(seed = 12345) = StableRNG(seed)
+
+default_loss_function(model, ps, x, y) = mean(abs2, y .- model(x, ps))
+
+train!(args...; kwargs...) = train!(default_loss_function, args...; kwargs...)
 
 function train!(loss, model, ps, st, data; epochs = 10)
     m = Lux.Experimental.StatefulLuxLayer(model, ps, st)

@@ -1,9 +1,10 @@
 module LuxNeuralOperators
 
 import PrecompileTools: @recompile_invalidations
+import Reexport: @reexport
 
 @recompile_invalidations begin
-    using ArrayInterface, FFTW, Lux, Random, TransmuteDims
+    using ArrayInterface, FFTW, Lux, Random
 
     import ChainRulesCore as CRC
     import Lux.Experimental: @compact
@@ -12,7 +13,12 @@ import PrecompileTools: @recompile_invalidations
     import Random: AbstractRNG
 end
 
+@reexport using Lux, Random
+
 __default_rng() = Xoshiro(0)
+
+const True = Val(true)
+const False = Val(false)
 
 include("transform.jl")
 include("layers.jl")
