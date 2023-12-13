@@ -31,22 +31,22 @@ OperatorConv{FourierTransform}(2 => 5, (16,); permuted = true)()  # 160 paramete
 ```
 """
 function OperatorConv(rng::AbstractRNG, ch::Pair{<:Integer, <:Integer},
-        _modes::NTuple{N, <:Integer}, ::Type{TR}; init_weight=glorot_uniform,
+        modes::NTuple{N, <:Integer}, ::Type{TR}; init_weight=glorot_uniform,
         T::Type{TP}=ComplexF32, permuted::Val=False) where {N, TR <: AbstractTransform, TP}
     in_chs, out_chs = ch
     scale = real(one(T)) / (in_chs * out_chs)
-    wt = scale * init_weight(rng, T, out_chs, in_chs, prod(_modes))
-    tr = TR(_modes)
-    name = "OperatorConv{$TR}($in_chs => $out_chs, $_modes; permuted = $permuted)"
+    weights = scale * init_weight(rng, T, out_chs, in_chs, prod(modes))
+    transform = TR(modes)
+    name = "OperatorConv{$TR}($in_chs => $out_chs, $modes; permuted = $permuted)"
 
     if permuted === True
-        return @compact(; modes=_modes, weights=wt, transform=tr,
+        return @compact(; modes, weights, transform,
             name) do x::AbstractArray{<:Real, M} where {M}
             y = __operator_conv(x, transform, weights)
             return y
         end
     else
-        return @compact(; modes=_modes, weights=wt, transform=tr,
+        return @compact(; modes, weights, transform,
             name) do x::AbstractArray{<:Real, M} where {M}
             N_ = ndims(transform)
             xᵀ = permutedims(x, (ntuple(i -> i + 1, N_)..., 1, N_ + 2))
@@ -128,8 +128,8 @@ function OperatorKernel(rng::AbstractRNG, ch::Pair{<:Integer, <:Integer},
     l₁ = permuted === True ? Conv(map(_ -> 1, modes), ch) : Dense(ch)
     l₂ = OperatorConv(rng, ch, modes, transform; permuted, kwargs...)
 
-    return @compact(; l1=l₁, l2=l₂, activation=σ) do x::AbstractArray{<:Real, M} where {M}
-        return activation.(l1(x) .+ l2(x))
+    return @compact(; l₁, l₂, activation=σ) do x::AbstractArray{<:Real, M} where {M}
+        return activation.(l₁(x) .+ l₂(x))
     end
 end
 
