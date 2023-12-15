@@ -37,7 +37,7 @@ function register_dataset(dataset::String)
 end
 
 function get_dataset(dataset::String; return_eltype::Type{T}=Float32, batchsize::Int = 128,
-        ratio::AbstractFloat=0.9) where {T}
+        ratio::AbstractFloat=0.9, no_dataloader::Val{DT} = Val(false)) where {T, DT}
     register_dataset(dataset)
     root = @datadep_str dataset
 
@@ -59,6 +59,8 @@ function get_dataset(dataset::String; return_eltype::Type{T}=Float32, batchsize:
     else
         error("Not Implemented Dataset: $(dataset)")
     end
+
+    DT && return x, y
 
     data_train, data_test = splitobs((x, y); at=ratio)
 

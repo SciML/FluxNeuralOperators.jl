@@ -1,5 +1,6 @@
 [deps]
 BSON = "fbb218c0-5317-5bc6-957e-2ee96dd4b1f0"
+CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
 DataDeps = "124859b0-ceae-595e-8997-d05f6a7a8dfe"
 Fetch = "bb354801-46f6-40b6-9c3d-d42d7a74c775"
 Lux = "b2108857-7c20-44ae-9111-449ecde12c47"
