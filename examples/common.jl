@@ -107,7 +107,7 @@ function train!(model, ps, st, trainloader, testloader, opt; epochs = 500)
             x = x |> gdev
             y = y |> gdev
             total_loss += l₂_loss(model_inf, ps, x, y)
-            total_data += size(y, ndims(y))
+            total_data += 1
         end
 
         @info "Epoch: $epoch, Loss: $(total_loss / total_data)"
