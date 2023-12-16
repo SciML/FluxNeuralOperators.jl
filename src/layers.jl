@@ -1,6 +1,6 @@
 """
-    OperatorConv([rng::AbstractRNG = __defautl_rng()], ch::Pair{<:Integer, <:Integer},
-        _modes::NTuple{N, <:Integer}, ::Type{TR}; init_weight = glorot_uniform,
+    OperatorConv([rng::AbstractRNG = __default_rng()], ch::Pair{<:Integer, <:Integer},
+        modes::NTuple{N, <:Integer}, ::Type{TR}; init_weight = glorot_uniform,
         T::Type{TP} = ComplexF32,
         permuted::Val{P} = Val(false)) where {N, TR <: AbstractTransform, TP, P}
 
@@ -40,13 +40,13 @@ function OperatorConv(rng::AbstractRNG, ch::Pair{<:Integer, <:Integer},
     name = "OperatorConv{$TR}($in_chs => $out_chs, $modes; permuted = $permuted)"
 
     if permuted === True
-        return @compact(; modes, weights, transform,
+        return @compact(; modes, weights, transform, dispatch=:OperatorConv,
             name) do x::AbstractArray{<:Real, M} where {M}
             y = __operator_conv(x, transform, weights)
             return y
         end
     else
-        return @compact(; modes, weights, transform,
+        return @compact(; modes, weights, transform, dispatch=:OperatorConv,
             name) do x::AbstractArray{<:Real, M} where {M}
             N_ = ndims(transform)
             xᵀ = permutedims(x, (ntuple(i -> i + 1, N_)..., 1, N_ + 2))
@@ -56,8 +56,6 @@ function OperatorConv(rng::AbstractRNG, ch::Pair{<:Integer, <:Integer},
         end
     end
 end
-
-OperatorConv(args...; kwargs...) = OperatorConv(__default_rng(), args...; kwargs...)
 
 """
     SpectralConv(args...; kwargs...)
@@ -78,7 +76,7 @@ OperatorConv{FourierTransform}(2 => 5, (16,); permuted = true)()  # 160 paramete
 SpectralConv(args...; kwargs...) = OperatorConv(args..., FourierTransform; kwargs...)
 
 """
-    OperatorKernel([rng::AbstractRNG = __defautl_rng()], ch::Pair{<:Integer, <:Integer},
+    OperatorKernel([rng::AbstractRNG = __default_rng()], ch::Pair{<:Integer, <:Integer},
         modes::NTuple{N, <:Integer}, transform::Type{TR}; σ = identity,
         permuted::Val{P} = Val(false), kwargs...) where {N, TR <: AbstractTransform, P}
 
@@ -128,7 +126,8 @@ function OperatorKernel(rng::AbstractRNG, ch::Pair{<:Integer, <:Integer},
     l₁ = permuted === True ? Conv(map(_ -> 1, modes), ch) : Dense(ch)
     l₂ = OperatorConv(rng, ch, modes, transform; permuted, kwargs...)
 
-    return @compact(; l₁, l₂, activation=σ) do x::AbstractArray{<:Real, M} where {M}
+    return @compact(; l₁, l₂, activation=σ,
+        dispatch=:OperatorKernel) do x::AbstractArray{<:Real, M} where {M}
         return activation.(l₁(x) .+ l₂(x))
     end
 end
@@ -165,7 +164,60 @@ end       # Total: 175 parameters,
 """
 SpectralKernel(args...; kwargs...) = OperatorKernel(args..., FourierTransform; kwargs...)
 
-OperatorKernel(args...; kwargs...) = OperatorKernel(__default_rng(), args...; kwargs...)
+# Building Blocks
+function BasicBlock(rng::AbstractRNG, ch::Integer, modes::NTuple{N, <:Integer}, args...;
+        add_mlp::Val=False, normalize::Val=False, σ=gelu, kwargs...) where {N}
+    conv1 = SpectralConv(rng, ch => ch, modes, args...; kwargs...)
+    conv2 = SpectralConv(rng, ch => ch, modes, args...; kwargs...)
+    conv3 = SpectralConv(rng, ch => ch, modes, args...; kwargs...)
+
+    kernel_size = map(_ -> 1, modes)
+
+    if add_mlp === True
+        mlp1 = Chain(Conv(kernel_size, ch => ch, σ), Conv(kernel_size, ch => ch))
+        mlp2 = Chain(Conv(kernel_size, ch => ch, σ), Conv(kernel_size, ch => ch))
+        mlp3 = Chain(Conv(kernel_size, ch => ch, σ), Conv(kernel_size, ch => ch))
+    else
+        mlp1 = NoOpLayer()
+        mlp2 = NoOpLayer()
+        mlp3 = NoOpLayer()
+    end
+
+    norm = normalize === True ? InstanceNorm(ch; affine = false) : NoOpLayer()
+
+    w1 = Conv(kernel_size, ch => ch)
+    w2 = Conv(kernel_size, ch => ch)
+    w3 = Conv(kernel_size, ch => ch)
+
+    return @compact(; conv1, conv2, conv3, mlp1, mlp2, mlp3, w1, w2, w3, norm, σ,
+        dispatch=:BasicBlock) do (inp,)
+        x, injection = __destructure(inp)
+
+        x = norm(x)
+        x1 = norm(mlp1(norm(conv1(x))))
+        x2 = norm(w1(x))
+        x = σ.(x1 .+ x2 .+ injection)
+
+        x1 = norm(mlp2(norm(conv2(x))))
+        x2 = norm(w2(x))
+        x = σ.(x1 .+ x2 .+ injection)
+
+        x1 = norm(mlp3(norm(conv3(x))))
+        x2 = norm(w3(x))
+        return σ.(x1 .+ x2 .+ injection)
+    end
+end
+
+function StackedBasicBlock(rng::AbstractRNG, args...; depth::Val{N} = Val(1),
+        kwargs...) where {N}
+    blocks = ntuple(i -> BasicBlock(rng, args...; kwargs...), N)
+    block = NamedTuple{ntuple(i -> Symbol("block_", i), N)}(blocks)
+
+    return @compact(; block, dispatch=:StackedBasicBlock) do (inp,)
+        x, injection = __destructure(inp)
+        return __applyblock(block, x, injection)
+    end
+end
 
 # Functional Versions
 @inline function __operator_conv(x, transform, weights)
@@ -189,6 +241,13 @@ end
     x_ = permutedims(x, (2, 3, 1))         # i x b x m
     res = batched_mul(y, x_)               # o x b x m
     return permutedims(res, (3, 1, 2))     # m x o x b
+end
+
+@inline @generated function __applyblock(block::NamedTuple{names}, x, inj) where {names}
+    calls = [:(x = block.$name((x, inj))) for name in names]
+    return quote
+        $(calls...)
+    end
 end
 
 @inline __pad_modes(x, dims::Integer...) = __pad_modes(x, dims)

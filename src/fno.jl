@@ -1,6 +1,6 @@
 """
-    FourierNeuralOperator(; chs = (2, 64, 64, 64, 64, 64, 128, 1), modes = (16,),
-        σ = gelu, rng = nothing, permuted::Val = Val(false), kwargs...)
+    FourierNeuralOperator([rng = __default_rng()]; chs = (2, 64, 64, 64, 64, 64, 128, 1),
+        modes = (16,), σ = gelu, permuted::Val = Val(false), kwargs...)
 
 Fourier neural operator is a operator learning model that uses Fourier kernel to perform
 spectral convolutions. It is a promising way for surrogate methods, and can be regarded as
@@ -16,7 +16,6 @@ kernels, and two `Dense` layers to project data back to the scalar field of inte
   - `modes`: The modes to be preserved. A tuple of length `d`, where `d` is the dimension
     of data.
   - `σ`: Activation function for all layers in the model.
-  - `rng`: Random number generator. If provided, it is forwarded to the Operator Layers.
   - `permuted`: Whether the dim is permuted. If `permuted = Val(true)`, the layer accepts
     data in the order of `(ch, x_1, ... , x_d , batch)`. Otherwise the order is
     `(x_1, ... , x_d, ch, batch)`.
@@ -35,28 +34,28 @@ Chain(
             l1 = Dense(64 => 64),       # 4_160 parameters
             l2 = OperatorConv{FourierTransform}(64 => 64, (16,); permuted = false)(),  # 65_536 parameters, plus 2
             activation = σ,
-        ) do x::(AbstractArray{<:Real, M} where M) 
+        ) do x::(AbstractArray{<:Real, M} where M)
             return activation.(l1(x) .+ l2(x))
         end,
         layer_2 = @compact(
             l1 = Dense(64 => 64),       # 4_160 parameters
             l2 = OperatorConv{FourierTransform}(64 => 64, (16,); permuted = false)(),  # 65_536 parameters, plus 2
             activation = σ,
-        ) do x::(AbstractArray{<:Real, M} where M) 
+        ) do x::(AbstractArray{<:Real, M} where M)
             return activation.(l1(x) .+ l2(x))
         end,
         layer_3 = @compact(
             l1 = Dense(64 => 64),       # 4_160 parameters
             l2 = OperatorConv{FourierTransform}(64 => 64, (16,); permuted = false)(),  # 65_536 parameters, plus 2
             activation = σ,
-        ) do x::(AbstractArray{<:Real, M} where M) 
+        ) do x::(AbstractArray{<:Real, M} where M)
             return activation.(l1(x) .+ l2(x))
         end,
         layer_4 = @compact(
             l1 = Dense(64 => 64),       # 4_160 parameters
             l2 = OperatorConv{FourierTransform}(64 => 64, (16,); permuted = false)(),  # 65_536 parameters, plus 2
             activation = σ,
-        ) do x::(AbstractArray{<:Real, M} where M) 
+        ) do x::(AbstractArray{<:Real, M} where M)
             return activation.(l1(x) .+ l2(x))
         end,
     ),
@@ -68,10 +67,9 @@ Chain(
           #        plus 12 states.
 ```
 """
-function FourierNeuralOperator(; chs=(2, 64, 64, 64, 64, 64, 128, 1), modes=(16,),
-        σ=gelu, rng=nothing, permuted::Val{P}=False, kwargs...) where {P}
+function FourierNeuralOperator(rng::AbstractRNG; chs=(2, 64, 64, 64, 64, 64, 128, 1),
+        modes=(16,), σ=gelu, permuted::Val{P}=False, kwargs...) where {P}
     @assert length(chs) ≥ 5
-    rng === nothing && (rng = __default_rng())
 
     map₁ = chs[1] => chs[2]
     map₂ = chs[end - 2] => chs[end - 1]
