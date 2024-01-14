@@ -1,24 +1,18 @@
-using NeuralOperators
-using CUDA
-using Flux
-using GeometricFlux
-using Graphs
-using Zygote
-using Test
-
-CUDA.allowscalar(false)
+using SafeTestsets, Test
 
 @testset "NeuralOperators.jl" begin
+    @safetestset "Quality Assurance" include("qa.jl")
     # kernels
-    include("Transform/Transform.jl")
-    include("operator_kernel.jl")
-    include("graph_kernel.jl")
-    include("loss.jl")
+    @safetestset "Fourier Transform" include("fourier_transform.jl")
+    @safetestset "Chebyshev Transform" include("chebyshev_transform.jl")
+    @safetestset "operator_kernel.jl" include("operator_kernel.jl")
+    @safetestset "graph kernel" include("graph_kernel.jl")
+    @safetestset "loss" include("loss.jl")
 
     # models
-    include("FNO/FNO.jl")
-    include("DeepONet/DeepONet.jl")
-    include("NOMAD/NOMAD.jl")
+    @safetestset "FNO" include("FNO/FNO.jl")
+    @safetestset "DeepONet" include("DeepONet/DeepONet.jl")
+    @safetestset "NOMAD" include("NOMAD/NOMAD.jl")
 end
 
 #=

@@ -1,3 +1,5 @@
+using NeuralOperators
+using Flux
 @testset "1D OperatorConv" begin
     modes = (16,)
     ch = 64 => 128

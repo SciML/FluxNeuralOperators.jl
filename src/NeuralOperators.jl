@@ -4,8 +4,6 @@ using Flux
 using FFTW
 using Tullio
 using CUDA
-using CUDAKernels
-using KernelAbstractions
 using Zygote
 using ChainRulesCore
 using GeometricFlux

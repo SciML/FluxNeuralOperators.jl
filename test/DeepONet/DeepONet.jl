@@ -1,3 +1,6 @@
+using NeuralOperators
+using CUDA; CUDA.allowscalar(false)
+using Flux
 @testset "DeepONet" begin
     @testset "proper construction" begin
         deeponet = DeepONet((32, 64, 72), (24, 48, 72), σ, tanh)

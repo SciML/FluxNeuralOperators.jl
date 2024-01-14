@@ -1,17 +1,4 @@
 steps:
-  - label: ":julia: Run tests on 1.6 LTS"
-    plugins:
-      - JuliaCI/julia#v1:
-          version: "1.6"
-      - JuliaCI/julia-test#v1:
-           coverage: false
-    agents:
-      queue: "juliagpu"
-      cuda: "*"
-    timeout_in_minutes: 60
-    # Don't run Buildkite if the commit message includes the text [skip tests]
-    if: build.message !~ /\[skip tests\]/
-
   - label: ":julia: Run tests on Julia-latest"
     plugins:
       - JuliaCI/julia#v1:

@@ -1,3 +1,5 @@
+using NeuralOperators
+using Flux
 @testset "FourierNeuralOperator" begin
     m = FourierNeuralOperator()
 

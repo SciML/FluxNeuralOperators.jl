@@ -1,3 +1,5 @@
+using NeuralOperators
+using Flux
 @testset "NOMAD" begin
     @testset "proper construction" begin
         nomad = NOMAD((32, 64, 72), (24, 48, 72), σ, tanh)

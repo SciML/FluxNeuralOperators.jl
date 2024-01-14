@@ -1,14 +1,14 @@
 export ChebyshevTransform
 
-struct ChebyshevTransform{N, S} <: AbstractTransform
-    modes::NTuple{N, S} # N == ndims(x)
+struct ChebyshevTransform{nMinus1, S} <: AbstractTransform
+    modes::Tuple{S,Vararg{S,nMinus1}} # nMinus1 == ndims(x)-1
 end
 
-Base.ndims(::ChebyshevTransform{N}) where {N} = N
+Base.ndims(::ChebyshevTransform{nMinus1}) where {nMinus1} = nMinus1 + 1
 Base.eltype(::Type{ChebyshevTransform}) = Float32
 
-function transform(t::ChebyshevTransform{N}, 𝐱::AbstractArray) where {N}
-    return FFTW.r2r(𝐱, FFTW.REDFT10, 1:N) # [size(x)..., in_chs, batch]
+function transform(t::ChebyshevTransform{nMinus1}, 𝐱::AbstractArray) where {nMinus1}
+    return FFTW.r2r(𝐱, FFTW.REDFT10, 1:(nMinus1+1)) # [size(x)..., in_chs, batch]
 end
 
 function truncate_modes(t::ChebyshevTransform, 𝐱̂::AbstractArray)
@@ -31,7 +31,7 @@ function ∇r2r(Δ::AbstractArray{T}, kind, dims) where {T}
     # derivative of r2r turns out to be r2r
     Δx = FFTW.r2r(Δ, kind, dims)
 
-    # rank 4 correction: needs @bischtob to elaborate the reason using this. 
+    # rank 4 correction: needs @bischtob to elaborate the reason using this.
     # (M,) = size(Δ)[dims]
     # a1 = fill!(similar(Δ, M), one(T))
     # CUDA.@allowscalar a1[1] = a1[end] = zero(T)
