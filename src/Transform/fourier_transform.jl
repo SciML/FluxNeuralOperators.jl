@@ -1,10 +1,10 @@
 export FourierTransform
 
-struct FourierTransform{N, S} <: AbstractTransform
-    modes::NTuple{N, S} # N == ndims(x)
+struct FourierTransform{nMinus1, S} <: AbstractTransform
+    modes::Tuple{S,Vararg{S,nMinus1}} # nMinus1 == ndims(x)-1
 end
 
-Base.ndims(::FourierTransform{N}) where {N} = N
+Base.ndims(::FourierTransform{nMinus1}) where {nMinus1} = nMinus1+1
 Base.eltype(::Type{FourierTransform}) = ComplexF32
 
 function transform(ft::FourierTransform, 𝐱::AbstractArray)
