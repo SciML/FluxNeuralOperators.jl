@@ -1,7 +1,7 @@
 name = "NeuralOperators"
 uuid = "ea5c82af-86e5-48da-8ee1-382d6ad7af4b"
 authors = ["JingYu Ning <foldfelis@gmail.com> and contributors"]
-version = "0.4.6"
+version = "0.4.7"
 
 [deps]
 CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
@@ -21,6 +21,7 @@ FFTW = "1"
 Flux = "0.14"
 GeometricFlux = "0.14"
 KernelAbstractions = "0.7, 0.8, 0.9"
+Statistics = "1"
 Tullio = "0.3"
 Zygote = "0.6"
 julia = "1.6"

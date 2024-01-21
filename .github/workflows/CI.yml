@@ -4,8 +4,12 @@ env:
 on:
   push:
     branches: '*'
+    paths-ignore:
+      - 'docs/**'
     tags: '*'
   pull_request:
+    paths-ignore:
+      - 'docs/**'
 concurrency:
   # Skip intermediate builds: always.
   # Cancel intermediate builds: only if it is a pull request build.
@@ -28,7 +32,7 @@ jobs:
         arch:
           - x64
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: julia-actions/setup-julia@v1
         with:
           version: ${{ matrix.version }}
@@ -46,7 +50,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: julia-actions/setup-julia@v1
         with:
           version: '1'
