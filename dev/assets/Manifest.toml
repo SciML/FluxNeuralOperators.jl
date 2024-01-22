@@ -968,7 +968,7 @@ version = "1.2.0"
 deps = ["CUDA", "ChainRulesCore", "FFTW", "Flux", "GeometricFlux", "KernelAbstractions", "Statistics", "Tullio", "Zygote"]
 path = "/home/runner/work/NeuralOperators.jl/NeuralOperators.jl"
 uuid = "ea5c82af-86e5-48da-8ee1-382d6ad7af4b"
-version = "0.4.7"
+version = "0.4.8"
 
 [[deps.OffsetArrays]]
 git-tree-sha1 = "6a731f2b5c03157418a20c12195eb4b74c8f8621"
