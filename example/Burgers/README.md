@@ -11,7 +11,7 @@ u(x, 0) ->  u(x, t_end)\
 
 ![](gallery/burgers.png)
 
-Change directory to `example/Burgers` and use following commend to train model:
+Change directory to `example/Burgers` and use following command to train model:
 
 ```julia
 julia> using Burgers;
