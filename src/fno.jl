@@ -16,7 +16,7 @@ kernels, and two `Dense` layers to project data back to the scalar field of inte
   - `modes`: The modes to be preserved. A tuple of length `d`, where `d` is the dimension
     of data.
   - `σ`: Activation function for all layers in the model.
-  - `permuted`: Whether the dim is permuted. If `permuted = Val(true)`, the layer accepts
+  - `permuted`: Whether the dim is permuted. If `permuted = Val(false)`, the layer accepts
     data in the order of `(ch, x_1, ... , x_d , batch)`. Otherwise the order is
     `(x_1, ... , x_d, ch, batch)`.
 
