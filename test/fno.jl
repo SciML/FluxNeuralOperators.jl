@@ -12,7 +12,7 @@ include("test_utils.jl")
             y_size=(1024, 1, 5), permuted=Val(true))]
 
     @testset "$(length(setup.modes))D: permuted = $(setup.permuted)" for setup in setups
-        fno = FourierNeuralOperator(; rng, setup.chs, setup.modes, setup.permuted)
+        fno = FourierNeuralOperator(rng; setup.chs, setup.modes, setup.permuted)
 
         x = rand(rng, Float32, setup.x_size...)
         y = rand(rng, Float32, setup.y_size...)
