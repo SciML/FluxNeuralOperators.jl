@@ -15,7 +15,7 @@
 ## Keyword Arguments
 
   - `init_weight`: Initial function to initialize parameters.
-  - `permuted`: Whether the dim is permuted. If `permuted = Val(true)`, the layer accepts
+  - `permuted`: Whether the dim is permuted. If `permuted = Val(false)`, the layer accepts
     data in the order of `(ch, x_1, ... , x_d , batch)`. Otherwise the order is
     `(x_1, ... , x_d, ch, batch)`.
   - `T`: Datatype of parameters.
@@ -86,7 +86,7 @@ SpectralConv(args...; kwargs...) = OperatorConv(args..., FourierTransform; kwarg
   - `ch`: A `Pair` of input and output channel size `ch_in => ch_out`, e.g. `64 => 64`.
   - `modes`: The modes to be preserved. A tuple of length `d`, where `d` is the dimension of
     data.
-  - `::Type{TR}`: The traform to operate the transformation.
+  - `::Type{TR}`: The transform to operate the transformation.
 
 ## Keyword Arguments
 
@@ -237,7 +237,7 @@ end
 end
 
 @inline function __apply_pattern_batched_mul(x, y)
-    # Use permutedims to guarantee contiguous memory
+    # Use permutedims to guarantee contiguous memory 
     x_ = permutedims(x, (2, 3, 1))         # i x b x m
     res = batched_mul(y, x_)               # o x b x m
     return permutedims(res, (3, 1, 2))     # m x o x b
