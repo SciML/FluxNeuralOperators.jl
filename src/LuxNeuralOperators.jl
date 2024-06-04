@@ -29,5 +29,6 @@ include("fno.jl")
 export FourierTransform
 export SpectralConv, OperatorConv, SpectralKernel, OperatorKernel
 export FourierNeuralOperator
+export DeepONet
 
 end
