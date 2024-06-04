@@ -27,7 +27,7 @@ include("deq.jl")
 
 # Pass `rng` if user doesn't pass it
 for f in (:BasicBlock, :StackedBasicBlock, :OperatorConv, :OperatorKernel,
-    :FourierNeuralOperator)
+    :FourierNeuralOperator, :DeepONet)
     @eval begin
         $(f)(args...; kwargs...) = $(f)(__default_rng(), args...; kwargs...)
     end
@@ -40,5 +40,6 @@ export FourierTransform
 export SpectralConv, OperatorConv
 export SpectralKernel, OperatorKernel
 export FourierNeuralOperator
+export DeepONet
 
 end
