@@ -1,7 +1,8 @@
-function DeepONet(rng::AbstractRNG, branch::Tuple, trunk::Tuple;
-    branch_activation = identity, trunk_activation = identity)\
+function DeepONet(branch = (64,32,16), trunk = (1,8,16),
+    branch_activation = identity, trunk_activation = identity)
 
     # checks for last dimension size
+    print("asdasd")
 
     branch_net = Chain([Dense(branch[i] => branch[i+1], branch_activation)
     for i in 1:length(branch) - 1]...);
@@ -9,7 +10,7 @@ function DeepONet(rng::AbstractRNG, branch::Tuple, trunk::Tuple;
     trunk_net = Chain([Dense(trunk[i] => trunk[i+1], trunk_activation)
     for i in 1:length(trunk) - 1]...);
 
-    return DeepONet(rng, branch_net, trunk_net);
+    return DeepONet(branch_net, trunk_net);
 end
 import Lux.Experimental:@compact
 
@@ -17,9 +18,11 @@ import Lux.Experimental:@compact
     DeepONet(rng::AbstractRNG, branch::L1, trunk::L2) where L1, L2
 returns a DeepONet architecture for given branch and trunk networks
 """
-function DeepONet(rng::AbstractRNG, branch::L1, trunk::L2) where {L1, L2}
+function DeepONet(branch::L1, trunk::L2) where {L1, L2}
 
     # checks for last dimension size
+
+    print("zxzczx")
 
     return @compact(; branch, trunk, dispatch =:DeepONet) do (u ,  y) # ::AbstractArray{<:Real, M} where {M}
         t = trunk(y); # p x N x nb 
