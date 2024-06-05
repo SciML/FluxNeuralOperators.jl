@@ -1,4 +1,4 @@
-function DeepONet(branch = (64,32,16), trunk = (1,8,16),
+function DeepONet5(branch::Tuple, trunk::Tuple,
     branch_activation = identity, trunk_activation = identity)
 
     # checks for last dimension size
@@ -12,7 +12,7 @@ function DeepONet(branch = (64,32,16), trunk = (1,8,16),
 
     return DeepONet(branch_net, trunk_net);
 end
-import Lux.Experimental:@compact
+# import Lux.Experimental:@compact
 
 """
     DeepONet(rng::AbstractRNG, branch::L1, trunk::L2) where L1, L2
