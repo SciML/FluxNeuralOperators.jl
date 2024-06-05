@@ -23,11 +23,12 @@ const False = Val(false)
 include("transform.jl")
 include("layers.jl")
 include("fno.jl")
+include("DeepONet")
 include("deq.jl")
 
 # Pass `rng` if user doesn't pass it
 for f in (:BasicBlock, :StackedBasicBlock, :OperatorConv, :OperatorKernel,
-    :FourierNeuralOperator, :DeepONet)
+    :FourierNeuralOperator)
     @eval begin
         $(f)(args...; kwargs...) = $(f)(__default_rng(), args...; kwargs...)
     end
