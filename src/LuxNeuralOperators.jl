@@ -25,7 +25,7 @@ include("functional.jl")
 include("layers.jl")
 
 include("fno.jl")
-include("DeepONet")
+include("deeponet")
 
 export FourierTransform
 export SpectralConv, OperatorConv, SpectralKernel, OperatorKernel
