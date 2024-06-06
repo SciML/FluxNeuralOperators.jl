@@ -7,4 +7,8 @@ using SafeTestsets, Test
     @safetestset "FNO" begin
         include("fno.jl")
     end
+
+    @safetestset "DeepONet" begin
+        include("deeponet.jl")
+    end
 end

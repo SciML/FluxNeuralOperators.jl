@@ -23,7 +23,7 @@ const False = Val(false)
 include("transform.jl")
 include("layers.jl")
 include("fno.jl")
-include("deepnet")
+include("deeponet.jl")
 include("deq.jl")
 
 # Pass `rng` if user doesn't pass it
