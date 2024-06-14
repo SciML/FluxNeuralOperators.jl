@@ -1,6 +1,7 @@
 """
-    FourierNeuralOperator([rng = __default_rng()]; chs = (2, 64, 64, 64, 64, 64, 128, 1),
-        modes = (16,), σ = gelu, permuted::Val = Val(false), kwargs...)
+    FourierNeuralOperator(
+        σ=gelu; chs::Dims{C}=(2, 64, 64, 64, 64, 64, 128, 1), modes::Dims{M}=(16,),
+        permuted::Val{perm}=False, kwargs...) where {C, M, perm}
 
 Fourier neural operator is a operator learning model that uses Fourier kernel to perform
 spectral convolutions. It is a promising way for surrogate methods, and can be regarded as
@@ -10,80 +11,60 @@ The model is comprised of a `Dense` layer to lift (d + 1)-dimensional vector fie
 n-dimensional vector field, and an integral kernel operator which consists of four Fourier
 kernels, and two `Dense` layers to project data back to the scalar field of interest space.
 
+## Arguments
+
+  - `σ`: Activation function for all layers in the model.
+
 ## Keyword Arguments
 
   - `chs`: A `Tuple` or `Vector` of the 8 channel size.
   - `modes`: The modes to be preserved. A tuple of length `d`, where `d` is the dimension
     of data.
-  - `σ`: Activation function for all layers in the model.
   - `permuted`: Whether the dim is permuted. If `permuted = Val(false)`, the layer accepts
     data in the order of `(ch, x_1, ... , x_d , batch)`. Otherwise the order is
     `(x_1, ... , x_d, ch, batch)`.
 
 ## Example
 
-```julia
-julia> using LuxNeuralOperators
-
-julia> FourierNeuralOperator(; chs=(2, 64, 64, 64, 64, 64, 128, 1),
-           modes=(16,), σ=gelu)
-Chain(
+```jldoctest
+julia> FourierNeuralOperator(gelu; chs=(2, 64, 64, 128, 1), modes=(16,))
+FourierNeuralOperator(
     lifting = Dense(2 => 64),           # 192 parameters
-    mapping = Chain(
-        layer_1 = @compact(
-            l1 = Dense(64 => 64),       # 4_160 parameters
-            l2 = OperatorConv{FourierTransform}(64 => 64, (16,); permuted = false)(),  # 65_536 parameters, plus 2
-            activation = σ,
-        ) do x::(AbstractArray{<:Real, M} where M)
-            return activation.(l1(x) .+ l2(x))
-        end,
-        layer_2 = @compact(
-            l1 = Dense(64 => 64),       # 4_160 parameters
-            l2 = OperatorConv{FourierTransform}(64 => 64, (16,); permuted = false)(),  # 65_536 parameters, plus 2
-            activation = σ,
-        ) do x::(AbstractArray{<:Real, M} where M)
-            return activation.(l1(x) .+ l2(x))
-        end,
-        layer_3 = @compact(
-            l1 = Dense(64 => 64),       # 4_160 parameters
-            l2 = OperatorConv{FourierTransform}(64 => 64, (16,); permuted = false)(),  # 65_536 parameters, plus 2
-            activation = σ,
-        ) do x::(AbstractArray{<:Real, M} where M)
-            return activation.(l1(x) .+ l2(x))
-        end,
-        layer_4 = @compact(
-            l1 = Dense(64 => 64),       # 4_160 parameters
-            l2 = OperatorConv{FourierTransform}(64 => 64, (16,); permuted = false)(),  # 65_536 parameters, plus 2
-            activation = σ,
-        ) do x::(AbstractArray{<:Real, M} where M)
-            return activation.(l1(x) .+ l2(x))
-        end,
-    ),
+    mapping = @compact(
+        l₁ = Dense(64 => 64),           # 4_160 parameters
+        l₂ = OperatorConv{FourierTransform}(64 => 64, (16,); permuted = false)(),  # 65_536 parameters
+        activation = gelu,
+    ) do x::AbstractArray
+        l₁x = l₁(x)
+        l₂x = l₂(x)
+        return @__dot__(activation(l₁x + l₂x))
+    end,
     project = Chain(
         layer_1 = Dense(64 => 128, gelu),  # 8_320 parameters
         layer_2 = Dense(128 => 1),      # 129 parameters
     ),
-)         # Total: 287_425 parameters,
-          #        plus 12 states.
+)         # Total: 78_337 parameters,
+          #        plus 1 states.
 ```
 """
-function FourierNeuralOperator(rng::AbstractRNG; chs=(2, 64, 64, 64, 64, 64, 128, 1),
-        modes=(16,), σ=gelu, permuted::Val{P}=False, kwargs...) where {P}
-    @assert length(chs) ≥ 5
+function FourierNeuralOperator(
+        σ=gelu; chs::Dims{C}=(2, 64, 64, 64, 64, 64, 128, 1), modes::Dims{M}=(16,),
+        permuted::Val{perm}=Val(false), kwargs...) where {C, M, perm}
+    @argcheck length(chs) ≥ 5
 
     map₁ = chs[1] => chs[2]
-    map₂ = chs[end - 2] => chs[end - 1]
-    map₃ = chs[end - 1] => chs[end]
+    map₂ = chs[C - 2] => chs[C - 1]
+    map₃ = chs[C - 1] => chs[C]
 
-    kernel_size = map(_ -> 1, modes)
+    kernel_size = map(Returns(1), modes)
 
-    lifting = permuted === True ? Conv(kernel_size, map₁) : Dense(map₁)
-    project = permuted === True ?
-              Chain(Conv(kernel_size, map₂, σ), Conv(kernel_size, map₃)) :
+    lifting = perm ? Conv(kernel_size, map₁) : Dense(map₁)
+    project = perm ? Chain(Conv(kernel_size, map₂, σ), Conv(kernel_size, map₃)) :
               Chain(Dense(map₂, σ), Dense(map₃))
 
     return Chain(; lifting,
-        mapping=Chain([SpectralKernel(rng, chs[i] => chs[i + 1], modes; σ, permuted,
-            kwargs...) for i in 2:(length(chs) - 3)]...),
-        project)
+        mapping=Chain([SpectralKernel(chs[i] => chs[i + 1], modes, σ; permuted, kwargs...)
+                       for i in 2:(C - 3)]...),
+        project,
+        name="FourierNeuralOperator")
 end
