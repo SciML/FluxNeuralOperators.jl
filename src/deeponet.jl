@@ -12,12 +12,14 @@ constructs a DeepONet composed of Dense layers. Make sure the last node of `bran
 - `trunk_activation`: activation function for trunk net
 
 ## References:
-Lu Lu, Pengzhan Jin, George Em Karniadakis , "DeepONet: Learning nonlinear operators for identifying differential equations based on the universal approximation theorem of operators"
-doi: https://arxiv.org/abs/1910.03193
+Lu Lu, Pengzhan Jin, George Em Karniadakis, "DeepONet: Learning nonlinear operators for identifying differential equations 
+based on the universal approximation theorem of operators", doi: https://arxiv.org/abs/1910.03193
 
 ## Example:
-```julia-repl
-julia> deeponet = DeepONet(; branch = (64, 32, 32, 16), trunk = (1, 8, 8, 16))
+```jldoctest
+deeponet = DeepONet(; branch = (64, 32, 32, 16), trunk = (1, 8, 8, 16))
+
+# output
 
 Branch : Chain(
     layer_1 = Dense(64 => 32),          # 2_080 parameters
@@ -43,10 +45,10 @@ function DeepONet(; branch = (64, 32, 32, 16), trunk = (1, 8, 8, 16),
     Otherwise Σᵢ bᵢⱼ tᵢₖ won't work."
 
     branch_net = Chain([Dense(branch[i] => branch[i+1], branch_activation)
-    for i in 1:length(branch) - 1]...);
+    for i in 1:length(branch) - 1]...)
 
     trunk_net = Chain([Dense(trunk[i] => trunk[i+1], trunk_activation)
-    for i in 1:length(trunk) - 1]...);
+    for i in 1:length(trunk) - 1]...)
 
     return DeepONet(branch_net, trunk_net);
 end
@@ -62,15 +64,17 @@ Make sure that both the nets output should have the same first dimension.
 
 
 ## References:
-Lu Lu, Pengzhan Jin, George Em Karniadakis , "DeepONet: Learning nonlinear operators for identifying differential equations based on the universal approximation theorem of operators"
-doi: https://arxiv.org/abs/1910.03193
+Lu Lu, Pengzhan Jin, George Em Karniadakis, "DeepONet: Learning nonlinear operators for identifying differential equations 
+based on the universal approximation theorem of operators", doi: https://arxiv.org/abs/1910.03193
 
 ## Example:
 
-```julia-repl
-julia> branch_net =  Chain(Dense(64 =>32), Dense(32 =>32), Dense(32 => 16));
-julia> trunk_net = Chain(Dense(1 =>8), Dense(8 =>8), Dense(8 => 16));
-julia> don_ = DeepONet(branch_net, trunk_net)
+```jldoctest
+branch_net =  Chain(Dense(64 =>32), Dense(32 =>32), Dense(32 => 16));
+trunk_net = Chain(Dense(1 =>8), Dense(8 =>8), Dense(8 => 16));
+don_ = DeepONet(branch_net, trunk_net)
+
+# output
 
 Branch : Chain(
     layer_1 = Dense(64 => 32),          # 2_080 parameters        
@@ -111,6 +115,6 @@ function DeepONet(branch::L1, trunk::L2) where {L1, L2}
         tᵀ = permutedims(t, (2, 1, 3)); # N x p x nb
         b_ = permutedims(reshape(b, size(b)..., 1), (1, 3, 2)); # p x 1 x nb
         G = batched_mul(tᵀ, b_); # N x 1 X nb
-        return dropdims(G; dims = 2);
+        @return dropdims(G; dims = 2);
     end
 end
