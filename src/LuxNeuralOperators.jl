@@ -1,44 +1,35 @@
 module LuxNeuralOperators
 
-import PrecompileTools: @recompile_invalidations
-import Reexport: @reexport
+using PrecompileTools: @recompile_invalidations
 
 @recompile_invalidations begin
-    using ArrayInterface, FFTW, Lux, Random, SciMLBase
-
-    import ChainRulesCore as CRC
-    import Lux.Experimental: @compact
-    import LuxCore: AbstractExplicitLayer,
-        AbstractExplicitContainerLayer, initialparameters, initialstates
-    import Random: AbstractRNG
+    using ArgCheck: @argcheck
+    using ChainRulesCore: ChainRulesCore, NoTangent
+    using ConcreteStructs: @concrete
+    using FFTW: FFTW, irfft, rfft
+    using Lux
+    using LuxCore: LuxCore, AbstractExplicitLayer
+    using NNlib: NNlib, batched_transpose, ⊠
+    using Random: Random, AbstractRNG
+    using Reexport: @reexport
 end
 
-@reexport using Lux, Random
+const CRC = ChainRulesCore
 
-__default_rng() = Xoshiro(0)
+@reexport using Lux
 
 const True = Val(true)
 const False = Val(false)
 
 include("transform.jl")
+
+include("functional.jl")
 include("layers.jl")
+
 include("fno.jl")
-include("deq.jl")
-
-# Pass `rng` if user doesn't pass it
-for f in (:BasicBlock, :StackedBasicBlock, :OperatorConv, :OperatorKernel,
-    :FourierNeuralOperator)
-    @eval begin
-        $(f)(args...; kwargs...) = $(f)(__default_rng(), args...; kwargs...)
-    end
-end
-
-__destructure(x::Tuple) = x
-__destructure(x) = x, zero(eltype(x))
 
 export FourierTransform
-export SpectralConv, OperatorConv
-export SpectralKernel, OperatorKernel
+export SpectralConv, OperatorConv, SpectralKernel, OperatorKernel
 export FourierNeuralOperator
 
 end
