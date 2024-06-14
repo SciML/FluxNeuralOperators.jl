@@ -1,20 +1,23 @@
 @testitem "Fourier Neural Operator" setup=[SharedTestSetup] begin
     @testset "BACKEND: $(mode)" for (mode, aType, dev, ongpu) in MODES
-        rng = get_default_rng(mode)
+        rng = get_stable_rng()
 
         setups = [
-            (modes=(16,), chs=(2, 64, 64, 64, 64, 64, 128, 1), x_size=(2, 1024, 5),
-                y_size=(1, 1024, 5), permuted=Val(false)),
-            (modes=(16,), chs=(2, 64, 64, 64, 64, 64, 128, 1), x_size=(1024, 2, 5),
-                y_size=(1024, 1, 5), permuted=Val(true))]
+            (modes=(16,), chs=(2, 64, 64, 64, 64, 64, 128, 1),
+                x_size=(2, 1024, 5), y_size=(1, 1024, 5), permuted=Val(false)),
+            (modes=(16,), chs=(2, 64, 64, 64, 64, 64, 128, 1),
+                x_size=(1024, 2, 5), y_size=(1024, 1, 5), permuted=Val(true))]
 
         @testset "$(length(setup.modes))D: permuted = $(setup.permuted)" for setup in setups
             fno = FourierNeuralOperator(; setup.chs, setup.modes, setup.permuted)
 
-            x = rand(rng, Float32, setup.x_size...)
-            y = rand(rng, Float32, setup.y_size...)
+            x = rand(rng, Float32, setup.x_size...) |> aType
+            y = rand(rng, Float32, setup.y_size...) |> aType
 
-            ps, st = Lux.setup(rng, fno)
+            ps, st = Lux.setup(rng, fno) |> dev
+
+            @inferred fno(x, ps, st)
+            @jet fno(x, ps, st)
 
             @test size(first(fno(x, ps, st))) == setup.y_size
 

@@ -43,7 +43,7 @@ default_loss_function(model, ps, x, y) = mean(abs2, y .- model(x, ps))
 train!(args...; kwargs...) = train!(default_loss_function, args...; kwargs...)
 
 function train!(loss, model, ps, st, data; epochs=10)
-    m = StatefulLuxLayer(model, ps, st)
+    m = StatefulLuxLayer{true}(model, ps, st)
 
     l1 = loss(m, ps, first(data)...)
     st_opt = Optimisers.setup(Adam(0.01f0), ps)

@@ -1,6 +1,6 @@
 @testitem "SpectralConv & SpectralKernel" setup=[SharedTestSetup] begin
     @testset "BACKEND: $(mode)" for (mode, aType, dev, ongpu) in MODES
-        rng = get_default_rng(mode)
+        rng = get_stable_rng()
 
         opconv = [SpectralConv, SpectralKernel]
         setups = [
@@ -11,7 +11,7 @@
             (; m=(10, 10), permuted=Val(true),
                 x_size=(22, 22, 1, 5), y_size=(22, 22, 64, 5))]
 
-        @testset "$(op) $(length(setup.modes))D: permuted = $(setup.permuted)" for setup in setups,
+        @testset "$(op) $(length(setup.m))D: permuted = $(setup.permuted)" for setup in setups,
             op in opconv
 
             p = Lux.__unwrap_val(setup.permuted)
@@ -22,13 +22,14 @@
             l1 = p ? Conv(ntuple(_ -> 1, length(setup.m)), in_chs => first(ch)) :
                  Dense(in_chs => first(ch))
             m = Chain(l1, op(ch, setup.m; setup.permuted))
-            ps, st = Lux.setup(rng, m)
+            ps, st = Lux.setup(rng, m) |> dev
 
-            x = rand(rng, Float32, setup.x_size...)
+            x = rand(rng, Float32, setup.x_size...) |> aType
             @test size(first(m(x, ps, st))) == setup.y_size
             @inferred m(x, ps, st)
+            @jet m(x, ps, st)
 
-            data = [(x, rand(rng, Float32, setup.y_size...))]
+            data = [(x, aType(rand(rng, Float32, setup.y_size...)))]
             l2, l1 = train!(m, ps, st, data; epochs=10)
             @test l2 < l1
         end
