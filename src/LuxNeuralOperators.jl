@@ -18,9 +18,6 @@ const CRC = ChainRulesCore
 
 @reexport using Lux
 
-const True = Val(true)
-const False = Val(false)
-
 include("utils.jl")
 include("transform.jl")
 

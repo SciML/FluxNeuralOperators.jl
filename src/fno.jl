@@ -49,7 +49,7 @@ FourierNeuralOperator(
 """
 function FourierNeuralOperator(
         σ=gelu; chs::Dims{C}=(2, 64, 64, 64, 64, 64, 128, 1), modes::Dims{M}=(16,),
-        permuted::Val{perm}=False, kwargs...) where {C, M, perm}
+        permuted::Val{perm}=Val(false), kwargs...) where {C, M, perm}
     @argcheck length(chs) ≥ 5
 
     map₁ = chs[1] => chs[2]

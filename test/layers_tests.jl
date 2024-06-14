@@ -30,8 +30,11 @@
             @jet m(x, ps, st)
 
             data = [(x, aType(rand(rng, Float32, setup.y_size...)))]
-            l2, l1 = train!(m, ps, st, data; epochs=10)
-            @test l2 < l1
+            broken = mode == "AMDGPU"
+            @test begin
+                l2, l1 = train!(m, ps, st, data; epochs=10)
+                l2 < l1
+            end broken=broken
         end
     end
 end

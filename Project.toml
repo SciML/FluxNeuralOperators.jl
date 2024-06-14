@@ -23,7 +23,7 @@ AMDGPU = "21141c5a-9bdb-4563-92ae-f87d6854732e"
 LuxNeuralOperatorsAMDGPUExt = "AMDGPU"
 
 [compat]
-AMDGPU = "0.9.5"
+AMDGPU = "0.8.4, 0.9"
 Aqua = "0.8.7"
 ArgCheck = "2.3.0"
 ChainRulesCore = "1.24.0"
