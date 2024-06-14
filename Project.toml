@@ -16,7 +16,14 @@ Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 Reexport = "189a3867-3050-52da-a836-e630ba90ab69"
 WeightInitializers = "d49dbf32-c5c2-4618-8acc-27bb2598ef2d"
 
+[weakdeps]
+AMDGPU = "21141c5a-9bdb-4563-92ae-f87d6854732e"
+
+[extensions]
+LuxNeuralOperatorsAMDGPUExt = "AMDGPU"
+
 [compat]
+AMDGPU = "0.9.5"
 Aqua = "0.8.7"
 ArgCheck = "2.3.0"
 ChainRulesCore = "1.24.0"

@@ -17,13 +17,6 @@ end
     return reshape(x_weighted, x_size[1:(N - 2)]..., size(x_weighted)[2:3]...)
 end
 
-@inline function __apply_pattern_batched_mul(
-        x::AbstractArray{T1, 3}, y::AbstractArray{T2, 3}) where {T1, T2}
-    x_ = batched_transpose(x)              # i x b x m
-    res = y ⊠ x_                           # o x b x m
-    return batched_transpose(res)          # m x o x b
-end
-
 @inline __pad_modes(x, dims::Integer...) = __pad_modes(x, dims)
 @inline __pad_modes(x, dims::NTuple) = __pad_modes!(similar(x, dims), x)
 

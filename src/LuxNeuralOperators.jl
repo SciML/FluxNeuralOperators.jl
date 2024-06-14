@@ -9,7 +9,7 @@ using PrecompileTools: @recompile_invalidations
     using FFTW: FFTW, irfft, rfft
     using Lux
     using LuxCore: LuxCore, AbstractExplicitLayer
-    using NNlib: NNlib, batched_transpose, ⊠
+    using NNlib: NNlib, ⊠
     using Random: Random, AbstractRNG
     using Reexport: @reexport
 end
@@ -21,6 +21,7 @@ const CRC = ChainRulesCore
 const True = Val(true)
 const False = Val(false)
 
+include("utils.jl")
 include("transform.jl")
 
 include("functional.jl")
