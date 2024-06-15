@@ -30,6 +30,6 @@
         don_ = DeepONet(Chain(Dense(64 => 32), Dense(32 => 32), Dense(32 => 20)),
             Chain(Dense(1 => 8), Dense(8 => 8), Dense(8 => 16)))
         ps, st = Lux.setup(rng_, don_) |> dev
-        @test_throws AssertionError don_((u, y), ps, st)
+        @test_throws ArgumentError don_((u, y), ps, st)
     end
 end
