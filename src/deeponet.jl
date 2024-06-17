@@ -27,20 +27,20 @@ deeponet = DeepONet(; branch=(64, 32, 32, 16), trunk=(1, 8, 8, 16))
 
 Branch net :
 (
-	Chain(
-		layer_1 = Dense(64 => 32),      # 2_080 parameters
-		layer_2 = Dense(32 => 32),      # 1_056 parameters
-		layer_3 = Dense(32 => 16),      # 528 parameters
-	),
+    Chain(
+        layer_1 = Dense(64 => 32),      # 2_080 parameters
+        layer_2 = Dense(32 => 32),      # 1_056 parameters
+        layer_3 = Dense(32 => 16),      # 528 parameters
+    ),
 )
 
 Trunk net :
 (
-	Chain(
-		layer_1 = Dense(1 => 8),        # 16 parameters
-		layer_2 = Dense(8 => 8),        # 72 parameters
-		layer_3 = Dense(8 => 16),       # 144 parameters
-	),
+    Chain(
+        layer_1 = Dense(1 => 8),        # 16 parameters
+        layer_2 = Dense(8 => 8),        # 72 parameters
+        layer_3 = Dense(8 => 16),       # 144 parameters
+    ),
 )
 ```
 """
@@ -89,20 +89,20 @@ don_ = DeepONet(branch_net, trunk_net)
 
 Branch net :
 (
-	Chain(
-		layer_1 = Dense(64 => 32),      # 2_080 parameters
-		layer_2 = Dense(32 => 32),      # 1_056 parameters
-		layer_3 = Dense(32 => 16),      # 528 parameters
-	),
+    Chain(
+        layer_1 = Dense(64 => 32),      # 2_080 parameters
+        layer_2 = Dense(32 => 32),      # 1_056 parameters
+        layer_3 = Dense(32 => 16),      # 528 parameters
+    ),
 )
 
 Trunk net :
 (
-	Chain(
-		layer_1 = Dense(1 => 8),        # 16 parameters
-		layer_2 = Dense(8 => 8),        # 72 parameters
-		layer_3 = Dense(8 => 16),       # 144 parameters
-	),
+    Chain(
+        layer_1 = Dense(1 => 8),        # 16 parameters
+        layer_2 = Dense(8 => 8),        # 72 parameters
+        layer_3 = Dense(8 => 16),       # 144 parameters
+    ),
 )
 ```
 """
