@@ -1,3 +1,4 @@
+
 @inline function operator_conv(x, tform::AbstractTransform, weights)
     x_t = transform(tform, x)
     x_tr = truncate_modes(tform, x_t)
