@@ -1,7 +1,7 @@
 @testsetup module SharedTestSetup
 import Reexport: @reexport
 
-@reexport using Lux, LuxCUDA, LuxAMDGPU, Zygote, Optimisers, Random, StableRNGs, Statistics
+@reexport using Lux, LuxCUDA, AMDGPU, Zygote, Optimisers, Random, StableRNGs
 using LuxTestUtils: @jet, @test_gradients
 
 CUDA.allowscalar(false)
@@ -9,22 +9,20 @@ CUDA.allowscalar(false)
 const BACKEND_GROUP = get(ENV, "BACKEND_GROUP", "All")
 
 cpu_testing() = BACKEND_GROUP == "All" || BACKEND_GROUP == "CPU"
-cuda_testing() = (BACKEND_GROUP == "All" || BACKEND_GROUP == "CUDA") && LuxCUDA.functional()
+function cuda_testing()
+    return (BACKEND_GROUP == "All" || BACKEND_GROUP == "CUDA") &&
+           LuxDeviceUtils.functional(LuxCUDADevice)
+end
 function amdgpu_testing()
-    return (BACKEND_GROUP == "All" || BACKEND_GROUP == "AMDGPU") && LuxAMDGPU.functional()
+    return (BACKEND_GROUP == "All" || BACKEND_GROUP == "AMDGPU") &&
+           LuxDeviceUtils.functional(LuxAMDGPUDevice)
 end
 
 const MODES = begin
-    # Mode, Array Type, Device Function, GPU?
-    cpu_mode = ("CPU", Array, LuxCPUDevice(), false)
-    cuda_mode = ("CUDA", CuArray, LuxCUDADevice(), true)
-    amdgpu_mode = ("AMDGPU", ROCArray, LuxAMDGPUDevice(), true)
-
     modes = []
-    cpu_testing() && push!(modes, cpu_mode)
-    cuda_testing() && push!(modes, cuda_mode)
-    amdgpu_testing() && push!(modes, amdgpu_mode)
-
+    cpu_testing() && push!(modes, ("CPU", Array, LuxCPUDevice(), false))
+    cuda_testing() && push!(modes, ("CUDA", CuArray, LuxCUDADevice(), true))
+    amdgpu_testing() && push!(modes, ("AMDGPU", ROCArray, LuxAMDGPUDevice(), true))
     modes
 end
 
@@ -36,28 +34,23 @@ function get_default_rng(mode::String)
     return rng isa TaskLocalRNG ? copy(rng) : deepcopy(rng)
 end
 
-get_stable_rng(seed=12345) = StableRNG(seed)
+train!(args...; kwargs...) = train!(MSELoss(), AutoZygote(), args...; kwargs...)
 
-default_loss_function(model, ps, x, y) = mean(abs2, y .- model(x, ps))
+function train!(loss, backend, model, ps, st, data; epochs=10)
+    l1 = loss(model, ps, st, first(data))
 
-train!(args...; kwargs...) = train!(default_loss_function, args...; kwargs...)
-
-function train!(loss, model, ps, st, data; epochs=10)
-    m = StatefulLuxLayer{true}(model, ps, st)
-
-    l1 = loss(m, ps, first(data)...)
-    st_opt = Optimisers.setup(Adam(0.01f0), ps)
+    tstate = Lux.Experimental.TrainState(model, ps, st, Adam(0.01f0))
     for _ in 1:epochs, (x, y) in data
-        _, gs, _, _ = Zygote.gradient(loss, m, ps, x, y)
-        Optimisers.update!(st_opt, ps, gs)
+        _, _, _, tstate = Lux.Experimental.single_train_step!(backend, loss, (x, y), tstate)
     end
-    l2 = loss(m, ps, first(data)...)
+
+    l2 = loss(model, ps, st, first(data))
 
     return l2, l1
 end
 
 export @jet, @test_gradients, check_approx
 export BACKEND_GROUP, MODES, cpu_testing, cuda_testing, amdgpu_testing, get_default_rng,
-       get_stable_rng, train!
+       train!
 
 end
