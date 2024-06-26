@@ -1,6 +1,6 @@
 @testitem "SpectralConv & SpectralKernel" setup=[SharedTestSetup] begin
     @testset "BACKEND: $(mode)" for (mode, aType, dev, ongpu) in MODES
-        rng = get_stable_rng()
+        rng = StableRNG(12345)
 
         opconv = [SpectralConv, SpectralKernel]
         setups = [

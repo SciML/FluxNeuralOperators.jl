@@ -1,6 +1,6 @@
 @testitem "Fourier Neural Operator" setup=[SharedTestSetup] begin
     @testset "BACKEND: $(mode)" for (mode, aType, dev, ongpu) in MODES
-        rng = get_stable_rng()
+        rng = StableRNG(12345)
 
         setups = [
             (modes=(16,), chs=(2, 64, 64, 64, 64, 64, 128, 1),
