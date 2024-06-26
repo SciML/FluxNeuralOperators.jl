@@ -16,5 +16,8 @@ export
 """
 abstract type AbstractTransform end
 
+include("utils.jl")
+include("polynomials.jl")
 include("fourier_transform.jl")
 include("chebyshev_transform.jl")
+include("wavelet_transform.jl")
