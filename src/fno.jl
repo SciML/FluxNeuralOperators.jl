@@ -27,24 +27,14 @@ kernels, and two `Dense` layers to project data back to the scalar field of inte
 ## Example
 
 ```jldoctest
-julia> FourierNeuralOperator(gelu; chs=(2, 64, 64, 128, 1), modes=(16,))
-FourierNeuralOperator(
-    lifting = Dense(2 => 64),           # 192 parameters
-    mapping = @compact(
-        l₁ = Dense(64 => 64),           # 4_160 parameters
-        l₂ = OperatorConv{FourierTransform}(64 => 64, (16,); permuted = false)(),  # 65_536 parameters
-        activation = gelu,
-    ) do x::AbstractArray
-        l₁x = l₁(x)
-        l₂x = l₂(x)
-        return @__dot__(activation(l₁x + l₂x))
-    end,
-    project = Chain(
-        layer_1 = Dense(64 => 128, gelu),  # 8_320 parameters
-        layer_2 = Dense(128 => 1),      # 129 parameters
-    ),
-)         # Total: 78_337 parameters,
-          #        plus 1 states.
+julia> fno = FourierNeuralOperator(gelu; chs=(2, 64, 64, 128, 1), modes=(16,));
+
+julia> ps, st = Lux.setup(Xoshiro(), fno);
+
+julia> u = rand(Float32, 2, 1024, 5);
+
+julia> size(first(fno(u, ps, st)))
+(1, 1024, 5)
 ```
 """
 function FourierNeuralOperator(
