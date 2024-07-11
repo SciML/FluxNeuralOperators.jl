@@ -1,20 +1,26 @@
 @testsetup module SharedTestSetup
 import Reexport: @reexport
 
-@reexport using Lux, LuxCUDA, AMDGPU, Zygote, Optimisers, Random, StableRNGs
+@reexport using Lux, Zygote, Optimisers, Random, StableRNGs
 using LuxTestUtils: @jet, @test_gradients
 
-CUDA.allowscalar(false)
+const BACKEND_GROUP = lowercase(get(ENV, "BACKEND_GROUP", "All"))
 
-const BACKEND_GROUP = get(ENV, "BACKEND_GROUP", "All")
+if BACKEND_GROUP == "all" || BACKEND_GROUP == "cuda"
+    using LuxCUDA
+end
 
-cpu_testing() = BACKEND_GROUP == "All" || BACKEND_GROUP == "CPU"
+if BACKEND_GROUP == "all" || BACKEND_GROUP == "amdgpu"
+    using AMDGPU
+end
+
+cpu_testing() = BACKEND_GROUP == "all" || BACKEND_GROUP == "cpu"
 function cuda_testing()
-    return (BACKEND_GROUP == "All" || BACKEND_GROUP == "CUDA") &&
+    return (BACKEND_GROUP == "all" || BACKEND_GROUP == "cuda") &&
            LuxDeviceUtils.functional(LuxCUDADevice)
 end
 function amdgpu_testing()
-    return (BACKEND_GROUP == "All" || BACKEND_GROUP == "AMDGPU") &&
+    return (BACKEND_GROUP == "all" || BACKEND_GROUP == "amdgpu") &&
            LuxDeviceUtils.functional(LuxAMDGPUDevice)
 end
 
@@ -24,14 +30,6 @@ const MODES = begin
     cuda_testing() && push!(modes, ("CUDA", CuArray, LuxCUDADevice(), true))
     amdgpu_testing() && push!(modes, ("AMDGPU", ROCArray, LuxAMDGPUDevice(), true))
     modes
-end
-
-# Some Helper Functions
-function get_default_rng(mode::String)
-    dev = mode == "CPU" ? LuxCPUDevice() :
-          mode == "CUDA" ? LuxCUDADevice() : mode == "AMDGPU" ? LuxAMDGPUDevice() : nothing
-    rng = default_device_rng(dev)
-    return rng isa TaskLocalRNG ? copy(rng) : deepcopy(rng)
 end
 
 train!(args...; kwargs...) = train!(MSELoss(), AutoZygote(), args...; kwargs...)
@@ -50,7 +48,6 @@ function train!(loss, backend, model, ps, st, data; epochs=10)
 end
 
 export @jet, @test_gradients, check_approx
-export BACKEND_GROUP, MODES, cpu_testing, cuda_testing, amdgpu_testing, get_default_rng,
-       train!
+export BACKEND_GROUP, MODES, cpu_testing, cuda_testing, amdgpu_testing, train!
 
 end

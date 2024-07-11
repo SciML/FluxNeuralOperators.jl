@@ -1,19 +1,15 @@
 module NeuralOperators
 
-using PrecompileTools: @recompile_invalidations
-
-@recompile_invalidations begin
-    using ArgCheck: @argcheck
-    using ChainRulesCore: ChainRulesCore, NoTangent
-    using ConcreteStructs: @concrete
-    using FFTW: FFTW, irfft, rfft
-    using Lux
-    using LuxCore: LuxCore, AbstractExplicitLayer
-    using LuxDeviceUtils: get_device, LuxAMDGPUDevice
-    using NNlib: NNlib, ⊠
-    using Random: Random, AbstractRNG
-    using Reexport: @reexport
-end
+using ArgCheck: @argcheck
+using ChainRulesCore: ChainRulesCore, NoTangent
+using ConcreteStructs: @concrete
+using FFTW: FFTW, irfft, rfft
+using Lux
+using LuxCore: LuxCore, AbstractExplicitLayer
+using LuxDeviceUtils: get_device, LuxAMDGPUDevice
+using NNlib: NNlib, ⊠
+using Random: Random, AbstractRNG
+using Reexport: @reexport
 
 const CRC = ChainRulesCore
 
