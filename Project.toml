@@ -1,7 +1,7 @@
 name = "LuxNeuralOperators"
 uuid = "c0ba2cc5-a80b-46ec-84b3-091eb317b01d"
 authors = ["Avik Pal <avikpal@mit.edu>"]
-version = "0.1.0"
+version = "1.0.0-DEV"
 
 [deps]
 ArgCheck = "dce04be8-c92d-5529-be00-80e4d2c0e197"
@@ -23,7 +23,7 @@ AMDGPU = "21141c5a-9bdb-4563-92ae-f87d6854732e"
 LuxNeuralOperatorsAMDGPUExt = "AMDGPU"
 
 [compat]
-AMDGPU = "0.8.4, 0.9"
+AMDGPU = "0.9.6"
 Aqua = "0.8.7"
 ArgCheck = "2.3.0"
 ChainRulesCore = "1.24.0"
