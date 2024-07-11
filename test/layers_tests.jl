@@ -22,6 +22,7 @@
             l1 = p ? Conv(ntuple(_ -> 1, length(setup.m)), in_chs => first(ch)) :
                  Dense(in_chs => first(ch))
             m = Chain(l1, op(ch, setup.m; setup.permuted))
+            display(m)
             ps, st = Lux.setup(rng, m) |> dev
 
             x = rand(rng, Float32, setup.x_size...) |> aType

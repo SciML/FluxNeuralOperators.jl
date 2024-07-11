@@ -7,7 +7,7 @@
         out_size = (10, 5)
 
         deeponet = DeepONet(; branch=(64, 32, 32, 16), trunk=(1, 8, 8, 16))
-
+        display(deeponet)
         ps, st = Lux.setup(rng, deeponet) |> dev
 
         @inferred deeponet((u, y), ps, st)
@@ -18,7 +18,7 @@
 
         deeponet = DeepONet(Chain(Dense(64 => 32), Dense(32 => 32), Dense(32 => 16)),
             Chain(Dense(1 => 8), Dense(8 => 8), Dense(8 => 16)))
-
+        display(deeponet)
         ps, st = Lux.setup(rng, deeponet) |> dev
 
         @inferred deeponet((u, y), ps, st)
@@ -29,6 +29,7 @@
 
         deeponet = DeepONet(Chain(Dense(64 => 32), Dense(32 => 32), Dense(32 => 20)),
             Chain(Dense(1 => 8), Dense(8 => 8), Dense(8 => 16)))
+        display(deeponet)
         ps, st = Lux.setup(rng, deeponet) |> dev
         @test_throws ArgumentError deeponet((u, y), ps, st)
 
@@ -36,6 +37,7 @@
             u = ones(Float32, 10, 10, 10) |> aType
             v = ones(Float32, 1, 10, 10) |> aType
             deeponet = DeepONet(; branch=(10, 10, 10), trunk=(1, 10, 10))
+            display(deeponet)
             ps, st = Lux.setup(rng, deeponet) |> dev
 
             y, st_ = deeponet((u, v), ps, st)
