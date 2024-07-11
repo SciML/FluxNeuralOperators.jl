@@ -2,7 +2,7 @@
     using Documenter, NeuralOperators
 
     DocMeta.setdocmeta!(
-        NeuralOperators, :DocTestSetup, :(using NeuralOperators); recursive=true)
+        NeuralOperators, :DocTestSetup, :(using NeuralOperators, Random); recursive=true)
     doctest(NeuralOperators; manual=false)
 end
 

@@ -20,11 +20,9 @@
 ## Example
 
 ```jldoctest
-julia> OperatorConv(2 => 5, (16,), FourierTransform{ComplexF32})
-OperatorConv{FourierTransform}(2 => 5, (16,); permuted = false)()  # 160 parameters
+julia> OperatorConv(2 => 5, (16,), FourierTransform{ComplexF32});
 
-julia> OperatorConv(2 => 5, (16,), FourierTransform{ComplexF32}; permuted=Val(true))
-OperatorConv{FourierTransform}(2 => 5, (16,); permuted = true)()  # 160 parameters
+julia> OperatorConv(2 => 5, (16,), FourierTransform{ComplexF32}; permuted=Val(true));
 ```
 """
 @concrete struct OperatorConv{perm, T <: AbstractTransform} <: AbstractExplicitLayer
@@ -78,11 +76,9 @@ Construct a `OperatorConv` with `FourierTransform{ComplexF32}` as the transform.
 ## Example
 
 ```jldoctest
-julia> SpectralConv(2 => 5, (16,))
-OperatorConv{FourierTransform}(2 => 5, (16,); permuted = false)()  # 160 parameters
+julia> SpectralConv(2 => 5, (16,));
 
-julia> SpectralConv(2 => 5, (16,); permuted=Val(true))
-OperatorConv{FourierTransform}(2 => 5, (16,); permuted = true)()  # 160 parameters
+julia> SpectralConv(2 => 5, (16,); permuted=Val(true));
 ```
 """
 SpectralConv(args...; kwargs...) = OperatorConv(
@@ -112,29 +108,9 @@ All the keyword arguments are passed to the [`OperatorConv`](@ref) constructor.
 ## Example
 
 ```jldoctest
-julia> OperatorKernel(2 => 5, (16,), FourierTransform{ComplexF64})
-@compact(
-    l₁ = Dense(2 => 5),                 # 15 parameters
-    l₂ = OperatorConv{FourierTransform}(2 => 5, (16,); permuted = false)(),  # 160 parameters
-    activation = identity,
-) do x::AbstractArray
-    l₁x = l₁(x)
-    l₂x = l₂(x)
-    return @__dot__(activation(l₁x + l₂x))
-end       # Total: 175 parameters,
-          #        plus 1 states.
+julia> OperatorKernel(2 => 5, (16,), FourierTransform{ComplexF64});
 
-julia> OperatorKernel(2 => 5, (16,), FourierTransform{ComplexF64}; permuted=Val(true))
-@compact(
-    l₁ = Conv((1,), 2 => 5),            # 15 parameters
-    l₂ = OperatorConv{FourierTransform}(2 => 5, (16,); permuted = true)(),  # 160 parameters
-    activation = identity,
-) do x::AbstractArray
-    l₁x = l₁(x)
-    l₂x = l₂(x)
-    return @__dot__(activation(l₁x + l₂x))
-end       # Total: 175 parameters,
-          #        plus 1 states.
+julia> OperatorKernel(2 => 5, (16,), FourierTransform{ComplexF64}; permuted=Val(true));
 ```
 """
 function OperatorKernel(ch::Pair{<:Integer, <:Integer}, modes::Dims{N}, transform::Type{TR},
@@ -160,29 +136,9 @@ Construct a `OperatorKernel` with `FourierTransform{ComplexF32}` as the transfor
 ## Example
 
 ```jldoctest
-julia> SpectralKernel(2 => 5, (16,))
-@compact(
-    l₁ = Dense(2 => 5),                 # 15 parameters
-    l₂ = OperatorConv{FourierTransform}(2 => 5, (16,); permuted = false)(),  # 160 parameters
-    activation = identity,
-) do x::AbstractArray
-    l₁x = l₁(x)
-    l₂x = l₂(x)
-    return @__dot__(activation(l₁x + l₂x))
-end       # Total: 175 parameters,
-          #        plus 1 states.
+julia> SpectralKernel(2 => 5, (16,));
 
-julia> SpectralKernel(2 => 5, (16,); permuted=Val(true))
-@compact(
-    l₁ = Conv((1,), 2 => 5),            # 15 parameters
-    l₂ = OperatorConv{FourierTransform}(2 => 5, (16,); permuted = true)(),  # 160 parameters
-    activation = identity,
-) do x::AbstractArray
-    l₁x = l₁(x)
-    l₂x = l₂(x)
-    return @__dot__(activation(l₁x + l₂x))
-end       # Total: 175 parameters,
-          #        plus 1 states.
+julia> SpectralKernel(2 => 5, (16,); permuted=Val(true));
 ```
 """
 function SpectralKernel(ch::Pair{<:Integer, <:Integer}, modes::Dims{N},

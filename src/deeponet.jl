@@ -21,31 +21,16 @@ operators", doi: https://arxiv.org/abs/1910.03193
 ## Example
 
 ```jldoctest
-julia> deeponet = DeepONet(; branch=(64, 32, 32, 16), trunk=(1, 8, 8, 16))
-@compact(
-    branch = Chain(
-        layer_1 = Dense(64 => 32),      # 2_080 parameters
-        layer_2 = Dense(32 => 32),      # 1_056 parameters
-        layer_3 = Dense(32 => 16),      # 528 parameters
-    ),
-    trunk = Chain(
-        layer_1 = Dense(1 => 8),        # 16 parameters
-        layer_2 = Dense(8 => 8),        # 72 parameters
-        layer_3 = Dense(8 => 16),       # 144 parameters
-    ),
-) do (u, y)
-    t = trunk(y)
-    b = branch(u)
-    @argcheck ndims(t) == ndims(b) + 1 || ndims(t) == ndims(b)
-    @argcheck size(t, 1) == size(b, 1) "Branch and Trunk net must share the same amount of nodes in the last layer. Otherwise Σᵢ bᵢⱼ tᵢₖ won't work."
-    b_ = if ndims(t) == ndims(b)
-            b
-        else
-            reshape(b, size(b, 1), 1, (size(b))[2:end]...)
-        end
-    return dropdims(sum(t .* b_; dims = 1); dims = 1)
-end       # Total: 3_896 parameters,
-          #        plus 0 states.
+julia> deeponet = DeepONet(; branch=(64, 32, 32, 16), trunk=(1, 8, 8, 16));
+
+julia> ps, st = Lux.setup(Xoshiro(), deeponet);
+
+julia> u = rand(Float32, 64, 5);
+
+julia> y = rand(Float32, 1, 10, 5);
+
+julia> size(first(deeponet((u, y), ps, st)))
+(10, 5)
 ```
 """
 function DeepONet(; branch=(64, 32, 32, 16), trunk=(1, 8, 8, 16),
@@ -53,8 +38,8 @@ function DeepONet(; branch=(64, 32, 32, 16), trunk=(1, 8, 8, 16),
 
     # checks for last dimension size
     @argcheck branch[end]==trunk[end] "Branch and Trunk net must share the same amount of \
-            nodes in the last layer. Otherwise Σᵢ bᵢⱼ tᵢₖ won't \
-            work."
+                                       nodes in the last layer. Otherwise Σᵢ bᵢⱼ tᵢₖ won't \
+                                       work."
 
     branch_net = Chain([Dense(branch[i] => branch[i + 1], branch_activation)
                         for i in 1:(length(branch) - 1)]...)
@@ -89,31 +74,16 @@ julia> branch_net = Chain(Dense(64 => 32), Dense(32 => 32), Dense(32 => 16));
 
 julia> trunk_net = Chain(Dense(1 => 8), Dense(8 => 8), Dense(8 => 16));
 
-julia> deeponet = DeepONet(branch_net, trunk_net)
-@compact(
-    branch = Chain(
-        layer_1 = Dense(64 => 32),      # 2_080 parameters
-        layer_2 = Dense(32 => 32),      # 1_056 parameters
-        layer_3 = Dense(32 => 16),      # 528 parameters
-    ),
-    trunk = Chain(
-        layer_1 = Dense(1 => 8),        # 16 parameters
-        layer_2 = Dense(8 => 8),        # 72 parameters
-        layer_3 = Dense(8 => 16),       # 144 parameters
-    ),
-) do (u, y)
-    t = trunk(y)
-    b = branch(u)
-    @argcheck ndims(t) == ndims(b) + 1 || ndims(t) == ndims(b)
-    @argcheck size(t, 1) == size(b, 1) "Branch and Trunk net must share the same amount of nodes in the last layer. Otherwise Σᵢ bᵢⱼ tᵢₖ won't work."
-    b_ = if ndims(t) == ndims(b)
-            b
-        else
-            reshape(b, size(b, 1), 1, (size(b))[2:end]...)
-        end
-    return dropdims(sum(t .* b_; dims = 1); dims = 1)
-end       # Total: 3_896 parameters,
-          #        plus 0 states.
+julia> deeponet = DeepONet(branch_net, trunk_net);
+
+julia> ps, st = Lux.setup(Xoshiro(), deeponet);
+
+julia> u = rand(Float32, 64, 5);
+
+julia> y = rand(Float32, 1, 10, 5);
+
+julia> size(first(deeponet((u, y), ps, st)))
+(10, 5)
 ```
 """
 function DeepONet(branch::L1, trunk::L2) where {L1, L2}
