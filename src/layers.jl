@@ -23,6 +23,7 @@
 julia> OperatorConv(2 => 5, (16,), FourierTransform{ComplexF32});
 
 julia> OperatorConv(2 => 5, (16,), FourierTransform{ComplexF32}; permuted=Val(true));
+
 ```
 """
 @concrete struct OperatorConv{perm, T <: AbstractTransform} <: AbstractExplicitLayer
@@ -79,6 +80,7 @@ Construct a `OperatorConv` with `FourierTransform{ComplexF32}` as the transform.
 julia> SpectralConv(2 => 5, (16,));
 
 julia> SpectralConv(2 => 5, (16,); permuted=Val(true));
+
 ```
 """
 SpectralConv(args...; kwargs...) = OperatorConv(
@@ -111,6 +113,7 @@ All the keyword arguments are passed to the [`OperatorConv`](@ref) constructor.
 julia> OperatorKernel(2 => 5, (16,), FourierTransform{ComplexF64});
 
 julia> OperatorKernel(2 => 5, (16,), FourierTransform{ComplexF64}; permuted=Val(true));
+
 ```
 """
 function OperatorKernel(ch::Pair{<:Integer, <:Integer}, modes::Dims{N}, transform::Type{TR},
@@ -139,6 +142,7 @@ Construct a `OperatorKernel` with `FourierTransform{ComplexF32}` as the transfor
 julia> SpectralKernel(2 => 5, (16,));
 
 julia> SpectralKernel(2 => 5, (16,); permuted=Val(true));
+
 ```
 """
 function SpectralKernel(ch::Pair{<:Integer, <:Integer}, modes::Dims{N},
