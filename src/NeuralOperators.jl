@@ -9,6 +9,7 @@ using PrecompileTools: @recompile_invalidations
     using FFTW: FFTW, irfft, rfft
     using Lux
     using LuxCore: LuxCore, AbstractExplicitLayer
+    using LuxDeviceUtils: get_device, LuxAMDGPUDevice
     using NNlib: NNlib, ⊠
     using Random: Random, AbstractRNG
     using Reexport: @reexport

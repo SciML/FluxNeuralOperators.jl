@@ -10,17 +10,12 @@ ConcreteStructs = "2569d6c7-a4a2-43d3-a901-331e8e4be471"
 FFTW = "7a1cc6ca-52ef-59f5-83cd-3a7055c09341"
 Lux = "b2108857-7c20-44ae-9111-449ecde12c47"
 LuxCore = "bb33d45b-7691-41d6-9220-0943567d0623"
+LuxDeviceUtils = "34f89e08-e1d5-43b4-8944-0b49ac560553"
 NNlib = "872c559c-99b0-510c-b3b7-b6c96a88d5cd"
 PrecompileTools = "aea7be01-6a6a-4083-8856-8a6e6704d82a"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 Reexport = "189a3867-3050-52da-a836-e630ba90ab69"
 WeightInitializers = "d49dbf32-c5c2-4618-8acc-27bb2598ef2d"
-
-[weakdeps]
-AMDGPU = "21141c5a-9bdb-4563-92ae-f87d6854732e"
-
-[extensions]
-NeuralOperatorsAMDGPUExt = "AMDGPU"
 
 [compat]
 AMDGPU = "0.9.6"
@@ -34,6 +29,7 @@ FFTW = "1.8.0"
 Lux = "0.5.56"
 LuxCUDA = "0.3.2"
 LuxCore = "0.1.15"
+LuxDeviceUtils = "0.1.24"
 LuxTestUtils = "0.1.15"
 NNlib = "0.9.17"
 Optimisers = "0.3.3"
@@ -48,6 +44,7 @@ Zygote = "0.6.70"
 julia = "1.10"
 
 [extras]
+AMDGPU = "21141c5a-9bdb-4563-92ae-f87d6854732e"
 Aqua = "4c88cf16-eb10-579e-8560-4a9242c79595"
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
 ExplicitImports = "7d51a73a-1435-4ff3-83d9-f097790105c7"
