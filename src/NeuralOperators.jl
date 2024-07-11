@@ -1,4 +1,4 @@
-module LuxNeuralOperators
+module NeuralOperators
 
 using PrecompileTools: @recompile_invalidations
 

@@ -1,2 +1,2 @@
 [LuxTestUtils]
-target_modules = ["LuxNeuralOperators", "Lux", "LuxLib"]
+target_modules = ["NeuralOperators", "Lux", "LuxLib"]

@@ -1,5 +1,5 @@
-name = "LuxNeuralOperators"
-uuid = "c0ba2cc5-a80b-46ec-84b3-091eb317b01d"
+name = "NeuralOperators"
+uuid = "ea5c82af-86e5-48da-8ee1-382d6ad7af4b"
 authors = ["Avik Pal <avikpal@mit.edu>"]
 version = "1.0.0-DEV"
 
@@ -20,7 +20,7 @@ WeightInitializers = "d49dbf32-c5c2-4618-8acc-27bb2598ef2d"
 AMDGPU = "21141c5a-9bdb-4563-92ae-f87d6854732e"
 
 [extensions]
-LuxNeuralOperatorsAMDGPUExt = "AMDGPU"
+NeuralOperatorsAMDGPUExt = "AMDGPU"
 
 [compat]
 AMDGPU = "0.9.6"
