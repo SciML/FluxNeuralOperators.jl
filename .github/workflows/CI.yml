@@ -35,6 +35,16 @@ jobs:
           - windows-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: DamianReeves/write-file-action@master
+        with:
+          path: "LocalPreferences.toml"
+          contents: |
+            [LuxTestUtils]
+            target_modules = ["NeuralOperators", "Lux", "LuxLib"]
+            [LuxLib]
+            instability_check = "error"
+            [LuxCore]
+            instability_check = "error"
       - uses: julia-actions/setup-julia@v2
         with:
           version: ${{ matrix.version }}
@@ -68,6 +78,16 @@ jobs:
         version: ["1"]
     steps:
       - uses: actions/checkout@v4
+      - uses: DamianReeves/write-file-action@master
+        with:
+          path: "LocalPreferences.toml"
+          contents: |
+            [LuxTestUtils]
+            target_modules = ["NeuralOperators", "Lux", "LuxLib"]
+            [LuxLib]
+            instability_check = "error"
+            [LuxCore]
+            instability_check = "error"
       - uses: julia-actions/setup-julia@v2
         with:
           version: ${{ matrix.version }}

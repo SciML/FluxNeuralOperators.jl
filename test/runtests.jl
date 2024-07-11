@@ -14,6 +14,6 @@ if !isempty(EXTRA_PKGS)
     Pkg.instantiate()
 end
 
-@testset "ReTestItems Tests" begin
+@testset "NeuralOperators.jl Tests" begin
     ReTestItems.runtests(@__DIR__)
 end
