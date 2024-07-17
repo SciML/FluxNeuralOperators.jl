@@ -7,7 +7,7 @@ using FFTW: FFTW, irfft, rfft
 using Lux
 using LuxCore: LuxCore, AbstractExplicitLayer
 using LuxDeviceUtils: get_device, LuxAMDGPUDevice
-using NNlib: NNlib, ⊠
+using NNlib: NNlib, ⊠, batched_adjoint
 using Random: Random, AbstractRNG
 using Reexport: @reexport
 
