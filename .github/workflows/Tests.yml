@@ -1,0 +1,39 @@
+name: "Tests"
+
+on:
+  pull_request:
+    branches:
+      - main
+      - 'release-'
+    paths-ignore:
+      - 'docs/**'
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'docs/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref_name != github.event.repository.default_branch || github.ref != 'refs/tags/v*' }}
+
+env:
+  DATADEPS_ALWAYS_ACCEPT: true
+
+jobs:
+  tests:
+    name: "Tests"
+    strategy:
+      fail-fast: false
+      matrix:
+        version:
+          - "1"
+          - "lts"
+        os:
+          - "ubuntu-latest"
+          - "windows-latest"
+    uses: "SciML/.github/.github/workflows/tests.yml@v1"
+    with:
+      julia-version: "${{ matrix.version }}"
+      os: "${{ matrix.os }}"
+    secrets: "inherit"
