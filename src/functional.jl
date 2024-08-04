@@ -12,8 +12,8 @@ end
     x_size = size(x_tr)
     x_flat = reshape(x_tr, :, x_size[N - 1], x_size[N])
 
-    x_flat_t = permutedims(x_flat, (2, 3, 1))                              # i x b x m
-    x_weighted = permutedims(__batched_mul(weights, x_flat_t), (3, 1, 2))  # m x o x b
+    x_flat_t = permutedims(x_flat, (2, 3, 1))                               # i x b x m
+    x_weighted = permutedims(batched_matmul(weights, x_flat_t), (3, 1, 2))  # m x o x b
 
     return reshape(x_weighted, x_size[1:(N - 2)]..., size(x_weighted)[2:3]...)
 end

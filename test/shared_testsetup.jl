@@ -1,8 +1,8 @@
 @testsetup module SharedTestSetup
 import Reexport: @reexport
 
-@reexport using Lux, Zygote, Optimisers, Random, StableRNGs
-using LuxTestUtils: @jet, @test_gradients
+@reexport using Lux, Zygote, Optimisers, Random, StableRNGs, LuxTestUtils
+using MLDataDevices
 
 const BACKEND_GROUP = lowercase(get(ENV, "BACKEND_GROUP", "All"))
 
@@ -17,18 +17,18 @@ end
 cpu_testing() = BACKEND_GROUP == "all" || BACKEND_GROUP == "cpu"
 function cuda_testing()
     return (BACKEND_GROUP == "all" || BACKEND_GROUP == "cuda") &&
-           LuxDeviceUtils.functional(LuxCUDADevice)
+           MLDataDevices.functional(CUDADevice)
 end
 function amdgpu_testing()
     return (BACKEND_GROUP == "all" || BACKEND_GROUP == "amdgpu") &&
-           LuxDeviceUtils.functional(LuxAMDGPUDevice)
+           MLDataDevices.functional(AMDGPUDevice)
 end
 
 const MODES = begin
     modes = []
-    cpu_testing() && push!(modes, ("CPU", Array, LuxCPUDevice(), false))
-    cuda_testing() && push!(modes, ("CUDA", CuArray, LuxCUDADevice(), true))
-    amdgpu_testing() && push!(modes, ("AMDGPU", ROCArray, LuxAMDGPUDevice(), true))
+    cpu_testing() && push!(modes, ("CPU", Array, CPUDevice(), false))
+    cuda_testing() && push!(modes, ("CUDA", CuArray, CUDADevice(), true))
+    amdgpu_testing() && push!(modes, ("AMDGPU", ROCArray, AMDGPUDevice(), true))
     modes
 end
 
@@ -47,7 +47,7 @@ function train!(loss, backend, model, ps, st, data; epochs=10)
     return l2, l1
 end
 
-export @jet, @test_gradients, check_approx
+export check_approx
 export BACKEND_GROUP, MODES, cpu_testing, cuda_testing, amdgpu_testing, train!
 
 end

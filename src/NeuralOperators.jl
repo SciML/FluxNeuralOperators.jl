@@ -6,8 +6,8 @@ using ConcreteStructs: @concrete
 using FFTW: FFTW, irfft, rfft
 using Lux
 using LuxCore: LuxCore, AbstractExplicitLayer
-using LuxDeviceUtils: get_device, LuxAMDGPUDevice
-using NNlib: NNlib, ⊠, batched_adjoint
+using LuxLib: batched_matmul
+using NNlib: NNlib, batched_adjoint
 using Random: Random, AbstractRNG
 using Reexport: @reexport
 

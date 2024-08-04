@@ -1,4 +1,6 @@
-using ReTestItems, Pkg, ReTestItems, Test
+using ReTestItems, Pkg, Test
+using InteractiveUtils, Hwloc
+using NeuralOperators
 
 const BACKEND_GROUP = lowercase(get(ENV, "BACKEND_GROUP", "all"))
 
@@ -14,6 +16,13 @@ if !isempty(EXTRA_PKGS)
     Pkg.instantiate()
 end
 
+const RETESTITEMS_NWORKERS = parse(
+    Int, get(ENV, "RETESTITEMS_NWORKERS", string(min(Hwloc.num_physical_cores(), 16))))
+const RETESTITEMS_NWORKER_THREADS = parse(Int,
+    get(ENV, "RETESTITEMS_NWORKER_THREADS",
+        string(max(Hwloc.num_virtual_cores() ÷ RETESTITEMS_NWORKERS, 1))))
+
 @testset "NeuralOperators.jl Tests" begin
-    ReTestItems.runtests(@__DIR__)
+    ReTestItems.runtests(NeuralOperators; nworkers=RETESTITEMS_NWORKERS,
+        nworker_threads=RETESTITEMS_NWORKER_THREADS, testitem_timeout=3600)
 end
