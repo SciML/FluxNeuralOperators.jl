@@ -29,7 +29,7 @@
             end broken=broken
 
             __f = (x, ps) -> sum(abs2, first(fno(x, ps, st)))
-            test_gradients(__f, x, ps; atol=1f-3, rtol=1f-3)
+            test_gradients(__f, x, ps; atol=1.0f-3, rtol=1.0f-3)
         end
     end
 end

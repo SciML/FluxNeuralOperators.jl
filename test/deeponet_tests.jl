@@ -50,7 +50,7 @@
             @test setup.out_size == size(pred)
 
             __f = (u, y, ps) -> sum(abs2, first(deeponet((u, y), ps, st)))
-            test_gradients(__f, u, y, ps; atol=1f-3, rtol=1f-3)
+            test_gradients(__f, u, y, ps; atol=1.0f-3, rtol=1.0f-3)
         end
 
         @testset "Embedding layer mismatch" begin
@@ -64,7 +64,7 @@
             @test_throws ArgumentError deeponet((u, y), ps, st)
 
             __f = (u, y, ps) -> sum(abs2, first(deeponet((u, y), ps, st)))
-            test_gradients(__f, u, y, ps; atol=1f-3, rtol=1f-3)
+            test_gradients(__f, u, y, ps; atol=1.0f-3, rtol=1.0f-3)
         end
     end
 end
