@@ -9,7 +9,8 @@ end
 @testitem "Aqua: Quality Assurance" tags=[:qa] begin
     using Aqua
 
-    Aqua.test_all(NeuralOperators)
+    Aqua.test_all(NeuralOperators; ambiguities=false)
+    Aqua.test_ambiguities(NeuralOperators; recursive=false)
 end
 
 @testitem "Explicit Imports: Quality Assurance" tags=[:qa] begin

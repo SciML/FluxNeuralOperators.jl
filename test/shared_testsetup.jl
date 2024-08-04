@@ -4,6 +4,8 @@ import Reexport: @reexport
 @reexport using Lux, Zygote, Optimisers, Random, StableRNGs, LuxTestUtils
 using MLDataDevices
 
+LuxTestUtils.jet_target_modules!(["NeuralOperators", "Lux", "LuxLib"])
+
 const BACKEND_GROUP = lowercase(get(ENV, "BACKEND_GROUP", "All"))
 
 if BACKEND_GROUP == "all" || BACKEND_GROUP == "cuda"
@@ -37,9 +39,9 @@ train!(args...; kwargs...) = train!(MSELoss(), AutoZygote(), args...; kwargs...)
 function train!(loss, backend, model, ps, st, data; epochs=10)
     l1 = loss(model, ps, st, first(data))
 
-    tstate = Lux.Experimental.TrainState(model, ps, st, Adam(0.01f0))
+    tstate = Training.TrainState(model, ps, st, Adam(0.01f0))
     for _ in 1:epochs, (x, y) in data
-        _, _, _, tstate = Lux.Experimental.single_train_step!(backend, loss, (x, y), tstate)
+        _, _, _, tstate = Training.single_train_step!(backend, loss, (x, y), tstate)
     end
 
     l2 = loss(model, ps, st, first(data))

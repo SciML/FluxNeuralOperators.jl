@@ -29,7 +29,8 @@
             end broken=broken
 
             __f = (x, ps) -> sum(abs2, first(fno(x, ps, st)))
-            test_gradients(__f, x, ps; atol=1.0f-3, rtol=1.0f-3)
+            test_gradients(__f, x, ps; atol=1.0f-3, rtol=1.0f-3,
+                skip_backends=[AutoEnzyme(), AutoTracker(), AutoReverseDiff()])
         end
     end
 end

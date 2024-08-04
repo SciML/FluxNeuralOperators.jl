@@ -1,6 +1,9 @@
-using ReTestItems, Pkg, Test
-using InteractiveUtils, Hwloc
-using NeuralOperators
+using Preferences
+
+Preferences.set_preferences!("LuxLib", "instability_check" => "error")
+Preferences.set_preferences!("LuxCore", "instability_check" => "error")
+
+using ReTestItems, Pkg, Test, InteractiveUtils, Hwloc, NeuralOperators
 
 const BACKEND_GROUP = lowercase(get(ENV, "BACKEND_GROUP", "all"))
 

@@ -7,8 +7,6 @@ steps:
           test_args: "--quickfail"
       - JuliaCI/julia-coverage#v1:
           codecov: true
-    commands: |
-      printf "[LuxTestUtils]\ntarget_modules = [\"NeuralOperators\", \"Lux\", \"LuxLib\"]\n[LuxLib]\ninstability_check = \"error\"\n[LuxCore]\ninstability_check = \"error\"\n" > LocalPreferences.toml
     agents:
       queue: "juliagpu"
       cuda: "*"
@@ -29,8 +27,6 @@ steps:
           test_args: "--quickfail"
       - JuliaCI/julia-coverage#v1:
           codecov: true
-    commands: |
-      printf "[LuxTestUtils]\ntarget_modules = [\"NeuralOperators\", \"Lux\", \"LuxLib\"]\n[LuxLib]\ninstability_check = \"error\"\n[LuxCore]\ninstability_check = \"error\"\n" > LocalPreferences.toml
     env:
       JULIA_AMDGPU_CORE_MUST_LOAD: "1"
       JULIA_AMDGPU_HIP_MUST_LOAD: "1"
