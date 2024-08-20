@@ -27,7 +27,7 @@ kernels, and two `Dense` layers to project data back to the scalar field of inte
 ## Example
 
 ```jldoctest
-julia> fno = FourierNeuralOperator(gelu; chs=(2, 64, 64, 128, 1), modes=(16,));
+julia> fno = FourierNeuralOperator(; σ=gelu, chs=(2, 64, 64, 128, 1), modes=(16,));
 
 julia> ps, st = Lux.setup(Xoshiro(), fno);
 
@@ -37,8 +37,15 @@ julia> size(first(fno(u, ps, st)))
 (1, 1024, 5)
 ```
 """
-function FourierNeuralOperator(
-        σ=gelu; chs::Dims{C}=(2, 64, 64, 64, 64, 64, 128, 1), modes::Dims{M}=(16,),
+@concrete struct FourierNeuralOperator <:
+                 AbstractExplicitContainerLayer{(:lifting, :mapping, :project)}
+    lifting
+    mapping
+    project
+end
+
+function FourierNeuralOperator(;
+        σ=gelu, chs::Dims{C}=(2, 64, 64, 64, 64, 64, 128, 1), modes::Dims{M}=(16,),
         permuted::Val{perm}=Val(false), kwargs...) where {C, M, perm}
     @argcheck length(chs) ≥ 5
 
@@ -52,9 +59,15 @@ function FourierNeuralOperator(
     project = perm ? Chain(Conv(kernel_size, map₂, σ), Conv(kernel_size, map₃)) :
               Chain(Dense(map₂, σ), Dense(map₃))
 
-    return Chain(; lifting,
-        mapping=Chain([SpectralKernel(chs[i] => chs[i + 1], modes, σ; permuted, kwargs...)
-                       for i in 2:(C - 3)]...),
-        project,
-        name="FourierNeuralOperator")
+    mapping = Chain([SpectralKernel(chs[i] => chs[i + 1], modes, σ; permuted, kwargs...)
+                     for i in 2:(C - 3)]...)
+
+    return FourierNeuralOperator(lifting, mapping, project)
+end
+
+function (fno::FourierNeuralOperator)(x::AbstractArray, ps, st::NamedTuple)
+    lift, st_lift = fno.lifting(x, ps.lifting, st.lifting)
+    mapping, st_mapping = fno.mapping(lift, ps.mapping, st.mapping)
+    project, st_project = fno.project(mapping, ps.project, st.project)
+    return project, (lifting=st_lift, mapping=st_mapping, project=st_project)
 end

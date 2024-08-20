@@ -14,7 +14,7 @@
         @testset "$(op) $(length(setup.m))D: permuted = $(setup.permuted)" for setup in setups,
             op in opconv
 
-            p = Lux.__unwrap_val(setup.permuted)
+            p = Lux.Utils.unwrap_val(setup.permuted)
             in_chs = ifelse(p, setup.x_size[end - 1], first(setup.x_size))
             out_chs = ifelse(p, setup.y_size[end - 1], first(setup.y_size))
             ch = 64 => out_chs
@@ -31,11 +31,10 @@
             @jet m(x, ps, st)
 
             data = [(x, aType(rand(rng, Float32, setup.y_size...)))]
-            broken = mode == "AMDGPU"
             @test begin
                 l2, l1 = train!(m, ps, st, data; epochs=10)
                 l2 < l1
-            end broken=broken
+            end
 
             __f = (x, ps) -> sum(abs2, first(m(x, ps, st)))
             test_gradients(__f, x, ps; atol=1.0f-3, rtol=1.0f-3,

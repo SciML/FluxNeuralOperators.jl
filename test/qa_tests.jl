@@ -1,8 +1,8 @@
 @testitem "doctests: Quality Assurance" tags=[:qa] begin
     using Documenter, NeuralOperators
 
-    DocMeta.setdocmeta!(
-        NeuralOperators, :DocTestSetup, :(using NeuralOperators, Random); recursive=true)
+    DocMeta.setdocmeta!(NeuralOperators, :DocTestSetup,
+        :(using Lux, NeuralOperators, Random); recursive=true)
     doctest(NeuralOperators; manual=false)
 end
 
@@ -14,7 +14,7 @@ end
 end
 
 @testitem "Explicit Imports: Quality Assurance" tags=[:qa] begin
-    using ExplicitImports
+    using ExplicitImports, Lux
 
     # Skip our own packages
     @test check_no_implicit_imports(NeuralOperators; skip=(Base, Core, Lux)) === nothing
