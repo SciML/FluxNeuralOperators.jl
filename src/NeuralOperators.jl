@@ -20,10 +20,12 @@ include("layers.jl")
 
 include("fno.jl")
 include("deeponet.jl")
+include("nomad.jl")
 
 export FourierTransform
 export SpectralConv, OperatorConv, SpectralKernel, OperatorKernel
 export FourierNeuralOperator
 export DeepONet
+export NOMAD
 
 end

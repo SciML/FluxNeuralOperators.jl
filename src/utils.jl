@@ -69,3 +69,34 @@ end
 
     return additional(b_ .* t_, params.ps, params.st) # p x u_size x N x nb => out_size x N x nb
 end
+
+@inline function __batch_vectorize(x::AbstractArray{T, N}) where {T, N}
+    dim_length = ndims(x) - 1
+    nb = size(x)[end]
+
+    slice = [Colon() for _ in 1:dim_length]
+    return reduce(hcat, [vec(view(x, slice..., i)) for i in 1:nb])
+end
+
+@inline function __merge(x::AbstractArray{T1, 2}, y::AbstractArray{T2, 2}) where {T1, T2}
+    return cat(x, y; dims=1)
+end
+
+@inline function __merge(
+        x::AbstractArray{T1, N1}, y::AbstractArray{T2, 2}) where {T1, T2, N1}
+    x_ = __batch_vectorize(x)
+    return vcat(x_, y)
+end
+
+@inline function __merge(
+        x::AbstractArray{T1, 2}, y::AbstractArray{T2, N2}) where {T1, T2, N2}
+    y_ = __batch_vectorize(y)
+    return vcat(x, y_)
+end
+
+@inline function __merge(
+        x::AbstractArray{T1, N1}, y::AbstractArray{T2, N2}) where {T1, T2, N1, N2}
+    x_ = __batch_vectorize(x)
+    y_ = __batch_vectorize(y)
+    return vcat(x_, y_)
+end
