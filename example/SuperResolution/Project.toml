@@ -24,7 +24,7 @@ NeuralOperators = "0.4"
 Plots = "1.36"
 Pluto = "0.19"
 ProgressMeter = "1.7"
-WaterLily = "0.2"
+WaterLily = "0.2, 1"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
