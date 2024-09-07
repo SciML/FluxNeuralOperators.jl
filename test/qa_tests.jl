@@ -22,6 +22,8 @@ end
     @test check_no_self_qualified_accesses(NeuralOperators) === nothing
     @test check_all_explicit_imports_via_owners(NeuralOperators) === nothing
     @test check_all_qualified_accesses_via_owners(NeuralOperators) === nothing
-    @test_broken check_all_explicit_imports_are_public(NeuralOperators) === nothing  # mostly upstream problems
-    @test_broken check_all_qualified_accesses_are_public(NeuralOperators) === nothing  # mostly upstream problems
+    if VERSION >= v"1.11-"
+        @test_broken check_all_explicit_imports_are_public(NeuralOperators) === nothing  # mostly upstream problems
+        @test_broken check_all_qualified_accesses_are_public(NeuralOperators) === nothing  # mostly upstream problems
+    end
 end

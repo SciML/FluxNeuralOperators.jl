@@ -12,24 +12,24 @@
 """
 abstract type AbstractTransform{T} end
 
-@inline Base.eltype(::Type{<:AbstractTransform{T}}) where {T} = T
+Base.eltype(::Type{<:AbstractTransform{T}}) where {T} = T
 
 # Fourier Transform
 @concrete struct FourierTransform{T} <: AbstractTransform{T}
     modes
 end
 
-@inline Base.ndims(T::FourierTransform) = length(T.modes)
+Base.ndims(T::FourierTransform) = length(T.modes)
 
-@inline transform(ft::FourierTransform, x::AbstractArray) = rfft(x, 1:ndims(ft))
+transform(ft::FourierTransform, x::AbstractArray) = rfft(x, 1:ndims(ft))
 
-@inline function low_pass(ft::FourierTransform, x_fft::AbstractArray)
+function low_pass(ft::FourierTransform, x_fft::AbstractArray)
     return view(x_fft, map(d -> 1:d, ft.modes)..., :, :)
 end
 
-@inline truncate_modes(ft::FourierTransform, x_fft::AbstractArray) = low_pass(ft, x_fft)
+truncate_modes(ft::FourierTransform, x_fft::AbstractArray) = low_pass(ft, x_fft)
 
-@inline function inverse(
+function inverse(
         ft::FourierTransform, x_fft::AbstractArray{T, N}, M::NTuple{N, Int64}) where {T, N}
     return real(irfft(x_fft, first(M), 1:ndims(ft)))
 end

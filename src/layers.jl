@@ -1,7 +1,7 @@
 """
-    OperatorConv(ch::Pair{<:Integer, <:Integer}, modes::NTuple{N, <:Integer},
-        ::Type{TR}; init_weight=glorot_uniform,
-        permuted::Val{perm}=Val(false)) where {N, TR <: AbstractTransform, perm}
+    OperatorConv(ch::Pair{<:Integer, <:Integer}, modes::Dims,
+        ::Type{<:AbstractTransform}; init_weight=glorot_uniform,
+        permuted=Val(false))
 
 ## Arguments
 
@@ -26,14 +26,13 @@ julia> OperatorConv(2 => 5, (16,), FourierTransform{ComplexF32}; permuted=Val(tr
 
 ```
 """
-@concrete struct OperatorConv{perm, T <: AbstractTransform} <: AbstractLuxLayer
+@concrete struct OperatorConv <: AbstractLuxLayer
+    perm <: StaticBool
     in_chs::Int
     out_chs::Int
     prod_modes::Int
-    tform::T
-
+    tform <: AbstractTransform
     init_weight
-
     name::String
 end
 
@@ -41,29 +40,30 @@ function LuxCore.initialparameters(rng::AbstractRNG, layer::OperatorConv)
     in_chs, out_chs = layer.in_chs, layer.out_chs
     scale = real(one(eltype(layer.tform))) / (in_chs * out_chs)
     return (;
-        weights=scale * layer.init_weight(
+        weight=scale * layer.init_weight(
             rng, eltype(layer.tform), out_chs, in_chs, layer.prod_modes))
 end
 
-@inline function LuxCore.parameterlength(layer::OperatorConv)
+function LuxCore.parameterlength(layer::OperatorConv)
     return layer.prod_modes * layer.in_chs * layer.out_chs
 end
 
-function OperatorConv(ch::Pair{<:Integer, <:Integer}, modes::NTuple{N, <:Integer},
-        ::Type{TR}; init_weight=glorot_uniform,
-        permuted::Val{perm}=Val(false)) where {N, TR <: AbstractTransform{<:Number}, perm}
-    name = "OperatorConv{$(string(nameof(TR)))}($(ch[1]) => $(ch[2]), $modes; permuted = $perm)"
-    return OperatorConv{perm}(ch..., prod(modes), TR(modes), init_weight, name)
+function OperatorConv(
+        ch::Pair{<:Integer, <:Integer}, modes::Dims, ::Type{TR}; init_weight=glorot_uniform,
+        permuted::BoolLike=False()) where {TR <: AbstractTransform{<:Number}}
+    name = "OperatorConv{$(string(nameof(TR)))}($(ch[1]) => $(ch[2]), $modes; \
+            permuted = $(dynamic(permuted)))"
+    return OperatorConv(static(permuted), ch..., prod(modes), TR(modes), init_weight, name)
 end
 
-function (conv::OperatorConv{true})(x::AbstractArray, ps, st)
-    return operator_conv(x, conv.tform, ps.weights), st
+function (conv::OperatorConv{True})(x::AbstractArray, ps, st)
+    return operator_conv(x, conv.tform, ps.weight), st
 end
 
-function (conv::OperatorConv{false})(x::AbstractArray, ps, st)
+function (conv::OperatorConv{False})(x::AbstractArray, ps, st)
     N = ndims(conv.tform)
     xᵀ = permutedims(x, (ntuple(i -> i + 1, N)..., 1, N + 2))
-    yᵀ = operator_conv(xᵀ, conv.tform, ps.weights)
+    yᵀ = operator_conv(xᵀ, conv.tform, ps.weight)
     y = permutedims(yᵀ, (N + 1, 1:N..., N + 2))
     return y, st
 end
@@ -87,9 +87,8 @@ SpectralConv(args...; kwargs...) = OperatorConv(
     args..., FourierTransform{ComplexF32}; kwargs...)
 
 """
-    OperatorKernel(ch::Pair{<:Integer, <:Integer}, modes::Dims{N}, transform::Type{TR},
-        act::A=identity; allow_fast_activation::Bool=false, permuted::Val{perm}=Val(false),
-        kwargs...) where {N, TR <: AbstractTransform, perm, A}
+    OperatorKernel(ch::Pair{<:Integer, <:Integer}, modes::Dims, transform::Type{TR},
+        act::A=identity; permuted=Val(false), kwargs...) where {TR <: AbstractTransform, A}
 
 ## Arguments
 
@@ -116,31 +115,18 @@ julia> OperatorKernel(2 => 5, (16,), FourierTransform{ComplexF64}; permuted=Val(
 
 ```
 """
-@concrete struct OperatorKernel <: AbstractLuxContainerLayer{(:lin, :conv)}
-    lin
-    conv
-    activation <: Function
+@concrete struct OperatorKernel <: AbstractLuxWrapperLayer{:layer}
+    layer
 end
 
 OperatorKernel(lin, conv) = OperatorKernel(lin, conv, identity)
 
 function OperatorKernel(
-        ch::Pair{<:Integer, <:Integer}, modes::Dims{N}, transform::Type{TR},
-        act::A=identity; allow_fast_activation::Bool=false, permuted::Val{perm}=Val(false),
-        kwargs...) where {N, TR <: AbstractTransform{<:Number}, perm, A}
-    act = allow_fast_activation ? NNlib.fast_act(act) : act
-    lin = perm ? Conv(map(_ -> 1, modes), ch) : Dense(ch)
+        ch::Pair{<:Integer, <:Integer}, modes::Dims, transform::Type{TR}, act=identity;
+        permuted::BoolLike=False(), kwargs...) where {TR <: AbstractTransform{<:Number}}
+    lin = known(static(permuted)) ? Conv(map(_ -> 1, modes), ch) : Dense(ch)
     conv = OperatorConv(ch, modes, transform; permuted, kwargs...)
-
-    return OperatorKernel(lin, conv, act)
-end
-
-function (op::OperatorKernel)(x::AbstractArray, ps, st::NamedTuple)
-    x_conv, st_conv = op.conv(x, ps.conv, st.conv)
-    x_lin, st_lin = op.lin(x, ps.lin, st.lin)
-
-    out = fast_activation!!(op.activation, x_conv .+ x_lin)
-    return out, (lin=st_lin, conv=st_conv)
+    return OperatorKernel(Parallel(Fix1(add_act, act), lin, conv))
 end
 
 """
@@ -158,7 +144,7 @@ julia> SpectralKernel(2 => 5, (16,); permuted=Val(true));
 
 ```
 """
-function SpectralKernel(ch::Pair{<:Integer, <:Integer}, modes::Dims{N},
-        act::A=identity; kwargs...) where {N, A}
+function SpectralKernel(
+        ch::Pair{<:Integer, <:Integer}, modes::Dims, act=identity; kwargs...)
     return OperatorKernel(ch, modes, FourierTransform{ComplexF32}, act; kwargs...)
 end

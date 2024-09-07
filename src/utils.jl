@@ -1,4 +1,4 @@
-@inline function __project(
+function __project(
         b::AbstractArray{T1, 2}, t::AbstractArray{T2, 3}, ::NoOpLayer, _) where {T1, T2}
     # b : p x nb
     # t : p x N x nb
@@ -6,7 +6,7 @@
     return dropdims(sum(b_ .* t; dims=1); dims=1), () # N x nb
 end
 
-@inline function __project(
+function __project(
         b::AbstractArray{T1, 3}, t::AbstractArray{T2, 3}, ::NoOpLayer, _) where {T1, T2}
     # b : p x u x nb
     # t : p x N x nb
@@ -17,7 +17,7 @@ end
     end
 end
 
-@inline function __project(
+function __project(
         b::AbstractArray{T1, N}, t::AbstractArray{T2, 3}, ::NoOpLayer, _) where {T1, T2, N}
     # b : p x u_size x nb
     # t : p x N x nb
@@ -32,7 +32,7 @@ end
     return dropdims(sum(b_ .* t_; dims=1); dims=1), () # u_size x N x nb
 end
 
-@inline function __project(b::AbstractArray{T1, 2}, t::AbstractArray{T2, 3},
+function __project(b::AbstractArray{T1, 2}, t::AbstractArray{T2, 3},
         additional::T, params) where {T1, T2, T}
     # b : p x nb
     # t : p x N x nb
@@ -40,7 +40,7 @@ end
     return additional(b_ .* t, params.ps, params.st) # p x N x nb => out_dims x N x nb
 end
 
-@inline function __project(b::AbstractArray{T1, 3}, t::AbstractArray{T2, 3},
+function __project(b::AbstractArray{T1, 3}, t::AbstractArray{T2, 3},
         additional::T, params) where {T1, T2, T}
     # b : p x u x nb
     # t : p x N x nb
@@ -55,7 +55,7 @@ end
     end
 end
 
-@inline function __project(b::AbstractArray{T1, N}, t::AbstractArray{T2, 3},
+function __project(b::AbstractArray{T1, N}, t::AbstractArray{T2, 3},
         additional::T, params) where {T1, T2, N, T}
     # b : p x u_size x nb
     # t : p x N x nb
@@ -70,7 +70,7 @@ end
     return additional(b_ .* t_, params.ps, params.st) # p x u_size x N x nb => out_size x N x nb
 end
 
-@inline function __batch_vectorize(x::AbstractArray{T, N}) where {T, N}
+function __batch_vectorize(x::AbstractArray{T, N}) where {T, N}
     dim_length = ndims(x) - 1
     nb = size(x)[end]
 
@@ -78,25 +78,35 @@ end
     return reduce(hcat, [vec(view(x, slice..., i)) for i in 1:nb])
 end
 
-@inline function __merge(x::AbstractArray{T1, 2}, y::AbstractArray{T2, 2}) where {T1, T2}
+function __merge(x::AbstractArray{T1, 2}, y::AbstractArray{T2, 2}) where {T1, T2}
     return cat(x, y; dims=1)
 end
 
-@inline function __merge(
-        x::AbstractArray{T1, N1}, y::AbstractArray{T2, 2}) where {T1, T2, N1}
+function __merge(x::AbstractArray{T1, N1}, y::AbstractArray{T2, 2}) where {T1, T2, N1}
     x_ = __batch_vectorize(x)
     return vcat(x_, y)
 end
 
-@inline function __merge(
-        x::AbstractArray{T1, 2}, y::AbstractArray{T2, N2}) where {T1, T2, N2}
+function __merge(x::AbstractArray{T1, 2}, y::AbstractArray{T2, N2}) where {T1, T2, N2}
     y_ = __batch_vectorize(y)
     return vcat(x, y_)
 end
 
-@inline function __merge(
-        x::AbstractArray{T1, N1}, y::AbstractArray{T2, N2}) where {T1, T2, N1, N2}
+function __merge(x::AbstractArray{T1, N1}, y::AbstractArray{T2, N2}) where {T1, T2, N1, N2}
     x_ = __batch_vectorize(x)
     y_ = __batch_vectorize(y)
     return vcat(x_, y_)
 end
+
+function add_act(act::F, x1, x2) where {F}
+    y = x1 .+ x2
+    act = NNlib.fast_act(act, y)
+    return fast_activation!!(act, y)
+end
+
+@concrete struct Fix1 <: Function
+    f
+    x
+end
+
+(f::Fix1)(args...) = f.f(f.x, args...)

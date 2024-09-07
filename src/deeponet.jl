@@ -11,8 +11,8 @@ nets output should have the same first dimension.
 
 ## Keyword Arguments
 
-  - `additional`: `Lux` network to pass the output of DeepONet, to include additional operations
-    for embeddings, defaults to `nothing`
+  - `additional`: `Lux` network to pass the output of DeepONet, to include additional
+    operations for embeddings, defaults to `nothing`
 
 ## References
 

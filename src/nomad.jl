@@ -40,13 +40,9 @@ julia> size(first(nomad((u, y), ps, st)))
 (8, 5)
 ```
 """
-@concrete struct NOMAD <: AbstractLuxContainerLayer{(:approximator, :decoder)}
-    approximator
-    decoder
-    concatenate <: Function
+@concrete struct NOMAD <: AbstractLuxWrapperLayer{:model}
+    model <: Chain
 end
-
-NOMAD(approximator, decoder) = NOMAD(approximator, decoder, __merge)
 
 """
     NOMAD(; approximator = (8, 32, 32, 16), decoder = (18, 16, 8, 8),
@@ -96,9 +92,6 @@ function NOMAD(; approximator=(8, 32, 32, 16), decoder=(18, 16, 8, 8),
     return NOMAD(approximator_net, decoder_net, concatenate)
 end
 
-function (nomad::NOMAD)(x, ps, st::NamedTuple)
-    a, st_a = nomad.approximator(x[1], ps.approximator, st.approximator)
-    out, st_d = nomad.decoder(nomad.concatenate(a, x[2]), ps.decoder, st.decoder)
-
-    return out, (approximator=st_a, decoder=st_d)
+function NOMAD(approximator, decoder, concatenate=__merge)
+    return NOMAD(Chain(Parallel(concatenate, approximator, NoOpLayer()), decoder))
 end

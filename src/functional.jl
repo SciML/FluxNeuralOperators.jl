@@ -1,5 +1,4 @@
-
-@inline function operator_conv(x, tform::AbstractTransform, weights)
+function operator_conv(x, tform::AbstractTransform, weights)
     x_t = transform(tform, x)
     x_tr = truncate_modes(tform, x_t)
     x_p = __apply_pattern(x_tr, weights)
@@ -7,7 +6,7 @@
     return inverse(tform, x_padded, size(x))
 end
 
-@inline function __apply_pattern(
+function __apply_pattern(
         x_tr::AbstractArray{T1, N}, weights::AbstractArray{T2, 3}) where {T1, T2, N}
     x_size = size(x_tr)
     x_flat = reshape(x_tr, :, x_size[N - 1], x_size[N])
@@ -18,16 +17,16 @@ end
     return reshape(x_weighted, x_size[1:(N - 2)]..., size(x_weighted)[2:3]...)
 end
 
-@inline __pad_modes(x, dims::Integer...) = __pad_modes(x, dims)
-@inline __pad_modes(x, dims::NTuple) = __pad_modes!(similar(x, dims), x)
+__pad_modes(x, dims::Integer...) = __pad_modes(x, dims)
+__pad_modes(x, dims::NTuple) = __pad_modes!(similar(x, dims), x)
 
-@inline function __pad_modes!(x_padded::AbstractArray, x::AbstractArray)
+function __pad_modes!(x_padded::AbstractArray, x::AbstractArray)
     fill!(x_padded, eltype(x)(0))
     x_padded[map(d -> 1:d, size(x))...] .= x
     return x_padded
 end
 
-@inline function CRC.rrule(::typeof(__pad_modes), x::AbstractArray, dims::NTuple)
+function CRC.rrule(::typeof(__pad_modes), x::AbstractArray, dims::NTuple)
     ∇pad_modes = let x = x
         ∂y -> (NoTangent(), view(∂y, map(Base.OneTo, size(x))...), NoTangent())
     end
