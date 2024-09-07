@@ -60,8 +60,8 @@ Constructs a DeepONet composed of Dense layers. Make sure the last node of `bran
   - `trunk`: Tuple of integers containing the number of nodes in each layer for trunk net
   - `branch_activation`: activation function for branch net
   - `trunk_activation`: activation function for trunk net
-  - `additional`: `Lux` network to pass the output of DeepONet, to include additional operations
-    for embeddings, defaults to `nothing`
+  - `additional`: `Lux` network to pass the output of DeepONet, to include additional
+    operations for embeddings, defaults to `nothing`
 
 ## References
 

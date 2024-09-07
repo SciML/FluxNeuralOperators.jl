@@ -14,7 +14,6 @@ abstract type AbstractTransform{T} end
 
 Base.eltype(::Type{<:AbstractTransform{T}}) where {T} = T
 
-# Fourier Transform
 @concrete struct FourierTransform{T} <: AbstractTransform{T}
     modes
 end

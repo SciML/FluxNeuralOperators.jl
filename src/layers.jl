@@ -83,8 +83,9 @@ julia> SpectralConv(2 => 5, (16,); permuted=Val(true));
 
 ```
 """
-SpectralConv(args...; kwargs...) = OperatorConv(
-    args..., FourierTransform{ComplexF32}; kwargs...)
+function SpectralConv(args...; kwargs...)
+    return OperatorConv(args..., FourierTransform{ComplexF32}; kwargs...)
+end
 
 """
     OperatorKernel(ch::Pair{<:Integer, <:Integer}, modes::Dims, transform::Type{TR},
@@ -122,9 +123,9 @@ end
 OperatorKernel(lin, conv) = OperatorKernel(lin, conv, identity)
 
 function OperatorKernel(
-        ch::Pair{<:Integer, <:Integer}, modes::Dims, transform::Type{TR}, act=identity;
-        permuted::BoolLike=False(), kwargs...) where {TR <: AbstractTransform{<:Number}}
-    lin = known(static(permuted)) ? Conv(map(_ -> 1, modes), ch) : Dense(ch)
+        ch::Pair{<:Integer, <:Integer}, modes::Dims{N}, transform::Type{TR}, act=identity;
+        permuted::BoolLike=False(), kwargs...) where {N, TR <: AbstractTransform{<:Number}}
+    lin = known(static(permuted)) ? Conv(ntuple(one, N), ch) : Dense(ch)
     conv = OperatorConv(ch, modes, transform; permuted, kwargs...)
     return OperatorKernel(Parallel(Fix1(add_act, act), lin, conv))
 end

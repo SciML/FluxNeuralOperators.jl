@@ -22,9 +22,9 @@ include("transform.jl")
 include("functional.jl")
 include("layers.jl")
 
-include("fno.jl")
-include("deeponet.jl")
-include("nomad.jl")
+include("models/fno.jl")
+include("models/deeponet.jl")
+include("models/nomad.jl")
 
 export FourierTransform
 export SpectralConv, OperatorConv, SpectralKernel, OperatorKernel

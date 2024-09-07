@@ -48,17 +48,20 @@ end
     NOMAD(; approximator = (8, 32, 32, 16), decoder = (18, 16, 8, 8),
         approximator_activation = identity, decoder_activation = identity)
 
-Constructs a NOMAD composed of Dense layers. Make sure that
-last node of `approximator` + coordinate length = first node of `decoder`
+Constructs a NOMAD composed of Dense layers. Make sure that last node of `approximator` +
+coordinate length = first node of `decoder`.
 
 ## Keyword arguments:
 
-  - `approximator`: Tuple of integers containing the number of nodes in each layer for approximator net
-  - `decoder`: Tuple of integers containing the number of nodes in each layer for decoder net
+  - `approximator`: Tuple of integers containing the number of nodes in each layer for
+    approximator net
+  - `decoder`: Tuple of integers containing the number of nodes in each layer for decoder
+    net
   - `approximator_activation`: activation function for approximator net
   - `decoder_activation`: activation function for decoder net
-  - `concatenate`: function that defines the concatenation of output from `approximator` and the coordinate
-    dimension, defaults to concatenation along first dimension after vectorizing the tensors
+  - `concatenate`: function that defines the concatenation of output from `approximator` and
+    the coordinate dimension, defaults to concatenation along first dimension after
+    vectorizing the tensors
 
 ## References
 
