@@ -1,8 +1,9 @@
 """
     NOMAD(approximator, decoder, concatenate)
 
-Constructs a NOMAD from `approximator` and `decoder` architectures. Make sure the output from
-`approximator` combined with the coordinate dimension has compatible size for input to `decoder`
+Constructs a NOMAD from `approximator` and `decoder` architectures. Make sure the output
+from `approximator` combined with the coordinate dimension has compatible size for input to
+`decoder`
 
 ## Arguments
 
@@ -11,8 +12,9 @@ Constructs a NOMAD from `approximator` and `decoder` architectures. Make sure th
 
 ## Keyword Arguments
 
-  - `concatenate`: function that defines the concatenation of output from `approximator` and the coordinate
-    dimension, defaults to concatenation along first dimension after vectorizing the tensors
+  - `concatenate`: function that defines the concatenation of output from `approximator` and
+    the coordinate dimension, defaults to concatenation along first dimension after
+    vectorizing the tensors
 
 ## References
 
@@ -38,7 +40,7 @@ julia> size(first(nomad((u, y), ps, st)))
 (8, 5)
 ```
 """
-@concrete struct NOMAD <: AbstractExplicitContainerLayer{(:approximator, :decoder)}
+@concrete struct NOMAD <: AbstractLuxContainerLayer{(:approximator, :decoder)}
     approximator
     decoder
     concatenate <: Function

@@ -1,7 +1,7 @@
 name = "NeuralOperators"
 uuid = "ea5c82af-86e5-48da-8ee1-382d6ad7af4b"
 authors = ["Avik Pal <avikpal@mit.edu>"]
-version = "1.0.0-DEV"
+version = "1.0.0"
 
 [deps]
 ArgCheck = "dce04be8-c92d-5529-be00-80e4d2c0e197"
@@ -20,9 +20,9 @@ ArgCheck = "2.3.0"
 ChainRulesCore = "1.24.0"
 ConcreteStructs = "0.2.3"
 FFTW = "1.8.0"
-Lux = "0.5.64"
-LuxCore = "0.1.24"
-LuxLib = "0.3.42"
+Lux = "1"
+LuxCore = "1"
+LuxLib = "1.2"
 NNlib = "0.9.21"
 Random = "1.10"
 WeightInitializers = "1"

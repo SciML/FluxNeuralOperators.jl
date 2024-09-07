@@ -39,7 +39,7 @@ julia> size(first(deeponet((u, y), ps, st)))
 (10, 5)
 ```
 """
-@concrete struct DeepONet <: AbstractExplicitContainerLayer{(:branch, :trunk, :additional)}
+@concrete struct DeepONet <: AbstractLuxContainerLayer{(:branch, :trunk, :additional)}
     branch
     trunk
     additional
@@ -102,9 +102,9 @@ function DeepONet(;
     return DeepONet(branch_net, trunk_net, additional)
 end
 
-function (deeponet::DeepONet)(x, ps, st::NamedTuple)
-    b, st_b = deeponet.branch(x[1], ps.branch, st.branch)
-    t, st_t = deeponet.trunk(x[2], ps.trunk, st.trunk)
+function (deeponet::DeepONet)((x1, x2), ps, st::NamedTuple)
+    b, st_b = deeponet.branch(x1, ps.branch, st.branch)
+    t, st_t = deeponet.trunk(x2, ps.trunk, st.trunk)
 
     @argcheck size(b, 1)==size(t, 1) "Branch and Trunk net must share the same amount of \
                                       nodes in the last layer. Otherwise Σᵢ bᵢⱼ tᵢₖ won't \

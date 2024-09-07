@@ -26,7 +26,7 @@ julia> OperatorConv(2 => 5, (16,), FourierTransform{ComplexF32}; permuted=Val(tr
 
 ```
 """
-@concrete struct OperatorConv{perm, T <: AbstractTransform} <: AbstractExplicitLayer
+@concrete struct OperatorConv{perm, T <: AbstractTransform} <: AbstractLuxLayer
     in_chs::Int
     out_chs::Int
     prod_modes::Int
@@ -116,7 +116,7 @@ julia> OperatorKernel(2 => 5, (16,), FourierTransform{ComplexF64}; permuted=Val(
 
 ```
 """
-@concrete struct OperatorKernel <: AbstractExplicitContainerLayer{(:lin, :conv)}
+@concrete struct OperatorKernel <: AbstractLuxContainerLayer{(:lin, :conv)}
     lin
     conv
     activation <: Function
@@ -124,7 +124,8 @@ end
 
 OperatorKernel(lin, conv) = OperatorKernel(lin, conv, identity)
 
-function OperatorKernel(ch::Pair{<:Integer, <:Integer}, modes::Dims{N}, transform::Type{TR},
+function OperatorKernel(
+        ch::Pair{<:Integer, <:Integer}, modes::Dims{N}, transform::Type{TR},
         act::A=identity; allow_fast_activation::Bool=false, permuted::Val{perm}=Val(false),
         kwargs...) where {N, TR <: AbstractTransform{<:Number}, perm, A}
     act = allow_fast_activation ? NNlib.fast_act(act) : act

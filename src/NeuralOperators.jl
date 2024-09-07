@@ -5,7 +5,7 @@ using ChainRulesCore: ChainRulesCore, NoTangent
 using ConcreteStructs: @concrete
 using FFTW: FFTW, irfft, rfft
 using Lux
-using LuxCore: LuxCore, AbstractExplicitLayer, AbstractExplicitContainerLayer
+using LuxCore: LuxCore, AbstractLuxLayer, AbstractLuxContainerLayer
 using LuxLib: batched_matmul
 using NNlib: NNlib, batched_adjoint
 using Random: Random, AbstractRNG

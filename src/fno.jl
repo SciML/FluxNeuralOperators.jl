@@ -38,7 +38,7 @@ julia> size(first(fno(u, ps, st)))
 ```
 """
 @concrete struct FourierNeuralOperator <:
-                 AbstractExplicitContainerLayer{(:lifting, :mapping, :project)}
+                 AbstractLuxContainerLayer{(:lifting, :mapping, :project)}
     lifting
     mapping
     project
