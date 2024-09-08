@@ -84,7 +84,8 @@ julia> size(first(nomad((u, y), ps, st)))
 ```
 """
 function NOMAD(; approximator=(8, 32, 32, 16), decoder=(18, 16, 8, 8),
-        approximator_activation=identity, decoder_activation=identity, concatenate=__merge)
+        approximator_activation=identity,
+        decoder_activation=identity, concatenate=nomad_concatenate)
     approximator_net = Chain([Dense(approximator[i] => approximator[i + 1],
                                   approximator_activation)
                               for i in 1:(length(approximator) - 1)]...)
@@ -95,6 +96,13 @@ function NOMAD(; approximator=(8, 32, 32, 16), decoder=(18, 16, 8, 8),
     return NOMAD(approximator_net, decoder_net, concatenate)
 end
 
-function NOMAD(approximator, decoder, concatenate=__merge)
+function NOMAD(approximator, decoder, concatenate=nomad_concatenate)
     return NOMAD(Chain(Parallel(concatenate, approximator, NoOpLayer()), decoder))
+end
+
+batch_vectorize(x::AbstractArray) = reshape(x, :, size(x, ndims(x)))
+
+nomad_concatenate(x::AbstractMatrix, y::AbstractMatrix) = vcat(x, y)
+function nomad_concatenate(x::AbstractArray, y::AbstractArray)
+    return nomad_concatenate(batch_vectorize(x), batch_vectorize(y))
 end

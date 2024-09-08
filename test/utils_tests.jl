@@ -1,5 +1,6 @@
 @testitem "utils" setup=[SharedTestSetup] begin
-    import NeuralOperators: __project, __merge, __batch_vectorize
+    import NeuralOperators: __project, nomad_concatenate, batch_vectorize
+
     @testset "BACKEND: $(mode)" for (mode, aType, dev, ongpu) in MODES
         rng = StableRNG(12345)
 
@@ -38,17 +39,17 @@
             (x_size=(4, 6, 5), y_size=(6, 5), out_size=(30, 5), name="Vector II"),
             (x_size=(4, 2, 3, 5), y_size=(2, 2, 3, 5), out_size=(36, 5), name="Tensor")]
 
-        @testset "merge $(setup.name)" for setup in setups
+        @testset "nomad_concatenate $(setup.name)" for setup in setups
             x_size = rand(Float32, setup.x_size...) |> aType
             y_size = rand(Float32, setup.y_size...) |> aType
 
-            @test setup.out_size == size(__merge(x_size, y_size))
+            @test setup.out_size == size(nomad_concatenate(x_size, y_size))
         end
 
         @testset "batch vectorize" begin
             x_size = (4, 2, 3)
             x = rand(Float32, x_size..., 5) |> aType
-            @test size(__batch_vectorize(x)) == (prod(x_size), 5)
+            @test size(batch_vectorize(x)) == (prod(x_size), 5)
         end
     end
 end
