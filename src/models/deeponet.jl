@@ -110,6 +110,56 @@ function (deeponet::DeepONet)((x1, x2), ps, st::NamedTuple)
                                       nodes in the last layer. Otherwise Σᵢ bᵢⱼ tᵢₖ won't \
                                       work."
 
-    out, st_a = __project(b, t, deeponet.additional, (; ps=ps.additional, st=st.additional))
-    return out, (branch=st_b, trunk=st_t, additional=st_a)
+    additional = deeponet.additional isa NoOpLayer ? nothing :
+                 StatefulLuxLayer{true}(deeponet.additional, ps.additional, st.additional)
+    out = deeponet_project(b, t, additional)
+
+    stₙ = merge((; branch=st_b, trunk=st_t),
+        deeponet.additional isa NoOpLayer ? (;) : additional.st)
+    return out, stₙ
+end
+
+function deeponet_project(
+        b::AbstractArray{T1, 2}, t::AbstractArray{T2, 3}, ::Nothing) where {T1, T2}
+    # b [p, nb], t [p, N, nb]
+    bᵣ = reshape(b, size(b, 1), 1, size(b, 2))
+    return dropdims(sum(bᵣ .* t; dims=1); dims=1) # [N, nb]
+end
+
+function deeponet_project(
+        b::AbstractArray{T1, 3}, t::AbstractArray{T2, 3}, ::Nothing) where {T1, T2}
+    # b [p, u, nb], t [p, N, nb]
+    return batched_matmul(batched_adjoint(b), t) # [u, N, b]
+end
+
+function deeponet_project(
+        b::AbstractArray{T1, N}, t::AbstractArray{T2, 3}, ::Nothing) where {T1, T2, N}
+    # b [p, u_size..., nb], t [p, N, nb]
+    bᵣ = reshape(b, size(b, 1), :, size(b, N))
+    return reshape(batched_matmul(batched_adjoint(bᵣ), t),
+        size(b)[2:(N - 1)]..., size(t, 2), size(b, N))
+end
+
+function deeponet_project(
+        b::AbstractArray{T1, 2}, t::AbstractArray{T2, 3}, additional) where {T1, T2}
+    # b [p, nb], t [p, N, nb]
+    bᵣ = reshape(b, size(b, 1), 1, size(b, 2))
+    return additional(bᵣ .* t) # [p, N, nb] => [out_dims, N, nb]
+end
+
+function deeponet_project(
+        b::AbstractArray{T1, 3}, t::AbstractArray{T2, 3}, additional) where {T1, T2}
+    # b [p, u, nb], t [p, N, nb]
+    bᵣ = reshape(b, size(b, 1), size(b, 2), 1, size(b, 3)) # [p, u, 1, nb]
+    tᵣ = reshape(t, size(t, 1), 1, size(t)[2:end]...)      # [p, 1, N, nb]
+    return additional(bᵣ .* tᵣ) # [p, u, N, nb] => [out_size, u, N, nb]
+end
+
+function deeponet_project(
+        b::AbstractArray{T1, N}, t::AbstractArray{T2, 3}, additional) where {T1, T2, N}
+    # b [p, u_size..., nb], t [p, N, nb]
+    bᵣ = reshape(b, size(b, 1), :, 1, size(b, N))          # [p, (u_size...), 1, nb]
+    tᵣ = reshape(t, size(t, 1), 1, size(t, 2), size(t, 3)) # [p, 1, N, nb]
+    bᵣtᵣ = reshape(bᵣ .* tᵣ, size(b, 1), size(b)[2:(N - 1)]..., size(t, 2), size(b, N))
+    return additional(bᵣtᵣ) # [p, u_size..., N, nb] => [out_size, u_size..., N, nb]
 end

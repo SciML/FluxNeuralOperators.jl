@@ -15,9 +15,8 @@ using NNlib: NNlib, batched_adjoint
 const BoolLike = Union{Bool, StaticBool, Val{true}, Val{false}}
 
 include("utils.jl")
-include("transform.jl")
 
-include("functional.jl")
+include("transform.jl")
 include("layers.jl")
 
 include("models/fno.jl")

@@ -102,7 +102,7 @@ end
 
 batch_vectorize(x::AbstractArray) = reshape(x, :, size(x, ndims(x)))
 
-nomad_concatenate(x::AbstractMatrix, y::AbstractMatrix) = vcat(x, y)
+nomad_concatenate(x::AbstractMatrix, y::AbstractMatrix) = cat(x, y; dims=1)
 function nomad_concatenate(x::AbstractArray, y::AbstractArray)
     return nomad_concatenate(batch_vectorize(x), batch_vectorize(y))
 end

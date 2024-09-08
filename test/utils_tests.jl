@@ -1,5 +1,5 @@
 @testitem "utils" setup=[SharedTestSetup] begin
-    import NeuralOperators: __project, nomad_concatenate, batch_vectorize
+    import NeuralOperators: deeponet_project, nomad_concatenate, batch_vectorize
 
     @testset "BACKEND: $(mode)" for (mode, aType, dev, ongpu) in MODES
         rng = StableRNG(12345)
@@ -15,7 +15,7 @@
                 out_size=(4, 3, 3, 10, 5), additional=NoOpLayer(), name="Tensor"),
             (b_size=(16, 5), t_size=(16, 10, 5), out_size=(4, 10, 5),
                 additional=Dense(16 => 4), name="additional : Scalar"),
-            (b_size=(16, 1, 5), t_size=(16, 10, 5), out_size=(4, 10, 5),
+            (b_size=(16, 1, 5), t_size=(16, 10, 5), out_size=(4, 1, 10, 5),
                 additional=Dense(16 => 4), name="additional : Scalar II"),
             (b_size=(16, 3, 5), t_size=(16, 10, 5), out_size=(4, 3, 10, 5),
                 additional=Dense(16 => 4), name="additional : Vector"),
@@ -28,10 +28,12 @@
             t = rand(Float32, setup.t_size...) |> aType
 
             ps, st = Lux.setup(rng, setup.additional) |> dev
-            @inferred first(__project(b, t, setup.additional, (; ps, st)))
-            @jet first(__project(b, t, setup.additional, (; ps, st)))
-            @test setup.out_size ==
-                  size(first(__project(b, t, setup.additional, (; ps, st))))
+            additional = setup.additional isa NoOpLayer ? nothing :
+                         StatefulLuxLayer{true}(setup.additional, ps, st)
+
+            @inferred deeponet_project(b, t, additional)
+            @jet deeponet_project(b, t, additional)
+            @test setup.out_size == size(deeponet_project(b, t, additional))
         end
 
         setups = [(x_size=(6, 5), y_size=(4, 5), out_size=(10, 5), name="Scalar"),

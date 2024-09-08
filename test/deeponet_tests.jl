@@ -29,7 +29,7 @@
             (u_size=(64, 5), y_size=(1, 10, 5), out_size=(4, 10, 5),
                 branch=(64, 32, 32, 16), trunk=(1, 8, 8, 16),
                 additional=Dense(16 => 4), name="Scalar"),
-            (u_size=(64, 1, 5), y_size=(1, 10, 5), out_size=(4, 10, 5),
+            (u_size=(64, 1, 5), y_size=(1, 10, 5), out_size=(4, 1, 10, 5),
                 branch=(64, 32, 32, 16), trunk=(1, 8, 8, 16),
                 additional=Dense(16 => 4), name="Scalar II"),
             (u_size=(64, 3, 5), y_size=(8, 10, 5), out_size=(4, 3, 10, 5),

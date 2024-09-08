@@ -68,6 +68,18 @@ function (conv::OperatorConv{False})(x::AbstractArray, ps, st)
     return y, st
 end
 
+function operator_conv(x, tform::AbstractTransform, weights)
+    x_t = transform(tform, x)
+    x_tr = truncate_modes(tform, x_t)
+    x_p = apply_pattern(x_tr, weights)
+
+    pad_dims = size(x_t)[1:(end - 2)] .- size(x_p)[1:(end - 2)]
+    x_padded = NNlib.pad_constant(x_p, expand_pad_dims(pad_dims), false;
+        dims=ntuple(identity, ndims(x_p) - 2))::typeof(x_p)
+
+    return inverse(tform, x_padded, size(x))
+end
+
 """
     SpectralConv(args...; kwargs...)
 
