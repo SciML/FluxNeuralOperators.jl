@@ -20,6 +20,8 @@ end
     x
 end
 
+Base.show(io::IO, f::Fix1) = print(io, "Fix1($(f.f), $(f.x))")
+
 (f::Fix1)(args...) = f.f(f.x, args...)
 
 function expand_pad_dims(pad_dims::Dims{N}) where {N}

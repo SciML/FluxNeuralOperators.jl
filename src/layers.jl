@@ -33,7 +33,11 @@ julia> OperatorConv(2 => 5, (16,), FourierTransform{ComplexF32}; permuted=Val(tr
     prod_modes::Int
     tform <: AbstractTransform
     init_weight
-    name::String
+end
+
+function Base.show(io::IO, layer::OperatorConv)
+    print(io, "OperatorConv($(layer.in_chs) => $(layer.out_chs), $(layer.tform.modes), \
+               $(printable_type(layer.tform)); permuted = $(layer.perm))")
 end
 
 function LuxCore.initialparameters(rng::AbstractRNG, layer::OperatorConv)
@@ -51,9 +55,7 @@ end
 function OperatorConv(
         ch::Pair{<:Integer, <:Integer}, modes::Dims, ::Type{TR}; init_weight=glorot_uniform,
         permuted::BoolLike=False()) where {TR <: AbstractTransform{<:Number}}
-    name = "OperatorConv{$(string(nameof(TR)))}($(ch[1]) => $(ch[2]), $modes; \
-            permuted = $(dynamic(permuted)))"
-    return OperatorConv(static(permuted), ch..., prod(modes), TR(modes), init_weight, name)
+    return OperatorConv(static(permuted), ch..., prod(modes), TR(modes), init_weight)
 end
 
 function (conv::OperatorConv{True})(x::AbstractArray, ps, st)

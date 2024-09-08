@@ -14,6 +14,8 @@ abstract type AbstractTransform{T} end
 
 Base.eltype(::Type{<:AbstractTransform{T}}) where {T} = T
 
+printable_type(T::AbstractTransform) = "$(nameof(typeof(T))){$(eltype(T))}"
+
 @concrete struct FourierTransform{T} <: AbstractTransform{T}
     modes
 end

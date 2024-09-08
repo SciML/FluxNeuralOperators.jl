@@ -5,7 +5,7 @@ using ChainRulesCore: @non_differentiable
 using ConcreteStructs: @concrete
 using FFTW: FFTW, irfft, rfft
 using Random: Random, AbstractRNG
-using Static: StaticBool, False, True, known, static, dynamic
+using Static: StaticBool, False, True, known, static
 
 using Lux
 using LuxCore: LuxCore, AbstractLuxLayer, AbstractLuxContainerLayer, AbstractLuxWrapperLayer
