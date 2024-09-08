@@ -17,10 +17,10 @@ Static = "aedffcd0-7271-4cad-89d0-dc628f76c6d3"
 WeightInitializers = "d49dbf32-c5c2-4618-8acc-27bb2598ef2d"
 
 [compat]
-ArgCheck = "2.3.0"
-ChainRulesCore = "1.24.0"
+ArgCheck = "2.3"
+ChainRulesCore = "1.24"
 ConcreteStructs = "0.2.3"
-FFTW = "1.8.0"
+FFTW = "1.8"
 Lux = "1"
 LuxCore = "1"
 LuxLib = "1.2"

@@ -110,3 +110,9 @@ end
 end
 
 (f::Fix1)(args...) = f.f(f.x, args...)
+
+function expand_pad_dims(pad_dims::Dims{N}) where {N}
+    return ntuple(i -> isodd(i) ? 0 : pad_dims[i ÷ 2], 2N)
+end
+
+@non_differentiable expand_pad_dims(::Any)
