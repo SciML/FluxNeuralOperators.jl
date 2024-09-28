@@ -21,7 +21,8 @@
                 additional=Dense(16 => 4), name="additional : Vector"),
             (b_size=(16, 4, 3, 3, 5), t_size=(16, 10, 5), out_size=(3, 4, 3, 4, 10, 5),
                 additional=Chain(Dense(16 => 4), ReshapeLayer((3, 4, 3, 4, 10))),
-                name="additional : Tensor")]
+                name="additional : Tensor")
+        ]
 
         @testset "project : $(setup.name)" for setup in setups
             b = rand(Float32, setup.b_size...) |> aType

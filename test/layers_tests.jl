@@ -9,7 +9,8 @@
             (; m=(10, 10), permuted=Val(false),
                 x_size=(1, 22, 22, 5), y_size=(64, 22, 22, 5)),
             (; m=(10, 10), permuted=Val(true),
-                x_size=(22, 22, 1, 5), y_size=(22, 22, 64, 5))]
+                x_size=(22, 22, 1, 5), y_size=(22, 22, 64, 5))
+        ]
 
         @testset "$(op) $(length(setup.m))D: permuted = $(setup.permuted)" for setup in setups,
             op in opconv
@@ -37,8 +38,11 @@
             end
 
             __f = (x, ps) -> sum(abs2, first(m(x, ps, st)))
-            test_gradients(__f, x, ps; atol=1.0f-3, rtol=1.0f-3,
-                skip_backends=[AutoEnzyme(), AutoTracker(), AutoReverseDiff()])
+            @test_gradients(__f, x,
+                ps;
+                atol=1.0f-3,
+                rtol=1.0f-3,
+                skip_backends=[AutoTracker(), AutoEnzyme(), AutoReverseDiff()])
         end
     end
 end

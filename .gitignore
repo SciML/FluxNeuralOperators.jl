@@ -1,4 +1,5 @@
 Manifest.toml
+Manifest-v*.toml
 .vscode
 wip
 examples

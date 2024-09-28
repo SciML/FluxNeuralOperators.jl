@@ -10,7 +10,8 @@
             (u_size=(64, 3, 5), y_size=(4, 10, 5), out_size=(3, 10, 5),
                 branch=(64, 32, 32, 16), trunk=(4, 8, 8, 16), name="Vector"),
             (u_size=(64, 4, 3, 3, 5), y_size=(4, 10, 5), out_size=(4, 3, 3, 10, 5),
-                branch=(64, 32, 32, 16), trunk=(4, 8, 8, 16), name="Tensor")]
+                branch=(64, 32, 32, 16), trunk=(4, 8, 8, 16), name="Tensor")
+        ]
 
         @testset "$(setup.name)" for setup in setups
             u = rand(Float32, setup.u_size...) |> aType
@@ -34,7 +35,8 @@
                 additional=Dense(16 => 4), name="Scalar II"),
             (u_size=(64, 3, 5), y_size=(8, 10, 5), out_size=(4, 3, 10, 5),
                 branch=(64, 32, 32, 16), trunk=(8, 8, 8, 16),
-                additional=Dense(16 => 4), name="Vector")]
+                additional=Dense(16 => 4), name="Vector")
+        ]
 
         @testset "Additional layer: $(setup.name)" for setup in setups
             u = rand(Float32, setup.u_size...) |> aType
@@ -50,16 +52,17 @@
             @test setup.out_size == size(pred)
 
             __f = (u, y, ps) -> sum(abs2, first(deeponet((u, y), ps, st)))
-            test_gradients(
-                __f, u, y, ps; atol=1.0f-3, rtol=1.0f-3, skip_backends=[AutoEnzyme()])
+            @test_gradients(__f, u, y, ps; atol=1.0f-3, rtol=1.0f-3)
         end
 
         @testset "Embedding layer mismatch" begin
             u = rand(Float32, 64, 5) |> aType
             y = rand(Float32, 1, 10, 5) |> aType
 
-            deeponet = DeepONet(Chain(Dense(64 => 32), Dense(32 => 32), Dense(32 => 20)),
-                Chain(Dense(1 => 8), Dense(8 => 8), Dense(8 => 16)))
+            deeponet = DeepONet(
+                Chain(Dense(64 => 32), Dense(32 => 32), Dense(32 => 20)),
+                Chain(Dense(1 => 8), Dense(8 => 8), Dense(8 => 16))
+            )
 
             ps, st = Lux.setup(rng, deeponet) |> dev
             @test_throws ArgumentError deeponet((u, y), ps, st)
