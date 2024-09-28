@@ -10,6 +10,11 @@
 [![ColPrac: Contributor's Guide on Collaborative Practices for Community Packages](https://img.shields.io/badge/ColPrac-Contributor%27s%20Guide-blueviolet)](https://github.com/SciML/ColPrac)
 [![SciML Code Style](https://img.shields.io/static/v1?label=code%20style&message=SciML&color=9558b2&labelColor=389826)](https://github.com/SciML/SciMLStyle)
 
+> [!warning]
+> This package isn't being maintained any longer. Checkout the new version of [NeuralOperators.jl](https://github.com/SciML/NeuralOperators.jl/)
+> built on top of Lux. While certain features might be missing in the new version, all implemented functionalities have been reworked
+> to ensure significantly better performance. Please direct any questions regarding Neural Operators to that repository.
+
 | **Ground Truth**                            | **Inferenced**                                     |
 |:-------------------------------------------:|:--------------------------------------------------:|
 | ![](example/FlowOverCircle/gallery/ans.gif) | ![](example/FlowOverCircle/gallery/inferenced.gif) |
